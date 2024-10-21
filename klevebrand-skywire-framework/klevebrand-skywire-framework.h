@@ -11,6 +11,9 @@ public:
     void start();
     void stop();
     static SoftwareSerial skywireSerialChannel;
+private:
+    bool isHologramApnSuccessfullyConfigured();
+    void configureHologramApn();
 };
 
 #endif // KLEVEBRAND_SKYWIRE_FRAMEWORK_H
