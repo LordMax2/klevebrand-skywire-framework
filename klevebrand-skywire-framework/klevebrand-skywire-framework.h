@@ -3,17 +3,14 @@
 
 #include <SoftwareSerial.h>
 
-#define SKYWIRE_RX_PIN 10
-#define SKYWIRE_TX_PIN 11
+#define SKYWIRE_RX_PIN 2
+#define SKYWIRE_TX_PIN 8
 
 class Skywire {
 public:
     void start();
-    void send();
     void stop();
-
-private:
-    static SoftwareSerial skywire;
+    static SoftwareSerial skywireSerialChannel;
 };
 
 #endif // KLEVEBRAND_SKYWIRE_FRAMEWORK_H

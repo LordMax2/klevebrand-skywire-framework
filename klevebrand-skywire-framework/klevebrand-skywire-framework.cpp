@@ -1,23 +1,18 @@
+#include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
-#include <Arduino.h>
-#include <SoftwareSerial.h>
+
+SoftwareSerial Skywire::skywireSerialChannel(SKYWIRE_RX_PIN, SKYWIRE_TX_PIN);
 
 void Skywire::start() {
-    Skywire::skywire = SoftwareSerial(SKYWIRE_RX_PIN, SKYWIRE_TX_PIN);
+    Serial.println("Starting skywire modem...");
 
-    delay(5000);
-
-    skywire.write("AT");
-
-    while(skywire.available()) {
-        String data = skywire.readString();
-    }
+    skywireSerialChannel.begin(115200);  
+    delay(1000);
+    skywireSerialChannel.println("ATE0\r");
+    delay(1000);
+    skywireSerialChannel.println("AT\r");
 }
 
-void Skywire::send() { 
-
-}
-
-void Skywire::stop() { 
-
+void Skywire::stop() {
+    
 }
