@@ -14,6 +14,12 @@ public:
 private:
     bool isHologramApnSuccessfullyConfigured();
     void configureHologramApn();
+    void disableEcho();
+    void sendAT();
+    String getIpAddress();
+    String getSignalStrengthAndQuality(); // Should not be of type string, should be something like tuple or class
+    bool isConnectedToNetwork();
+    String getConnectedNetworkProviderName();
 };
 
 #endif // KLEVEBRAND_SKYWIRE_FRAMEWORK_H
