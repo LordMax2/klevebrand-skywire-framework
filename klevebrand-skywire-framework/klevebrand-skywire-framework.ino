@@ -7,11 +7,18 @@ void setup() {
   Serial.begin(115200);
 
   skywire.start();
+
+  skywire.getAssignment();
 }
 
 void loop() {
-  if (skywire.skywireSerialChannel.available())
-    Serial.write(skywire.skywireSerialChannel.read());
-  if (Serial.available())
-    skywire.skywireSerialChannel.write(Serial.read()); 
+  
+  skywire.getAssignment();
+
+  delay(1000);
+
+  //if (skywire.skywireSerialChannel.available())
+  //  Serial.write(skywire.skywireSerialChannel.read());
+  //if (Serial.available())
+  //  skywire.skywireSerialChannel.write(Serial.read()); 
 }
