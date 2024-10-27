@@ -18,6 +18,7 @@ public:
     static String getConnectedNetworkProviderName();
     static bool waitForSkywireResponse(int millisecondsToWait, bool (*isResponseValid)(String));
     static void enableVerboseOutput();
+    static bool openSocketConnection(String ipAddress, int port);
 private:
     static void configureHologramApn();
     static bool isHologramApnSuccessfullyConfigured();
@@ -29,6 +30,7 @@ private:
     static void waitUntilConnectedToHomeNetwork();
     static void enablePacketDataProtocol();
     static bool responseOkSerialPrint(String responseContent);
+    static bool isOpenSocketConnectionResponseOk(String responseContent);
 };
 
 #endif // KLEVEBRAND_SKYWIRE_FRAMEWORK_H

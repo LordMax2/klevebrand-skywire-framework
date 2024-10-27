@@ -8,7 +8,7 @@ void Skywire::start() {
 
   skywireSerialChannel.begin(115200);
 
-  sendAT(); 
+  sendAT();
   disableEcho();
   enableVerboseOutput();
 
@@ -45,6 +45,20 @@ String Skywire::getConnectedNetworkProviderName() {
 void Skywire::enableVerboseOutput() {
   skywireSerialChannel.println("AT+CMEE=2\r");
   delay(BASE_DELAY);
+}
+
+bool Skywire::openSocketConnection(String ipAddress, int port) {
+  skywireSerialChannel.println("AT#SD=1,0," + String(port) + ",\"" + ipAddress + "\"\r");
+
+  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenConnectionResponseOk);
+}
+
+bool Skywire::isOpenSocketConnectionResponseOk(String responseContent) {
+  if (responseContent.indexOf("CONNECT") != -1) {
+    return true;
+  }
+
+  return false;
 }
 
 void Skywire::waitUntilConnectedToHomeNetwork() {
@@ -105,10 +119,10 @@ bool Skywire::isHologramApnSuccessfullyConfigured() {
 
 bool Skywire::isHologramApnSuccessfullyConfiguredResponseOk(String responseContent) {
   if (responseContent.indexOf("hologram") != -1) {
-        Serial.println("Hologram APN is configured.");
+    Serial.println("Hologram APN is configured.");
 
-        return true;
-      }
+    return true;
+  }
 
   return false;
 }
