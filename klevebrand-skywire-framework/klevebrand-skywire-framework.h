@@ -13,21 +13,21 @@ public:
     static void start();
     static void stop();
     static SoftwareSerial skywireSerialChannel;
+    static String getIpAddress();
+    static String getSignalStrengthAndQuality(); 
+    static String getConnectedNetworkProviderName();
+    static bool waitForSkywireResponse(int millisecondsToWait, bool (*isResponseValid)(String));
+    static void enableVerboseOutput();
 private:
     static void configureHologramApn();
     static bool isHologramApnSuccessfullyConfigured();
     static bool isHologramApnSuccessfullyConfiguredResponseOk(String responseContent);
     static void sendAT();
     static void disableEcho();
-    static String getIpAddress();
-    static String getSignalStrengthAndQuality(); 
     static bool isConnectedToNetwork();
-    static String getConnectedNetworkProviderName();
     static bool isConnectedToNetworkResponseOk(String responseContent);
     static void waitUntilConnectedToHomeNetwork();
-    static void enableVerboseOutput();
     static void enablePacketDataProtocol();
-    static bool waitForSkywireResponse(int millisecondsToWait, bool (*isResponseValid)(String));
     static bool responseOkSerialPrint(String responseContent);
 };
 
