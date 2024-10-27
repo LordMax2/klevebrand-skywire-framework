@@ -58,6 +58,8 @@ bool Skywire::isOpenSocketConnectionResponseOk(String responseContent) {
     return true;
   }
 
+  Serial.println("Failed to connect to socket, message: " + responseContent);
+
   return false;
 }
 

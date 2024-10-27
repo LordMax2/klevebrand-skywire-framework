@@ -10,7 +10,7 @@ SkywireTcpClient::SkywireTcpClient(String ipAddress, int port) {
 void SkywireTcpClient::open() {
   skywire.start();
 
-  //skywire.openSocketConnection(ipAddress, port);
+  skywire.openSocketConnection(ipAddress, port);
 }
 
 void SkywireTcpClient::send(String payload) {
