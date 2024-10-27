@@ -50,7 +50,7 @@ void Skywire::enableVerboseOutput() {
 bool Skywire::openSocketConnection(String ipAddress, int port) {
   skywireSerialChannel.println("AT#SD=1,0," + String(port) + ",\"" + ipAddress + "\"\r");
 
-  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenConnectionResponseOk);
+  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenSocketConnectionResponseOk);
 }
 
 bool Skywire::isOpenSocketConnectionResponseOk(String responseContent) {
