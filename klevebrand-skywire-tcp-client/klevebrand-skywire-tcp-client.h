@@ -6,9 +6,9 @@
 class SkywireTcpClient {
   public: 
     SkywireTcpClient(String ipAddress, int port);
-    void open();
-    void send(String payload);
-    void close();
+    bool open();
+    bool send(String message);
+    bool close();
     Skywire skywire;
   private: 
     String ipAddress;

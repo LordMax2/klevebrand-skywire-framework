@@ -7,16 +7,16 @@ SkywireTcpClient::SkywireTcpClient(String ipAddress, int port) {
   SkywireTcpClient::skywire = Skywire();
 }
 
-void SkywireTcpClient::open() {
+bool SkywireTcpClient::open() {
   skywire.start();
 
-  skywire.openSocketConnection(ipAddress, port);
+  return skywire.openSocketConnection(ipAddress, port);
 }
 
-void SkywireTcpClient::send(String payload) {
-
+bool SkywireTcpClient::send(String message) {
+  return skywire.sendMessageInSocketConnection(message);;
 }
 
-void SkywireTcpClient::close() {
-  
+bool SkywireTcpClient::close() {
+  return skywire.closeSocketConnection();
 }

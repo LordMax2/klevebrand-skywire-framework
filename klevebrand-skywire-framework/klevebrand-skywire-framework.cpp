@@ -24,7 +24,7 @@ void Skywire::start() {
 void Skywire::stop() {
 }
 
-void Skywire::sendAT() {
+void Skywire::sendAt() {
   skywireSerialChannel.println("AT\r");
   delay(BASE_DELAY);
 }
@@ -47,13 +47,13 @@ void Skywire::enableVerboseOutput() {
   delay(BASE_DELAY);
 }
 
-bool Skywire::openSocketConnection(String ipAddress, int port) {
+bool Skywire::openTcpSocketConnection(String ipAddress, int port) {
   skywireSerialChannel.println("AT#SD=1,0," + String(port) + ",\"" + ipAddress + "\"\r");
 
-  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenSocketConnectionResponseOk);
+  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenTcpSocketConnectionResponseOk);
 }
 
-bool Skywire::isOpenSocketConnectionResponseOk(String responseContent) {
+bool Skywire::isOpenTcpSocketConnectionResponseOk(String responseContent) {
   if (responseContent.indexOf("CONNECT") != -1) {
     return true;
   }
@@ -61,6 +61,26 @@ bool Skywire::isOpenSocketConnectionResponseOk(String responseContent) {
   Serial.println("Failed to connect to socket, message: " + responseContent);
 
   return false;
+}
+
+bool Skywire::sendMessageInTcpSocketConnection(String message) {
+  skywireSerialChannel.println("AT#SSEND=1");
+
+  delay(BASE_DELAY);
+
+  skywireSerialChannel.println(message);
+
+  delay(BASE_DELAY);
+  
+  skywireSerialChannel.println("AT#SRECV=1,1500");
+
+  return waitForSkywireResponse(5000, &responseOkSerialPrint);
+}
+
+bool Skywire::closeTcpSocketConnection() {
+  skywireSerialChannel.println("AT#SH=1");
+
+  return true;
 }
 
 void Skywire::waitUntilConnectedToHomeNetwork() {
