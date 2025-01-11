@@ -8,7 +8,7 @@ void Skywire::start() {
 
   skywireSerialChannel.begin(115200);
 
-  sendAT();
+  sendAt();
   disableEcho();
   enableVerboseOutput();
 

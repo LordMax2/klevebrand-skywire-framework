@@ -11,11 +11,11 @@
             "intelliSenseMode": "windows-msvc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\Users\\max.klevebrand\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\**",
-                "C:\\Users\\max.klevebrand\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\cores\\arduino\\**",
-                "C:\\Users\\max.klevebrand\\AppData\\Local\\Arduino15\\libraries\\**",
-                "C:\\Users\\max.klevebrand\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
-                "C:\\Users\\max.klevebrand\\AppData\\Local\\Arduino15\\**"
+                "C:\\Users\\maxkl\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\**",
+                "C:\\Users\\maxkl\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\cores\\arduino\\**",
+                "C:\\Users\\maxkl\\AppData\\Local\\Arduino15\\libraries\\**",
+                "C:\\Users\\maxkl\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
+                "C:\\Users\\maxkl\\AppData\\Local\\Arduino15\\**"
             ]
         }
     ],
