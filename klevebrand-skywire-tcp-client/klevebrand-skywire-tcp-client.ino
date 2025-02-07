@@ -1,3 +1,7 @@
+/*
+* This is a test sketch for development with a Skywire modem using an Arduino and the base Skywire framework abstraction.
+*/
+
 #include "klevebrand-skywire-tcp-client.h"
 
 SkywireTcpClient skywireTcpClient("x.x.x.x", 31300);
