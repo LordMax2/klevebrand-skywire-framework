@@ -8,7 +8,7 @@ void Skywire::start() {
 
   skywireSerialChannel.begin(115200);
 
-  sendAT();
+  sendAt();
   disableEcho();
   enableVerboseOutput();
 
@@ -22,6 +22,18 @@ void Skywire::start() {
 }
 
 void Skywire::stop() {
+}
+
+int Skywire::available() {
+  return skywireSerialChannel.available();
+}
+
+String Skywire::readString() {
+  return skywireSerialChannel.readString();
+}
+
+size_t Skywire::write(char *payload) {
+  return skywireSerialChannel.write(payload);
 }
 
 void Skywire::sendAt() {

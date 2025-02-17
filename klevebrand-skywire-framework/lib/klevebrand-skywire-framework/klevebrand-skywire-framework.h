@@ -29,6 +29,12 @@ public:
     */
     static void stop();
 
+    static int available();
+
+    static String readString();
+
+    static size_t write(char *payload);
+
     /*
     * Tries to get the current ip address of the modem.
     * If the modem is not connected to a network, and fails to start, this will just return 
