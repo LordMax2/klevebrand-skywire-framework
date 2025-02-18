@@ -9,12 +9,8 @@ void Skywire::start()
   Serial.println("Starting skywire modem...");
 
   skywireSerialChannel.begin(115200);
-  
-  closeAllTcpSocketConnection();
 
-  disablePacketDataProtocol();
-
-  reboot();
+  print("+++\r");
 
   delay(5000);
 
@@ -33,7 +29,7 @@ void Skywire::start()
 
 void Skywire::reboot()
 {
-  print("AT#ENHRST=1,0");
+  print("AT#ENHRST=1,0\r");
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
 }
 
@@ -91,6 +87,10 @@ int Skywire::openTcpSocketConnection(String ipAddress, int port)
 
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenTcpSocketConnectionResponseOk);
 
+  print("AT#SCFG=" + String(socketDialConnectionIdCounter) + ",1,0,0,100,100\r");
+  
+  waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
+
   return socketDialConnectionIdCounter;
 }
 
@@ -108,7 +108,7 @@ bool Skywire::isOpenTcpSocketConnectionResponseOk(String responseContent)
 
 bool Skywire::sendMessageInTcpSocketConnection(String message, int socketDialConnectionId)
 {
-  print("AT#SSEND=" + String(socketDialConnectionId));
+  print("AT#SSEND=" + String(socketDialConnectionId) + "\r");
 
   print(message);
 
@@ -117,7 +117,7 @@ bool Skywire::sendMessageInTcpSocketConnection(String message, int socketDialCon
 
 bool Skywire::closeTcpSocketConnection(int socketDialConnectionId)
 {
-  print("AT#SH=" + String(socketDialConnectionId));
+  print("AT#SH=" + String(socketDialConnectionId) + "\r");
 
   return true;
 }
@@ -125,7 +125,7 @@ bool Skywire::closeTcpSocketConnection(int socketDialConnectionId)
 bool Skywire::closeAllTcpSocketConnection()
 {
   for(int i = 0; i < 6; i++) {
-    print("AT#SH=" + String(i));
+    print("AT#SH=" + String(i) + "\r");
     waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
   }
   
