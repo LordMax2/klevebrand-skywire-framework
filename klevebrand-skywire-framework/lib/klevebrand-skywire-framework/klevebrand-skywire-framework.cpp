@@ -39,11 +39,11 @@ String Skywire::readString()
 
 size_t Skywire::print(String payload)
 {
-  if(DEBUG)
+  if (DEBUG)
     Serial.println(payload);
-    
+
   size_t result = skywireSerialChannel.print(payload);
-  
+
   delay(BASE_DELAY);
 
   return result;
@@ -75,7 +75,7 @@ void Skywire::enableVerboseOutput()
 
 int Skywire::openTcpSocketConnection(String ipAddress, int port)
 {
-  socketDialConnectionIdCounter++; 
+  socketDialConnectionIdCounter++;
 
   print("AT#SD= " + String(socketDialConnectionIdCounter) + ",0," + String(port) + ",\"" + ipAddress + "\"\r");
 
@@ -143,7 +143,7 @@ bool Skywire::isConnectedToNetworkResponseOk(String responseContent)
   if (responseContent.indexOf(",5") != -1 || responseContent.indexOf(",1") != -1)
   {
     Serial.println("Connected to network.");
-    
+
     return true;
   }
 

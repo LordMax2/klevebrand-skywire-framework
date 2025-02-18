@@ -3,19 +3,21 @@
 
 #include "klevebrand-skywire-framework.h"
 
-class SkywireTcpClient {
-  public: 
-    SkywireTcpClient(String ipAddress, int port);
-    bool open();
-    bool send(String message);
-    bool close();
-    int available();
-    String readString();
-    Skywire skywire;
-  private: 
-    String ipAddress;
-    int port;
-    int socketDialConnectionId;
+class SkywireTcpClient
+{
+public:
+  SkywireTcpClient(String ipAddress, int port);
+  bool open();
+  bool send(String message);
+  bool close();
+  int available();
+  String readString();
+  Skywire skywire;
+
+private:
+  String ipAddress;
+  int port;
+  int socketDialConnectionId;
 };
 
-#endif //KLEVEBRAND_SKYWIRE_TCP_CLIENT_H
+#endif // KLEVEBRAND_SKYWIRE_TCP_CLIENT_H

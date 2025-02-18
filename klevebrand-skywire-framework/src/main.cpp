@@ -13,10 +13,11 @@ void setup()
 
 void loop()
 {
-  if (skywireTcpClient.available()) {
+  if (skywireTcpClient.available())
+  {
     Serial.println(skywireTcpClient.readString());
   }
-  
+
   if (Serial.available())
   {
     Serial.println("Serial is available!");
