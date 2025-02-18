@@ -9,15 +9,17 @@ SkywireTcpClient::SkywireTcpClient(String ipAddress, int port) {
 bool SkywireTcpClient::open() {
   skywire.start();
 
-  return skywire.openTcpSocketConnection(ipAddress, port);
+  socketDialConnectionId = skywire.openTcpSocketConnection(ipAddress, port);
+
+  return socketDialConnectionId > 0;
 }
 
 bool SkywireTcpClient::send(String message) {
-  return skywire.sendMessageInTcpSocketConnection(message);;
+  return skywire.sendMessageInTcpSocketConnection(message, socketDialConnectionId);
 }
 
 bool SkywireTcpClient::close() {
-  return skywire.closeTcpSocketConnection();
+  return skywire.closeTcpSocketConnection(socketDialConnectionId);
 }
 
 int SkywireTcpClient::available() {
@@ -26,8 +28,4 @@ int SkywireTcpClient::available() {
 
 String SkywireTcpClient::readString() {
   return skywire.readString();
-}
-
-size_t SkywireTcpClient::write(char *payload) {
-  return skywire.write(payload);
 }

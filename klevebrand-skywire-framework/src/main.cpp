@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "../lib/klevebrand-skywire-framework/klevebrand-skywire-tcp-client/klevebrand-skywire-tcp-client.h"
+#include "../lib/klevebrand-skywire-framework/klevebrand-skywire-tcp-client.h"
 
 SkywireTcpClient skywireTcpClient("213.66.134.107", 31300);
 
@@ -19,13 +19,8 @@ void loop()
   
   if (Serial.available())
   {
-    String incoming = Serial.readString();
+    Serial.println("Serial is available!");
 
-    int incomingLength = incoming.length();
-    char buffer[incomingLength + 1];
-
-    incoming.toCharArray(buffer, incomingLength + 1);
-
-    skywireTcpClient.write(buffer);
+    skywireTcpClient.send(Serial.readString());
   }
 }

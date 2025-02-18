@@ -5,8 +5,11 @@
 
 #define SKYWIRE_RX_PIN 2
 #define SKYWIRE_TX_PIN 8
+
 #define BASE_DELAY 200
 #define BASE_WAIT_FOR_RESPONSE_DELAY 5000
+
+#define DEBUG true
 
 class Skywire {
 public:
@@ -33,7 +36,7 @@ public:
 
     static String readString();
 
-    static size_t write(char *payload);
+    static size_t print(String payload);
 
     /*
     * Tries to get the current ip address of the modem.
@@ -75,18 +78,18 @@ public:
     /*
     * Tries to open a TCP socket to the endpoint supplied in the parameters.
     */
-    static bool openTcpSocketConnection(String ipAddress, int port);
+    static int openTcpSocketConnection(String ipAddress, int port);
 
     /*
     * Tries to send a message in the open TCP socket. 
     * If the socket is down, it will try to re-open the socket and then try to send the message.
     */
-    static bool sendMessageInTcpSocketConnection(String message);
+    static bool sendMessageInTcpSocketConnection(String message, int socketDialConnectionId);
 
     /*
     * Tries to close the TCP channel.
     */
-    static bool closeTcpSocketConnection();
+    static bool closeTcpSocketConnection(int socketDialConnectionId);
 private:
     /*
     * Configures 'hologram' as APN, will verify the state of the modem and retry the 
@@ -111,6 +114,8 @@ private:
     * Can be used to do a 'connection check' or 'alive check'.
     */
     static void sendAt();
+
+    static void send(String payload);
 
     /*
     * Turns off echo on the Skywire modem. 
