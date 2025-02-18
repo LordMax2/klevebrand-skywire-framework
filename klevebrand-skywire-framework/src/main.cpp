@@ -2,7 +2,7 @@
 #include <SoftwareSerial.h>
 #include "../lib/klevebrand-skywire-framework/klevebrand-skywire-tcp-client.h"
 
-SkywireTcpClient skywireTcpClient("213.66.134.107", 31300);
+SkywireTcpClient skywireTcpClient("XXX.XXX.XXX.XXX", 0);
 
 void setup()
 {

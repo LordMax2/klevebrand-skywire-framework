@@ -31,7 +31,7 @@ public:
     /*
      * Shuts down the Skywire modem.
      */
-    static void stop();
+    static void reboot();
 
     static int available();
 
@@ -91,6 +91,11 @@ public:
      * Tries to close the TCP channel.
      */
     static bool closeTcpSocketConnection(int socketDialConnectionId);
+    
+    /*
+     * Tries to close all the TCP channels.
+     */
+    static bool closeAllTcpSocketConnection();
 
 private:
     /*
@@ -136,6 +141,7 @@ private:
     static bool isConnectedToNetworkResponseOk(String responseContent);
     static void waitUntilConnectedToHomeNetwork();
     static void enablePacketDataProtocol();
+    static void disablePacketDataProtocol();
     static bool responseOkSerialPrint(String responseContent);
     static bool isOpenTcpSocketConnectionResponseOk(String responseContent);
 };

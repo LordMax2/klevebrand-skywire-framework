@@ -9,6 +9,14 @@ void Skywire::start()
   Serial.println("Starting skywire modem...");
 
   skywireSerialChannel.begin(115200);
+  
+  closeAllTcpSocketConnection();
+
+  disablePacketDataProtocol();
+
+  reboot();
+
+  delay(5000);
 
   sendAt();
   disableEcho();
@@ -23,8 +31,10 @@ void Skywire::start()
   enablePacketDataProtocol();
 }
 
-void Skywire::stop()
+void Skywire::reboot()
 {
+  print("AT#ENHRST=1,0");
+  waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
 }
 
 int Skywire::available()
@@ -112,6 +122,16 @@ bool Skywire::closeTcpSocketConnection(int socketDialConnectionId)
   return true;
 }
 
+bool Skywire::closeAllTcpSocketConnection()
+{
+  for(int i = 0; i < 6; i++) {
+    print("AT#SH=" + String(i));
+    waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
+  }
+  
+  return true;
+}
+
 void Skywire::waitUntilConnectedToHomeNetwork()
 {
   while (!isConnectedToNetwork())
@@ -123,6 +143,13 @@ void Skywire::waitUntilConnectedToHomeNetwork()
 void Skywire::enablePacketDataProtocol()
 {
   print("AT#SGACT=1,1\r");
+
+  waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
+}
+
+void Skywire::disablePacketDataProtocol()
+{
+  print("AT#SGACT=1,0\r");
 
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
 }
@@ -181,7 +208,7 @@ bool Skywire::isHologramApnSuccessfullyConfigured()
 
 bool Skywire::isHologramApnSuccessfullyConfiguredResponseOk(String responseContent)
 {
-  if (responseContent.indexOf("hologram") != -1)
+  if (responseContent.indexOf("hologram") != -1 || responseContent.indexOf("context already activated") != -1)
   {
     Serial.println("Hologram APN is configured.");
 
@@ -207,7 +234,8 @@ bool Skywire::waitForSkywireResponse(int millisecondsToWait, bool (*isResponseCo
     if (skywireSerialChannel.available())
     {
       responseContent += skywireSerialChannel.readString();
-      Serial.println(responseContent);
+      if(DEBUG)
+        Serial.println("Received: " + responseContent);
 
       if (isResponseContentValid(responseContent))
       {
