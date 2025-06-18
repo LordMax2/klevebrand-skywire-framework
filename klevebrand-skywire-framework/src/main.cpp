@@ -1,27 +1,19 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "../lib/klevebrand-skywire-framework/klevebrand-skywire-tcp-client.h"
+#include "../lib/klevebrand-skywire-http-client/klevebrand-skywire-http-client.h"
 
-SkywireTcpClient skywireTcpClient("XXX.XXX.XXX.XXX", 0);
+SkywireHttpClient skywireHttpClient("flightcontroltower.klevebrand.se", 80);
 
 void setup()
 {
   Serial.begin(115200);
 
-  skywireTcpClient.open();
+  skywireHttpClient.skywire.start();
 }
 
 void loop()
 {
-  if (skywireTcpClient.available())
-  {
-    Serial.println(skywireTcpClient.readString());
-  }
+  skywireHttpClient.get("/api/v1/weather/coordinates?latitude=59.8586&longitude=17.6389");
 
-  if (Serial.available())
-  {
-    Serial.println("Serial is available!");
-
-    skywireTcpClient.send(Serial.readString());
-  }
+  delay(1000);
 }

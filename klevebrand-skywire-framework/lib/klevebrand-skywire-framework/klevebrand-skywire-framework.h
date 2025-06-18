@@ -3,10 +3,10 @@
 
 #include <SoftwareSerial.h>
 
-#define SKYWIRE_RX_PIN 2
-#define SKYWIRE_TX_PIN 8
+#define SKYWIRE_RX_PIN 0
+#define SKYWIRE_TX_PIN 1
 
-#define BASE_DELAY 200
+#define BASE_DELAY 50
 #define BASE_WAIT_FOR_RESPONSE_DELAY 5000
 
 #define DEBUG true
@@ -26,7 +26,7 @@ public:
      * The start method will try to configure and start the mode, and also verify the
      * configuration by verifying the state of the Skywire modem.
      */
-    static void start();
+    void start();
 
     /*
      * Shuts down the Skywire modem.
@@ -97,24 +97,16 @@ public:
      */
     static bool closeAllTcpSocketConnection();
 
+    /*
+    * Configures the modem for a base http url
+    */
+   static bool configureHttp(String base_url);
+
+   /*
+   * Queries the setup http base url
+   */
+  static String queryHttp(String query);
 private:
-    /*
-     * Configures 'hologram' as APN, will verify the state of the modem and retry the
-     * configuration until it is successful.
-     */
-    static void configureHologramApn();
-
-    /*
-     * Validates the configuration and checks if hologram is configured as an APN.
-     */
-    static bool isHologramApnSuccessfullyConfigured();
-
-    /*
-     * Validates the response of isHologramApnSuccessfullyConfigured to make sure
-     * that 'hologram' exists in any of the response messages from the Skywire modem.
-     */
-    static bool isHologramApnSuccessfullyConfiguredResponseOk(String responseContent);
-
     /*
      * Just sends a regular AT command to the Skywire modem, the modem should respond with
      * an 'OK' here.
@@ -130,16 +122,9 @@ private:
     static void disableEcho();
 
     /*
-     * Validates that the current state of the modem is connected to a network.
-     */
-    static bool isConnectedToNetwork();
-
-    /*
      * Validates the response of isConnectedToNetwork to make sure that we are connected to
      * a network.
      */
-    static bool isConnectedToNetworkResponseOk(String responseContent);
-    static void waitUntilConnectedToHomeNetwork();
     static void enablePacketDataProtocol();
     static void disablePacketDataProtocol();
     static bool responseOkSerialPrint(String responseContent);

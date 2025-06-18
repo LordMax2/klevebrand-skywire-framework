@@ -1,5 +1,7 @@
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
+#include "configure-hologram-command.h"
+#include "connect-to-network-command.h"
 
 SoftwareSerial Skywire::skywireSerialChannel(SKYWIRE_RX_PIN, SKYWIRE_TX_PIN);
 static int socketDialConnectionIdCounter = 1;
@@ -10,9 +12,7 @@ void Skywire::start()
 
   skywireSerialChannel.begin(115200);
 
-  print("+++\r");
-
-  delay(5000);
+  delay(500);
 
   sendAt();
   disableEcho();
@@ -20,9 +20,11 @@ void Skywire::start()
 
   Serial.println("Skywire modem started.");
 
-  configureHologramApn();
+  ConfigureHologramCommand configureHologramCommand;
+  configureHologramCommand.Execute(this); 
 
-  isConnectedToNetwork();
+  ConnectToNetworkCommand connectToNetworkCommand;
+  connectToNetworkCommand.Execute(this);
 
   enablePacketDataProtocol();
 }
@@ -88,7 +90,7 @@ int Skywire::openTcpSocketConnection(String ipAddress, int port)
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isOpenTcpSocketConnectionResponseOk);
 
   print("AT#SCFG=" + String(socketDialConnectionIdCounter) + ",1,0,0,100,100\r");
-  
+
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
 
   return socketDialConnectionIdCounter;
@@ -124,20 +126,13 @@ bool Skywire::closeTcpSocketConnection(int socketDialConnectionId)
 
 bool Skywire::closeAllTcpSocketConnection()
 {
-  for(int i = 0; i < 6; i++) {
+  for (int i = 0; i < 6; i++)
+  {
     print("AT#SH=" + String(i) + "\r");
     waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
   }
-  
-  return true;
-}
 
-void Skywire::waitUntilConnectedToHomeNetwork()
-{
-  while (!isConnectedToNetwork())
-  {
-    delay(1000);
-  }
+  return true;
 }
 
 void Skywire::enablePacketDataProtocol()
@@ -154,68 +149,24 @@ void Skywire::disablePacketDataProtocol()
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &responseOkSerialPrint);
 }
 
-bool Skywire::isConnectedToNetwork()
+bool Skywire::configureHttp(String base_url)
 {
-  Serial.println("Verifying network connection...");
+  Serial.println("Setting " + base_url + "as the HTTP base url...");
 
-  // Response format: +CEREG: 0,<stat> OK, verify that <stat> is either 1 or 5, otherwise failure
-  print("AT+CEREG?\r");
+  print("AT#HTTPCFG=0,\"" + String(base_url) + "\"\r");
 
-  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isConnectedToNetworkResponseOk);
+  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, responseOkSerialPrint);
 }
 
-bool Skywire::isConnectedToNetworkResponseOk(String responseContent)
+String Skywire::queryHttp(String query)
 {
-  // Response format: +CEREG: 0,<stat> OK, verify that <stat> is either 1 or 5, otherwise failure
-  if (responseContent.indexOf(",5") != -1 || responseContent.indexOf(",1") != -1)
-  {
-    Serial.println("Connected to network.");
+  Serial.println("Querying http...");
 
-    return true;
-  }
+  print("AT#HTTPQRY=0,0," + query + "\"\r");
 
-  return false;
-}
+ waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, responseOkSerialPrint);
 
-void Skywire::configureHologramApn()
-{
-  Serial.println("Configuring hologram.io as APN...");
-
-  String command = "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"\r";
-
-  print(command);
-
-  while (!isHologramApnSuccessfullyConfigured())
-  {
-    Serial.println("Failed to configure hologram.io as APN. Retrying in 1 second.");
-
-    print(command);
-
-    delay(1000);
-  }
-
-  Serial.println("Hologram set as APN.");
-}
-
-bool Skywire::isHologramApnSuccessfullyConfigured()
-{
-  Serial.println("Verifying hologram APN configuration...");
-
-  print("AT+CGDCONT?\r");
-
-  return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY, &isHologramApnSuccessfullyConfiguredResponseOk);
-}
-
-bool Skywire::isHologramApnSuccessfullyConfiguredResponseOk(String responseContent)
-{
-  if (responseContent.indexOf("hologram") != -1 || responseContent.indexOf("context already activated") != -1)
-  {
-    Serial.println("Hologram APN is configured.");
-
-    return true;
-  }
-
-  return false;
+  return "return just nu temp";
 }
 
 bool Skywire::responseOkSerialPrint(String responseContent)
@@ -234,7 +185,7 @@ bool Skywire::waitForSkywireResponse(int millisecondsToWait, bool (*isResponseCo
     if (skywireSerialChannel.available())
     {
       responseContent += skywireSerialChannel.readString();
-      if(DEBUG)
+      if (DEBUG)
         Serial.println("Received: " + responseContent);
 
       if (isResponseContentValid(responseContent))
