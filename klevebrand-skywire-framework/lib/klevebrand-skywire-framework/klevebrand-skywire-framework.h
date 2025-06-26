@@ -111,12 +111,6 @@ private:
     static bool isHologramApnSuccessfullyConfigured();
 
     /*
-     * Validates the response of isHologramApnSuccessfullyConfigured to make sure
-     * that 'hologram' exists in any of the response messages from the Skywire modem.
-     */
-    static bool isHologramApnSuccessfullyConfiguredResponseOk(String responseContent);
-
-    /*
      * Just sends a regular AT command to the Skywire modem, the modem should respond with
      * an 'OK' here.
      * Can be used to do a 'connection check' or 'alive check'.
@@ -139,11 +133,9 @@ private:
      * Validates the response of isConnectedToNetwork to make sure that we are connected to
      * a network.
      */
-    static bool isConnectedToNetworkResponseOk(String responseContent);
     static void waitUntilConnectedToHomeNetwork();
     static bool enablePacketDataProtocol();
     static bool disablePacketDataProtocol();
-    static bool isOpenTcpSocketConnectionResponseOk(String responseContent);
 };
 
 #endif // KLEVEBRAND_SKYWIRE_FRAMEWORK_H
