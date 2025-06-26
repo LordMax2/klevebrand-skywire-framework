@@ -1,18 +1,13 @@
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
 
-SoftwareSerial Skywire::skywireSerialChannel(SKYWIRE_RX_PIN, SKYWIRE_TX_PIN);
 static int socketDialConnectionIdCounter = 1;
 
 void Skywire::start()
 {
   Serial.println("Starting skywire modem...");
 
-  skywireSerialChannel.begin(115200);
-
-  print("+++\r");
-
-  delay(5000);
+  Serial3.begin(115200);
 
   sendAt();
   disableEcho();
@@ -35,12 +30,12 @@ void Skywire::reboot()
 
 int Skywire::available()
 {
-  return skywireSerialChannel.available();
+  return Serial3.available();
 }
 
 String Skywire::readString()
 {
-  return skywireSerialChannel.readString();
+  return Serial3.readString();
 }
 
 size_t Skywire::print(String payload)
@@ -48,7 +43,7 @@ size_t Skywire::print(String payload)
   if (DEBUG)
     Serial.println(payload);
 
-  size_t result = skywireSerialChannel.print(payload);
+  size_t result = Serial3.print(payload);
 
   delay(BASE_DELAY);
 
@@ -231,9 +226,9 @@ bool Skywire::waitForSkywireResponse(int millisecondsToWait, bool (*isResponseCo
 
   while (startMillis + millisecondsToWait > millis())
   {
-    if (skywireSerialChannel.available())
+    if (Serial3.available())
     {
-      responseContent += skywireSerialChannel.readString();
+      responseContent += Serial3.readString();
       if(DEBUG)
         Serial.println("Received: " + responseContent);
 
