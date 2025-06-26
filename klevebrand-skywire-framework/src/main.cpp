@@ -11,18 +11,21 @@ void setup()
 
 void loop()
 {
+  /*
   if (httpClient.skywire.available())
   {
     Serial.println(httpClient.skywire.readString());
   }
-
+  */
   if (Serial.available())
   {
     String string = Serial.readString();
 
     if (string == "http\r")
     {
-      httpClient.get("api/v1/weather/coordinates?latitude=59.8586&longitude=17.6389");
+      String json = httpClient.get("api/v1/weather/coordinates?latitude=59.8586&longitude=17.6389");
+
+      Serial.println(json);
     }
     else
     {

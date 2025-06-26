@@ -5,10 +5,7 @@ static int socketDialConnectionIdCounter = 1;
 
 void Skywire::start()
 {
-  if (!Serial3)
-  {
-    Serial3.begin(115200);
-  }
+  Serial3.begin(115200);
   Serial.println("STARTING SKYWIRE MODEM...");
 
   sendAt();
