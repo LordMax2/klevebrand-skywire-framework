@@ -8,6 +8,17 @@
 
 #define DEBUG true
 
+struct SkywireResponseResult_t
+{
+    SkywireResponseResult_t(bool is_success, String response_content)
+    {
+        this->is_success = is_success;
+        this->response_content = response_content;
+    }
+    bool is_success;
+    String response_content;
+};
+
 class Skywire
 {
 public:
@@ -58,13 +69,13 @@ public:
      * The maximum wait period for a valid message is the input parameter millisecondsToWait.
      * Otherwise it will return false.
      */
-    static bool waitForSkywireResponse(int millisecondsToWait, bool (*isResponseValid)(String));
+    static SkywireResponseResult_t waitForSkywireResponse(int millisecondsToWait);
 
     /*
      * Enables verbose output on the Skywire modem.
      * Can be helpful when debugging and during development.
      */
-    static void enableVerboseOutput();
+    static bool enableVerboseOutput();
 
     /*
      * Tries to open a TCP socket to the endpoint supplied in the parameters.
@@ -81,7 +92,7 @@ public:
      * Tries to close the TCP channel.
      */
     static bool closeTcpSocketConnection(int socketDialConnectionId);
-    
+
     /*
      * Tries to close all the TCP channels.
      */
@@ -92,7 +103,7 @@ private:
      * Configures 'hologram' as APN, will verify the state of the modem and retry the
      * configuration until it is successful.
      */
-    static void configureHologramApn();
+    static bool configureHologramApn();
 
     /*
      * Validates the configuration and checks if hologram is configured as an APN.
@@ -110,14 +121,14 @@ private:
      * an 'OK' here.
      * Can be used to do a 'connection check' or 'alive check'.
      */
-    static void sendAt();
+    static bool sendAt();
 
     static void send(String payload);
 
     /*
      * Turns off echo on the Skywire modem.
      */
-    static void disableEcho();
+    static bool disableEcho();
 
     /*
      * Validates that the current state of the modem is connected to a network.
@@ -130,9 +141,8 @@ private:
      */
     static bool isConnectedToNetworkResponseOk(String responseContent);
     static void waitUntilConnectedToHomeNetwork();
-    static void enablePacketDataProtocol();
-    static void disablePacketDataProtocol();
-    static bool responseOkSerialPrint(String responseContent);
+    static bool enablePacketDataProtocol();
+    static bool disablePacketDataProtocol();
     static bool isOpenTcpSocketConnectionResponseOk(String responseContent);
 };
 

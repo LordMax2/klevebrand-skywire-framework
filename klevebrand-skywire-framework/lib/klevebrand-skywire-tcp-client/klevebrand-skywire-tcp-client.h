@@ -1,7 +1,7 @@
 #ifndef KLEVEBRAND_SKYWIRE_TCP_CLIENT_H
 #define KLEVEBRAND_SKYWIRE_TCP_CLIENT_H
 
-#include "klevebrand-skywire-framework.h"
+#include "../klevebrand-skywire-framework/klevebrand-skywire-framework.h"
 
 class SkywireTcpClient
 {

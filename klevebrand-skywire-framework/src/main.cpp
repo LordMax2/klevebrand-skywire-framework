@@ -1,23 +1,19 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "../lib/klevebrand-skywire-framework/klevebrand-skywire-framework.h"
-#include "../lib/klevebrand-skywire-framework/klevebrand-skywire-http-client.h"
+#include "../lib/klevebrand-skywire-http-client/klevebrand-skywire-http-client.h"
 
-Skywire skywire;
 SkywireHttpClient httpClient("flightcontroltower.klevebrand.se", 80);
 
 void setup()
 {
   Serial.begin(115200);
-
-  skywire.start();
 }
 
 void loop()
 {
-  if (skywire.available())
+  if (httpClient.skywire.available())
   {
-    Serial.println(skywire.readString());
+    Serial.println(httpClient.skywire.readString());
   }
 
   if (Serial.available())
@@ -30,7 +26,7 @@ void loop()
     }
     else
     {
-      skywire.print(string);
+      httpClient.skywire.print(string);
     }
   }
 }
