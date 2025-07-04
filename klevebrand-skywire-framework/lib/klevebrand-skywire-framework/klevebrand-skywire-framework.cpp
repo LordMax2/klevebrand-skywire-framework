@@ -94,18 +94,6 @@ int Skywire::openTcpSocketConnection(String ipAddress, int port)
   return socketDialConnectionIdCounter;
 }
 
-bool Skywire::isOpenTcpSocketConnectionResponseOk(String responseContent)
-{
-  if (responseContent.indexOf("CONNECT") != -1)
-  {
-    return true;
-  }
-
-  Serial.println("FAILED TO CONNECT TO SOCKET, MESSAGE: " + responseContent);
-
-  return false;
-}
-
 bool Skywire::sendMessageInTcpSocketConnection(String message, int socketDialConnectionId)
 {
   print("AT#SSEND=" + String(socketDialConnectionId) + "\r");
