@@ -1,185 +1,167 @@
 #include "klevebrand-skywire-http-stepper-client.h"
 
+void SkywireHttpStepperClient::resetState()
+{
+	http_cfg_ok_recieved = false;
+	http_cfg_sent = false;
+	http_qry_ok_recieved = false;
+	http_qry_sent = false;
+	http_ring_recieved = false;
+	http_rcv_sent = false;
+
+	resetRxBuffer();
+}
+
+void SkywireHttpStepperClient::resetRxBuffer()
+{
+	rx_buffer = "";
+}
+
 bool SkywireHttpStepperClient::start()
 {
-    skywire.start();
+	skywire.start();
+	return true;
 }
 
 SkywireResponseResult_t SkywireHttpStepperClient::get(String path)
 {
-    if (!httpCfg())
-    {
-        SkywireResponseResult_t result(false, "");
+	if(!httpCfg()) {
+		return SkywireResponseResult_t(false, "");
+	} 
 
-        return result;
-    }
+	if(!httpQry(path)) {
+		return SkywireResponseResult_t(false, "");
+	}
 
-    if (!httpQry(path))
-    {
-        SkywireResponseResult_t result(false, "");
+	if(!httpRing()) {
+		return SkywireResponseResult_t(false ,"");
 
-        return result;
-    }
+	}
 
-    if (!httpRing())
-    {
-        SkywireResponseResult_t result(false, "");
+	if(!httpRcv()) {
+		return SkywireResponseResult_t(false, "");
+	}
 
-        return result;
-    }
 
-    if (!httpRcv())
-    {
-        SkywireResponseResult_t result(false, "");
+	serialReadToRxBuffer();
 
-        return result;
-    }
+	if(DEBUG) {
+		Serial.println(rx_buffer);
+	}
 
-    if (skywire.available())
-    {
-        String response_content = skywire.readString();
+	resetState();
 
-        SkywireResponseResult_t result(true, response_content);
-
-        http_cfg_ok_recieved = false;
-        http_cfg_sent = false;
-        http_qry_ok_recieved = false;
-        http_qry_sent = false;
-        http_ring_recieved = false;
-        http_rcv_ok_recieved = false;
-        http_rcv_sent = false;
-
-        return result;
-    }
-
-    SkywireResponseResult_t result(false, "");
-
-    return result;
+	return SkywireResponseResult_t(true, rx_buffer);
 }
 
 bool SkywireHttpStepperClient::httpCfg()
 {
-    if (!http_cfg_sent)
-    {
-        skywire.print("AT#HTTPCFG=0,\"" + base_url + "\"\r");
+	if (!http_cfg_sent)
+	{
+		skywire.print("AT#HTTPCFG=0,\"" + base_url + "\"\r");
 
-        http_cfg_sent = true;
+		http_cfg_sent = true;
 
-        return false;
-    }
+		return false;
+	}
 
-    if (http_cfg_sent && !http_cfg_ok_recieved)
-    {
-        if (Serial3.available())
-        {
-            String response = Serial3.readString();
+	serialReadToRxBuffer();
 
-            Serial.println("STEPPER CLIENT RECIEVED HTTPCFG OK");
+	if (http_cfg_sent && !http_cfg_ok_recieved)
+	{
+		http_cfg_ok_recieved = rx_buffer.indexOf("OK") >= 0;
 
-            http_cfg_ok_recieved = true;
+		if (http_cfg_ok_recieved)
+		{
+			if(DEBUG) {
+				Serial.println("STEPPER CLIENT RECEIVED HTTPCFG OK");
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    if (http_cfg_sent && http_cfg_ok_recieved)
-    {
-        return true;
-    }
-
-    return false;
+	return true;
 }
 
 bool SkywireHttpStepperClient::httpQry(String path)
 {
-    if (!http_qry_sent)
-    {
-        skywire.print("AT#HTTPQRY=0,0,\"/" + path + "\"\r");
+	if (!http_qry_sent)
+	{
+		if(DEBUG) {
+			Serial.println("Sending QRY");
+		}
 
-        http_qry_sent = true;
+		http_qry_sent = skywire.print("AT#HTTPQRY=0,0,\"/" + path + "\"\r");
 
-        return false;
-    }
+		return false;
+	}
 
-    if (http_qry_sent && !http_qry_ok_recieved)
-    {
-        if (Serial3.available())
-        {
-            String response = Serial3.readString();
+	serialReadToRxBuffer();
 
-            Serial.println("STEPPER CLIENT RECIEVED HTTPQRY OK");
+	if (!http_qry_ok_recieved)
+	{
+		http_qry_ok_recieved = rx_buffer.indexOf("OK\r") >= 0;
 
-            http_qry_ok_recieved = true;
+		if (http_qry_ok_recieved)
+		{
+			if(DEBUG) {
+				Serial.println("STEPPER CLIENT RECEIVED HTTPQRY OK");
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    if (http_qry_sent && http_qry_ok_recieved)
-    {
-        return true;
-    }
-
-    return false;
+	return true;
 }
 
 bool SkywireHttpStepperClient::httpRing()
 {
-    if (!http_ring_recieved)
-    {
-        if (Serial3.available())
-        {
-            String response = Serial3.readString();
+	serialReadToRxBuffer();
 
-            http_ring_recieved = response.indexOf("HTTPRING") > 0;
+	if (!http_ring_recieved)
+	{
+		
+		http_ring_recieved = rx_buffer.indexOf("HTTPRING") > 0;
 
-            if (http_ring_recieved)
-            {
-                Serial.println("STEPPER CLIENT RECIEVED HTTPRING OK");
+		if (http_ring_recieved)
+		{
+			if(DEBUG) {
+				Serial.println(rx_buffer);
+				Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK");
+			}
 
-                return true;
-            }
-        }
-    }
+			return true;
+		}
 
-    return false;
+		return false;
+	}
+
+	return true;
 }
 
-bool SkywireHttpStepperClient::httpQry(String path)
+bool SkywireHttpStepperClient::httpRcv()
 {
-    if (!http_rcv_sent)
-    {
-        skywire.print("AT#HTTPRCV=0");
+	if (!http_rcv_sent)
+	{
+		http_rcv_sent = skywire.print("AT#HTTPRCV=0\r");
 
-        http_qry_sent = true;
+		return false;
+	}
 
-        return false;
-    }
+	return true;
+}
 
-    if (http_qry_sent && !http_qry_ok_recieved)
-    {
-        if (Serial3.available())
-        {
-            String response = Serial3.readString();
-
-            Serial.println("STEPPER CLIENT RECIEVED HTTPQRY OK");
-
-            http_qry_ok_recieved = true;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    if (http_qry_sent && http_qry_ok_recieved)
-    {
-        return true;
-    }
-
-    return false;
+void SkywireHttpStepperClient::serialReadToRxBuffer()
+{
+	while (Serial3.available())
+	{
+		char c = Serial3.read();
+		rx_buffer += c;
+	}
 }

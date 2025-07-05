@@ -1,12 +1,12 @@
 #ifndef KLEVEBRAND_SKYWIRE_FRAMEWORK_H
 #define KLEVEBRAND_SKYWIRE_FRAMEWORK_H
 
-#include <SoftwareSerial.h>
-
 #define BASE_DELAY 200
 #define BASE_WAIT_FOR_RESPONSE_DELAY 5000
 
 #define DEBUG true
+
+#include "Arduino.h"
 
 struct SkywireResponseResult_t
 {
