@@ -24,7 +24,7 @@ String SkywireHttpClient::get(String path)
 
 bool SkywireHttpClient::prepareHttpClient()
 {
-    skywire.print("AT#HTTPCFG=0,\"" + baseUrl + "\"\r");
+    skywire.print("AT#HTTPCFG=0,\"" + _base_url + "\"\r");
 
     return skywire.waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY).is_success;
 }

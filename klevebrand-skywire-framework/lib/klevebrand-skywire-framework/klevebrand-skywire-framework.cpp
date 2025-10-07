@@ -1,11 +1,11 @@
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
 
-static int socketDialConnectionIdCounter = 1;
+static int socket_dial_connection_id_counter = 1;
 
 void Skywire::start()
 {
-  Serial3.begin(115200);
+  _skywire_serial.begin(115200);
   Serial.println("STARTING SKYWIRE MODEM...");
 
   sendAt();
@@ -29,12 +29,12 @@ void Skywire::reboot()
 
 int Skywire::available()
 {
-  return Serial3.available();
+  return _skywire_serial.available();
 }
 
 String Skywire::readString()
 {
-  return Serial3.readString();
+  return _skywire_serial.readString();
 }
 
 size_t Skywire::print(String payload)
@@ -42,7 +42,7 @@ size_t Skywire::print(String payload)
   if (DEBUG)
     Serial.println(payload);
 
-  size_t result = Serial3.print(payload);
+  size_t result = _skywire_serial.print(payload);
 
   delay(BASE_DELAY);
 
@@ -79,33 +79,33 @@ bool Skywire::enableVerboseOutput()
   return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY).is_success;
 }
 
-int Skywire::openTcpSocketConnection(String ipAddress, int port)
+int Skywire::openTcpSocketConnection(String ip_address, int port)
 {
-  socketDialConnectionIdCounter++;
+  socket_dial_connection_id_counter++;
 
-  print("AT#SD= " + String(socketDialConnectionIdCounter) + ",0," + String(port) + ",\"" + ipAddress + "\"\r");
-
-  waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
-
-  print("AT#SCFG=" + String(socketDialConnectionIdCounter) + ",1,0,0,100,100\r");
+  print("AT#SD= " + String(socket_dial_connection_id_counter) + ",0," + String(port) + ",\"" + ip_address + "\"\r");
 
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
 
-  return socketDialConnectionIdCounter;
+  print("AT#SCFG=" + String(socket_dial_connection_id_counter) + ",1,0,0,100,100\r");
+
+  waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return socket_dial_connection_id_counter;
 }
 
-bool Skywire::sendMessageInTcpSocketConnection(String message, int socketDialConnectionId)
+bool Skywire::sendMessageInTcpSocketConnection(String message, int socket_dial_connection_id)
 {
-  print("AT#SSEND=" + String(socketDialConnectionId) + "\r");
+  print("AT#SSEND=" + String(socket_dial_connection_id) + "\r");
 
   print(message);
 
   return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY).is_success;
 }
 
-bool Skywire::closeTcpSocketConnection(int socketDialConnectionId)
+bool Skywire::closeTcpSocketConnection(int socket_dial_connection_id)
 {
-  print("AT#SH=" + String(socketDialConnectionId) + "\r");
+  print("AT#SH=" + String(socket_dial_connection_id) + "\r");
 
   return true;
 }
@@ -207,20 +207,20 @@ bool Skywire::isHologramApnSuccessfullyConfigured()
   return false;
 }
 
-SkywireResponseResult_t Skywire::waitForSkywireResponse(int millisecondsToWait)
+SkywireResponseResult_t Skywire::waitForSkywireResponse(int milliseconds_to_wait)
 {
-  long startMillis = millis();
-  String responseContent = "";
+  long start_milliseconds = millis();
+  String response_content = "";
 
-  while (startMillis + millisecondsToWait > millis())
+  while (start_milliseconds + milliseconds_to_wait > millis())
   {
-    if (Serial3.available())
+    if (_skywire_serial.available())
     {
-      responseContent += Serial3.readString();
+      response_content += _skywire_serial.readString();
       if (DEBUG)
-        Serial.println("RECEIVED: " + responseContent);
+        Serial.println("RECEIVED: " + response_content);
 
-      SkywireResponseResult_t result(true, responseContent);
+      SkywireResponseResult_t result(true, response_content);
 
       return result;
     }

@@ -7,7 +7,7 @@
 class SkywireHttpStepperClient
 {
 public:
-	SkywireHttpStepperClient(String base_url, int port)
+	SkywireHttpStepperClient(HardwareSerial skywire_serial, String base_url, int port) : skywire(skywire_serial)
 	{
 		this->base_url = base_url;
 		this->port = port;

@@ -5,20 +5,20 @@
 
 //SkywireHttpClient httpClient("flightcontroltower.klevebrand.se", 80);
 
-SkywireHttpStepperClient stepperClient("flightcontroltower.klevebrand.se", 80);
+SkywireHttpStepperClient stepper_client(Serial3, "flightcontroltower.klevebrand.se", 80);
 
 void setup()
 {
 	Serial.begin(115200);
 
-	stepperClient.start();
+	stepper_client.start();
 }
 
 void loop()
 {
 	long start_micros = micros();
 
-	stepperClient.get("api/v1/drone/1337");
+	stepper_client.get("api/v1/drone/1337");
 
 	Serial.println(micros() - start_micros);
 
