@@ -1,29 +1,28 @@
 #include "klevebrand-skywire-tcp-client.h"
 
-SkywireTcpClient::SkywireTcpClient(String ipAddress, int port)
+SkywireTcpClient::SkywireTcpClient(HardwareSerial skywire_serial, String ip_address, int port) : skywire(skywire_serial)
 {
-  SkywireTcpClient::ipAddress = ipAddress;
+  SkywireTcpClient::ip_address = ip_address;
   SkywireTcpClient::port = port;
-  SkywireTcpClient::skywire = Skywire();
 }
 
 bool SkywireTcpClient::open()
 {
   skywire.start();
 
-  socketDialConnectionId = skywire.openTcpSocketConnection(ipAddress, port);
+  socket_dial_connection_id = skywire.openTcpSocketConnection(ip_address, port);
 
-  return socketDialConnectionId > 0;
+  return socket_dial_connection_id > 0;
 }
 
 bool SkywireTcpClient::send(String message)
 {
-  return skywire.sendMessageInTcpSocketConnection(message, socketDialConnectionId);
+  return skywire.sendMessageInTcpSocketConnection(message, socket_dial_connection_id);
 }
 
 bool SkywireTcpClient::close()
 {
-  return skywire.closeTcpSocketConnection(socketDialConnectionId);
+  return skywire.closeTcpSocketConnection(socket_dial_connection_id);
 }
 
 int SkywireTcpClient::available()

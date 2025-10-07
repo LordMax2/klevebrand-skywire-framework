@@ -88,12 +88,12 @@ public:
      * Tries to send a message in the open TCP socket.
      * If the socket is down, it will try to re-open the socket and then try to send the message.
      */
-    bool sendMessageInTcpSocketConnection(String message, int socketDialConnectionId);
+    bool sendMessageInTcpSocketConnection(String message, int socket_dial_connection_id);
 
     /*
      * Tries to close the TCP channel.
      */
-    bool closeTcpSocketConnection(int socketDialConnectionId);
+    bool closeTcpSocketConnection(int socket_dial_connection_id);
 
     /*
      * Tries to close all the TCP channels.

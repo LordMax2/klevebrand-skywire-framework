@@ -6,7 +6,7 @@
 class SkywireTcpClient
 {
 public:
-  SkywireTcpClient(String ipAddress, int port);
+  SkywireTcpClient(HardwareSerial skywire_serial, String ip_address, int port);
   bool open();
   bool send(String message);
   bool close();
@@ -15,9 +15,9 @@ public:
   Skywire skywire;
 
 private:
-  String ipAddress;
+  String ip_address;
   int port;
-  int socketDialConnectionId;
+  int socket_dial_connection_id;
 };
 
 #endif // KLEVEBRAND_SKYWIRE_TCP_CLIENT_H
