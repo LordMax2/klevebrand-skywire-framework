@@ -44,8 +44,6 @@ size_t Skywire::print(String payload)
 
   size_t result = _skywire_serial.print(payload);
 
-  delay(BASE_DELAY);
-
   return result;
 }
 
