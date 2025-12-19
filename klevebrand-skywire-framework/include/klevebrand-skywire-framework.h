@@ -40,6 +40,8 @@ public:
 
     String readString();
 
+    int read();
+
     size_t print(String payload);
 
     /*

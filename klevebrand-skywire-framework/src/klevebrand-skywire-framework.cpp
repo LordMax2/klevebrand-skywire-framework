@@ -37,6 +37,11 @@ String Skywire::readString()
   return _skywire_serial.readString();
 }
 
+int Skywire::read()
+{
+  return _skywire_serial.read();
+}
+
 size_t Skywire::print(String payload)
 {
   if (DEBUG)
