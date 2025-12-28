@@ -44,7 +44,7 @@ int Skywire::read()
 
 size_t Skywire::print(String payload)
 {
-  if (DEBUG)
+  if (_debug_mode)
     Serial.println(payload);
 
   size_t result = _skywire_serial.print(payload);
@@ -220,7 +220,7 @@ SkywireResponseResult_t Skywire::waitForSkywireResponse(int milliseconds_to_wait
     if (_skywire_serial.available())
     {
       response_content += _skywire_serial.readString();
-      if (DEBUG)
+      if (_debug_mode)
         Serial.println("RECEIVED: " + response_content);
 
       SkywireResponseResult_t result(true, response_content);

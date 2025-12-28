@@ -4,8 +4,6 @@
 #define BASE_DELAY 200
 #define BASE_WAIT_FOR_RESPONSE_DELAY 5000
 
-#define DEBUG true
-
 #include "Arduino.h"
 
 struct SkywireResponseResult_t
@@ -22,7 +20,7 @@ struct SkywireResponseResult_t
 class Skywire
 {
 public:
-    Skywire(HardwareSerial& skywire_serial) : _skywire_serial(skywire_serial) {}
+    Skywire(HardwareSerial& skywire_serial, bool debug_mode) : _skywire_serial(skywire_serial), _debug_mode(debug_mode) {}
 
     /*
      * Starts the Skywire modem and configures it currently with 'hologram' as APN.
@@ -104,6 +102,8 @@ public:
 
 private:
     HardwareSerial& _skywire_serial;
+
+    bool _debug_mode = false;
 
     /*
      * Configures 'hologram' as APN, will verify the state of the modem and retry the
