@@ -232,3 +232,86 @@ SkywireResponseResult_t Skywire::waitForSkywireResponse(int milliseconds_to_wait
   SkywireResponseResult_t result_failure(false, "NO RESPONSE FROM MODEM");
   return result_failure;
 }
+
+bool Skywire::httpConfigureParameters(String url, int port)
+{
+  print("AT#HTTPCFG=0,\"" + url + "\"\r");
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response.is_success;
+}
+
+bool Skywire::httpSendRequest(String path)
+{
+  print("AT#HTTPQRY=0,0,\"/" + path + "\"\r");
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response.is_success;
+}
+
+bool Skywire::httpWaitForHttpRing(int timeout_milliseconds)
+{
+  long start_milliseconds = millis();
+
+  while(true)
+  {
+    SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+    if (response.response_content.indexOf("HTTPRING") != -1)
+    {
+      return true;
+    }
+
+    if (start_milliseconds + timeout_milliseconds < millis())
+    {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+SkywireResponseResult_t Skywire::httpReadResponse()
+{
+  print("AT#HTTPRCV=0\r");
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response;
+}
+
+bool Skywire::enableGps()
+{
+  print("AT$GPSP=1\r");
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response.is_success;
+}
+
+SkywireResponseResult_t Skywire::getGpsData()
+{
+  print("AT$GPSACP\r");
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response;
+}
+
+bool Skywire::setGpsDataStreamingMode(bool enable_streaming)
+{
+  String command = "AT$GPSNMUN=";
+
+  if (enable_streaming)
+    command += "1\r";
+  else
+    command += "0\r";
+
+  print(command);
+
+  SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
+
+  return response.is_success;
+}

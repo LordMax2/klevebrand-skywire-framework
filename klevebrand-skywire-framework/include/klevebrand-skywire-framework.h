@@ -100,6 +100,20 @@ public:
      */
     bool closeAllTcpSocketConnection();
 
+    bool httpConfigureParameters(String url, int port);
+
+    bool httpSendRequest(String path);
+
+    bool httpWaitForHttpRing(int timeout_milliseconds);
+
+    SkywireResponseResult_t httpReadResponse();
+
+    bool enableGps();
+
+    SkywireResponseResult_t getGpsData();
+
+    bool setGpsDataStreamingMode(bool enable_streaming);
+
 private:
     HardwareSerial& _skywire_serial;
 
