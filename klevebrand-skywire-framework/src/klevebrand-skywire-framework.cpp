@@ -8,13 +8,21 @@ void Skywire::start()
   _skywire_serial.begin(115200);
   Serial.println("STARTING SKYWIRE MODEM...");
 
-  sendAt();
+  while(!sendAt())
+  {
+    Serial.println("NO RESPONSE FROM MODEM. RETRYING IN 1 SECOND...");
+    delay(1000);
+  }
   disableEcho();
   enableVerboseOutput();
 
   configureHologramApn();
 
-  isConnectedToNetwork();
+  while(!isConnectedToNetwork())
+  {
+    Serial.println("NOT CONNECTED TO NETWORK. RETRYING IN 1 SECOND...");
+    delay(1000);
+  }
 
   enablePacketDataProtocol();
 
