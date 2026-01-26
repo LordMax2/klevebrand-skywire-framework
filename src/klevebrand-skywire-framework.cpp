@@ -8,30 +8,31 @@ void Skywire::start()
   _skywire_serial.begin(115200);
   Serial.println("STARTING SKYWIRE MODEM...");
 
-  while(!sendAt())
+  while (!sendAt())
   {
     Serial.println("NO RESPONSE FROM MODEM. RETRYING IN 1 SECOND...");
     delay(1000);
   }
   disableEcho();
-  enableVerboseOutput();
+
+  if (_debug_mode)
+  {
+    setVerboseOutputLevel(2);
+  }
 
   configureHologramApn();
 
-  while(!isConnectedToNetwork())
-  {
-    Serial.println("NOT CONNECTED TO NETWORK. RETRYING IN 1 SECOND...");
-    delay(1000);
-  }
+  waitUntilConnectedToNetwork();
 
   enablePacketDataProtocol();
 
-  Serial.println("SKYWIRE MODEM STARTEd.");
+  Serial.println("SKYWIRE MODEM STARTED.");
 }
 
 void Skywire::reboot()
 {
   print("AT#ENHRST=1,0\r");
+
   waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
 }
 
@@ -82,10 +83,10 @@ String Skywire::getConnectedNetworkProviderName()
   print("AT+COPS?\r");
 }
 
-bool Skywire::enableVerboseOutput()
+bool Skywire::setVerboseOutputLevel(int level)
 {
   // CMEE 0 = disable, 1 numeric error values, 2 verbose error values
-  print("AT+CMEE=2\r");
+  print("AT+CMEE=" + String(level) + "\r");
 
   return waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY).is_success;
 }
@@ -132,7 +133,7 @@ bool Skywire::closeAllTcpSocketConnection()
   return true;
 }
 
-void Skywire::waitUntilConnectedToHomeNetwork()
+void Skywire::waitUntilConnectedToNetwork()
 {
   while (!isConnectedToNetwork())
   {
@@ -263,7 +264,7 @@ bool Skywire::httpWaitForHttpRing(int timeout_milliseconds)
 {
   long start_milliseconds = millis();
 
-  while(true)
+  while (true)
   {
     SkywireResponseResult_t response = waitForSkywireResponse(BASE_WAIT_FOR_RESPONSE_DELAY);
 

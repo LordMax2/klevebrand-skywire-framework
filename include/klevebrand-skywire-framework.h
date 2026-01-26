@@ -77,10 +77,11 @@ public:
      * Enables verbose output on the Skywire modem.
      * Can be helpful when debugging and during development.
      */
-    bool enableVerboseOutput();
+    bool setVerboseOutputLevel(int level);
 
     /*
      * Tries to open a TCP socket to the endpoint supplied in the parameters.
+     * Returns the socket dial connection id. 
      */
     int openTcpSocketConnection(String ipAddress, int port);
 
@@ -100,23 +101,52 @@ public:
      */
     bool closeAllTcpSocketConnection();
 
+    /*
+     * Configures the http parameters for the Skywire modem.
+     * For now, only the url and port is configurable, but here we can set headers etc. too.
+     */
     bool httpConfigureParameters(String url, int port);
 
+    /*
+     * Sends an HTTP request to the configured URL and port.
+     */
     bool httpSendRequest(String path);
 
+    /*
+     * Waits for an HTTP response ring from the Skywire modem.
+     * Which means that we have received an HTTP response from the server.
+     */
     bool httpWaitForHttpRing(int timeout_milliseconds);
 
+    /*
+     * Reads the HTTP response from the Skywire modem.
+     */
     SkywireResponseResult_t httpReadResponse();
 
+    /*
+     * Enable GPS and power up the appropriate things on the Skywire modem to make GPS work.
+     */
     bool enableGps();
 
+    /*
+     * Sends GPSACP command to get GPS data from the Skywire modem.
+     */
     SkywireResponseResult_t getGpsData();
 
+    /*
+     * If this is enabled, the serial output will get spammed with GPS data.
+     */
     bool setGpsDataStreamingMode(bool enable_streaming);
 
 private:
+    /*
+     * Reference to the serial instance used to communicate with the Skywire modem.
+     */
     HardwareSerial& _skywire_serial;
 
+    /*
+     * If debug mode is enabled, the Skywire class will print debug information to Serial.
+     */
     bool _debug_mode = false;
 
     /*
@@ -153,7 +183,7 @@ private:
      * Validates the response of isConnectedToNetwork to make sure that we are connected to
      * a network.
      */
-    void waitUntilConnectedToHomeNetwork();
+    void waitUntilConnectedToNetwork();
     bool enablePacketDataProtocol();
     bool disablePacketDataProtocol();
 };
