@@ -1,0 +1,33 @@
+#ifndef SKYWIRE_HTTP_STEPPER_CLIENT_STEP_H
+#define SKYWIRE_HTTP_STEPPER_CLIENT_STEP_H
+
+#include "Arduino.h"
+#include "klevebrand-skywire-framework.h"
+
+class SkywireHttpStepperClientStep
+{
+public:
+	SkywireHttpStepperClientStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
+
+	bool completed();
+	virtual SkywireResponseResult_t process();
+	void resetState();
+
+	Skywire &skywire;
+	String command;
+	bool debug_mode;
+
+	void (*on_completed_function)(String result_content);
+
+	bool sent = false;
+	unsigned long sent_timestamp = 0;
+	bool ok_recieved = false;
+	bool on_completed_called = false;
+
+	String rx_buffer = "";
+
+	void serialReadToRxBuffer();
+	void resetRxBuffer();
+};
+
+#endif // SKYWIRE_HTTP_STEPPER_CLIENT_STEP_H

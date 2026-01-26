@@ -219,7 +219,7 @@ bool Skywire::isHologramApnSuccessfullyConfigured()
   return false;
 }
 
-SkywireResponseResult_t Skywire::waitForSkywireResponse(int milliseconds_to_wait)
+SkywireResponseResult_t Skywire::waitForSkywireResponse(unsigned long milliseconds_to_wait)
 {
   long start_milliseconds = millis();
   String response_content = "";
@@ -260,7 +260,7 @@ bool Skywire::httpSendRequest(String path)
   return response.is_success;
 }
 
-bool Skywire::httpWaitForHttpRing(int timeout_milliseconds)
+bool Skywire::httpWaitForHttpRing(unsigned long timeout_milliseconds)
 {
   long start_milliseconds = millis();
 

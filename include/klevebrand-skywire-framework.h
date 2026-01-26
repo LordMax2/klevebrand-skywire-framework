@@ -71,7 +71,7 @@ public:
      * The maximum wait period for a valid message is the input parameter millisecondsToWait.
      * Otherwise it will return false.
      */
-    SkywireResponseResult_t waitForSkywireResponse(int millisecondsToWait);
+    SkywireResponseResult_t waitForSkywireResponse(unsigned long millisecondsToWait);
 
     /*
      * Enables verbose output on the Skywire modem.
@@ -116,7 +116,7 @@ public:
      * Waits for an HTTP response ring from the Skywire modem.
      * Which means that we have received an HTTP response from the server.
      */
-    bool httpWaitForHttpRing(int timeout_milliseconds);
+    bool httpWaitForHttpRing(unsigned long timeout_milliseconds);
 
     /*
      * Reads the HTTP response from the Skywire modem.
