@@ -8,7 +8,7 @@
 class SkywireStepWorker 
 {
 public:
-    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, SkywireStep** steps, int step_count) : 
+    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, int step_count) : 
         step_count(step_count),
         skywire(skywire_serial, debug_mode) {} 
 
