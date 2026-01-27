@@ -1,5 +1,5 @@
-#ifndef KLEVEBRAND_SKYWIRE_HTTP_STEPPER_CLIENT_H
-#define KLEVEBRAND_SKYWIRE_HTTP_STEPPER_CLIENT_H
+#ifndef KLEVEBRAND_SKYWIRE_STEP_WORKER_H
+#define KLEVEBRAND_SKYWIRE_STEP_WORKER_H
 
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
@@ -8,6 +8,10 @@
 class SkywireStepWorker 
 {
 public:
+    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, SkywireStep** steps, int step_count) : 
+        step_count(step_count),
+        skywire(skywire_serial, debug_mode) {} 
+
 	bool start();
 	void run();
 	void resetState();
@@ -19,4 +23,4 @@ public:
 	SkywireStep **steps;
 };
 
-#endif // KLEVEBRAND_SKYWIRE_HTTP_STEPPER_CLIENT_H
+#endif // KLEVEBRAND_SKYWIRE_STEP_WORKER_H
