@@ -4,15 +4,15 @@ void SkywireStepWorker::resetState()
 {
 	for (int i = 0; i < step_count; i++)
 	{
-		_steps[i]->resetState();
+		steps[i]->resetState();
 	}
 }
 
 bool SkywireStepWorker::start()
 {
-	_skywire.start();
+	skywire.start();
 
-	_skywire.enableGps();
+	skywire.enableGps();
 
 	return true;
 }
@@ -21,7 +21,7 @@ void SkywireStepWorker::run()
 {
 	for (int i = 0; i < step_count; i++)
 	{
-		SkywireResponseResult_t step_result = _steps[i]->process();
+		SkywireResponseResult_t step_result = steps[i]->process();
 
 		if (!step_result.is_success)
 		{
@@ -33,7 +33,7 @@ void SkywireStepWorker::run()
 
 	for (int i = 0; i < step_count; i++)
 	{
-		if (!_steps[i]->completed())
+		if (!steps[i]->completed())
 		{
 			all_completed = false;
 			break;

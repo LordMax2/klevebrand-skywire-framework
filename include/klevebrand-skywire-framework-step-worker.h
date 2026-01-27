@@ -14,10 +14,9 @@ public:
 
     int step_count = 0;
 
-private:
-	Skywire _skywire;
+	Skywire skywire;
 
-	SkywireStep **_steps;
+	SkywireStep **steps;
 };
 
 #endif // KLEVEBRAND_SKYWIRE_HTTP_STEPPER_CLIENT_H
