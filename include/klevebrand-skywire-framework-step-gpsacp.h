@@ -3,12 +3,12 @@
 
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
-#include "klevebrand-skywire-http-stepper-client-step.h"
+#include "klevebrand-skywire-framework-step.h"
 
-class GpsAcp : public SkywireHttpStepperClientStep
+class GpsAcpSkywireStep : public SkywireStep
 {
 public:
-    GpsAcp(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String result_content)) : SkywireHttpStepperClientStep(skywire, "", debug_mode, on_completed_function) {}
+    GpsAcpSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
     SkywireResponseResult_t process() override
     {
         if (completed())
@@ -27,9 +27,7 @@ public:
 
         serialReadToRxBuffer();
 
-        ok_recieved = rx_buffer.indexOf("\r\n") != -1 && !skywire.available() && rx_buffer.indexOf("OK") != -1;
-
-        if (debug_mode && ok_recieved)
+        if (debug_mode && okReceived())
         {
             Serial.println(rx_buffer);
             Serial.println("STEPPER CLIENT RECEIVED GPSACP");

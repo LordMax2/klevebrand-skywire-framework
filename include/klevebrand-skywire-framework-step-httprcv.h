@@ -3,12 +3,12 @@
 
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
-#include "klevebrand-skywire-http-stepper-client-step.h"
+#include "klevebrand-skywire-framework-step.h"
 
-class HttpRcv : public SkywireHttpStepperClientStep
+class HttpRcvSkywireStep : public SkywireStep
 {
 public:
-    HttpRcv(Skywire &skywire, bool debug_mode, void (*on_oompleted_function)(String result_content)) : SkywireHttpStepperClientStep(skywire, "AT#HTTPRCV=0", debug_mode, on_oompleted_function) {}
+    HttpRcvSkywireStep(Skywire &skywire, bool debug_mode, void (*on_oompleted_function)(String result_content)) : SkywireStep(skywire, "", debug_mode, on_oompleted_function) {}
     SkywireResponseResult_t process() override
     {
 		if(completed())
@@ -36,9 +36,7 @@ public:
 
         serialReadToRxBuffer();
 
-        ok_recieved = rx_buffer.indexOf("\r\n") != -1 && !skywire.available() && rx_buffer.indexOf("OK") != -1;
-
-        if (debug_mode && ok_recieved)
+        if (debug_mode && okReceived())
         {
             Serial.println(rx_buffer);
             Serial.println("STEPPER CLIENT RECEIVED HTTPRCV CONTENT");

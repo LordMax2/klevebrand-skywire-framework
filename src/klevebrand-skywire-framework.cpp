@@ -81,6 +81,8 @@ String Skywire::getConnectedNetworkProviderName()
 
   // Response format: +COPS: <mode>[,<format>[,<oper>][,<Act>]]
   print("AT+COPS?\r");
+
+  return "PLACEHOLDER";
 }
 
 bool Skywire::setVerboseOutputLevel(int level)

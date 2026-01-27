@@ -4,14 +4,14 @@
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
 
-class SkywireHttpStepperClientStep
+class SkywireStep
 {
 public:
-	SkywireHttpStepperClientStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
+	SkywireStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
 
-	bool completed();
+	virtual bool completed();
 	virtual SkywireResponseResult_t process();
-	void resetState();
+	virtual bool okReceived();
 
 	Skywire &skywire;
 	String command;
@@ -21,13 +21,13 @@ public:
 
 	bool sent = false;
 	unsigned long sent_timestamp = 0;
-	bool ok_recieved = false;
 	bool on_completed_called = false;
 
 	String rx_buffer = "";
 
 	void serialReadToRxBuffer();
 	void resetRxBuffer();
+	void resetState();
 };
 
 #endif // SKYWIRE_HTTP_STEPPER_CLIENT_STEP_H

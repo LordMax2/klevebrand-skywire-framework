@@ -1,6 +1,6 @@
-#include "klevebrand-skywire-http-stepper-client-step.h"
+#include "klevebrand-skywire-framework-step.h"
 
-void SkywireHttpStepperClientStep::serialReadToRxBuffer()
+void SkywireStep::serialReadToRxBuffer()
 {
     while (skywire.available())
     {
@@ -9,27 +9,31 @@ void SkywireHttpStepperClientStep::serialReadToRxBuffer()
     }
 }
 
-void SkywireHttpStepperClientStep::resetRxBuffer()
+void SkywireStep::resetRxBuffer()
 {
     rx_buffer = "";
 }
 
-void SkywireHttpStepperClientStep::resetState()
+bool SkywireStep::okReceived() 
+{
+    return rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1 && !skywire.available();
+}
+
+void SkywireStep::resetState()
 {
     sent = false;
     sent_timestamp = 0;
-    ok_recieved = false;
     on_completed_called = false;
 
     resetRxBuffer();
 }
 
-bool SkywireHttpStepperClientStep::completed()
+bool SkywireStep::completed()
 {
-    return sent && ok_recieved;
+    return sent && okReceived();
 }
 
-SkywireResponseResult_t SkywireHttpStepperClientStep::process()
+SkywireResponseResult_t SkywireStep::process()
 {
     if (completed())
     {
@@ -49,9 +53,7 @@ SkywireResponseResult_t SkywireHttpStepperClientStep::process()
 
     serialReadToRxBuffer();
 
-    ok_recieved = rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1 && !skywire.available();
-
-    if (ok_recieved)
+    if (okReceived())
     {
         if (debug_mode)
         {
