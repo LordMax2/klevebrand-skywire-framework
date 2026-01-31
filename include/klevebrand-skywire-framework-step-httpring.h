@@ -16,14 +16,18 @@ public:
 			return SkywireResponseResult_t(true, rx_buffer);
 		}
 
-		sent = true;
+		if (!sent)
+		{
+			sent = true;
+			sent_timestamp = millis();
+		}
 
 		serialReadToRxBuffer();
 
 		if (debug_mode && okReceived())
 		{
 			Serial.println(rx_buffer);
-			Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK");
+			Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + rx_buffer);
 		}
 
 		return SkywireResponseResult_t(false, "");
@@ -32,6 +36,11 @@ public:
 	bool okReceived() override
 	{
 		return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1;
+	}
+
+	bool completed() override
+	{
+		return sent && okReceived() && (millis() - sent_timestamp) > 1000;
 	}
 };
 
