@@ -7,7 +7,7 @@
 class SkywireStep
 {
 public:
-	SkywireStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
+	SkywireStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
 
 	virtual bool completed();
 	virtual SkywireResponseResult_t process();
@@ -17,7 +17,7 @@ public:
 	String command;
 	bool debug_mode;
 
-	void (*on_completed_function)(String result_content);
+	void (*on_completed_function)(String& result_content);
 
 	bool sent = false;
 	unsigned long sent_timestamp = 0;
