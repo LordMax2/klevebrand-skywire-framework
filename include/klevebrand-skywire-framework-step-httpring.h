@@ -31,7 +31,7 @@ public:
 
 	bool okReceived() override
 	{
-		return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1 && !skywire.available();
+		return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1;
 	}
 };
 
