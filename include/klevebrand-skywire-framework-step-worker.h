@@ -21,6 +21,8 @@ public:
 	Skywire skywire;
 
 	SkywireStep **steps;
+
+	unsigned long last_run_timestamp = 0;
 };
 
 #endif // KLEVEBRAND_SKYWIRE_STEP_WORKER_H

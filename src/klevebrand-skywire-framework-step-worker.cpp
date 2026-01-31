@@ -19,6 +19,11 @@ bool SkywireStepWorker::start()
 
 void SkywireStepWorker::run()
 {
+	if(millis() - last_run_timestamp < 100)
+	{
+		return;
+	}
+
 	for (int i = 0; i < step_count; i++)
 	{
 		SkywireResponseResult_t step_result = steps[i]->process();
