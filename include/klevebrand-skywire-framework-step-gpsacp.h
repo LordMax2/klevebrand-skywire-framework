@@ -22,6 +22,8 @@ public:
             
             sent = true;
 
+            sent_timestamp = millis();
+
             return SkywireResponseResult_t(false, "");
         }
 
