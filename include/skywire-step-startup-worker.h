@@ -18,7 +18,7 @@ class SkywireStepStartupWorker : public SkywireStepWorker
 public:
     SkywireStepStartupWorker(
         HardwareSerial &skywire_serial,
-        bool debug_mode = false) : SkywireStepWorker(skywire_serial, debug_mode, 5000)
+        bool debug_mode = false) : SkywireStepWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
     {
         this->steps = new SkywireStep *[STEP_COUNT];
 
@@ -64,6 +64,40 @@ public:
     static void onEnableGpsCommandCompleted(String &result_content)
     {
         Serial.println("Enable GPS command completed with result: " + result_content);
+    }
+
+    bool run() override
+    {
+        for (int i = 0; i < step_count; i++)
+        {
+            SkywireResponseResult_t step_result = steps[i]->process();
+
+            // Dont go further if not successful.
+            // Also, add do not go to the next step until 100ms has passed
+            if (!step_result.is_success || millis() - steps[i]->sent_timestamp < 100)
+            {
+                break;
+            }
+
+            // If timeout on a step, force reset everything and start over
+            if (millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+            {
+                //resetState();
+            }
+        }
+
+        bool all_completed = true;
+
+        for (int i = 0; i < step_count; i++)
+        {
+            if (!steps[i]->completed())
+            {
+                all_completed = false;
+                break;
+            }
+        }
+
+        return all_completed;
     }
 };
 

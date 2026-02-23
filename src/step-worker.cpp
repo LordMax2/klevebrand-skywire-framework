@@ -17,7 +17,7 @@ bool SkywireStepWorker::start()
 	return true;
 }
 
-void SkywireStepWorker::run()
+bool SkywireStepWorker::run()
 {
 	for (int i = 0; i < step_count; i++)
 	{
@@ -51,5 +51,9 @@ void SkywireStepWorker::run()
 	if (all_completed)
 	{
 		resetState();
+
+		return true;
 	}
+
+	return false;
 }

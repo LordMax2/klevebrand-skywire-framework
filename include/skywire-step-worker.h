@@ -13,8 +13,8 @@ public:
         skywire(skywire_serial, debug_mode),
 		timeout_milliseconds(timeout_milliseconds) {} 
 
-	bool start();
-	void run();
+	virtual bool start();
+	virtual bool run();
 	void resetState();
 
     int step_count = 0;
