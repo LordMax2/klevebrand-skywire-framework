@@ -7,7 +7,7 @@
 class NetworkConnectSkywireStep : public SkywireStep
 {
 public:
-    NetworkConnectSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+    NetworkConnectSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
 
     SkywireResponseResult_t process() override
     {
@@ -18,7 +18,7 @@ public:
 
         if (!sent)
         {
-            skywire.print("AT+CEREG?\r");
+            skywire->print("AT+CEREG?\r");
 
             sent = true;
             sent_timestamp = millis();

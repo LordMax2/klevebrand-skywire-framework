@@ -10,11 +10,12 @@
 #include "skywire-step.h"
 
 void setup() {
+    /*
     Serial.begin(115200);
 
     Serial.println("Starting Skywire modem...");
 
-    SkywireStepStartupWorker startupWorker(Serial3, true);
+    SkywireStepStartupWorker startupWorker(&Serial3, true);
 
     Serial3.begin(115200);
 
@@ -29,7 +30,7 @@ void setup() {
     {
         // Do nothing, just keep the program running.
     }
-
+    */
 }   
 
 void loop() {

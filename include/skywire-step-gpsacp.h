@@ -7,7 +7,7 @@
 class GpsAcpSkywireStep : public SkywireStep
 {
 public:
-    GpsAcpSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+    GpsAcpSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
     SkywireResponseResult_t process() override
     {
         if (completed())
@@ -17,7 +17,7 @@ public:
 
         if(!sent) 
         {
-            skywire.print("AT$GPSACP\r");
+            skywire->print("AT$GPSACP\r");
             
             sent = true;
 

@@ -6,7 +6,7 @@
 class SetApnHologramSkywireStep : public SkywireStep
 {
 public:
-    SetApnHologramSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+    SetApnHologramSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
         : SkywireStep(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
           state(State::SEND_SET)
     {
@@ -21,7 +21,7 @@ public:
         case State::SEND_SET:
             if (!sent)
             {
-                skywire.print(command + "\r");
+                skywire->print(command + "\r");
                 sent = true;
                 sent_timestamp = now;
             }
@@ -44,7 +44,7 @@ public:
         case State::SEND_QUERY:
             if (!sent)
             {
-                skywire.print("AT+CGDCONT?\r");
+                skywire->print("AT+CGDCONT?\r");
                 sent = true;
                 sent_timestamp = now;
             }
@@ -84,11 +84,11 @@ public:
         {
             if (state == State::WAIT_SET)
             {
-                skywire.print(command + "\r");
+                skywire->print(command + "\r");
             }
             else if (state == State::WAIT_QUERY)
             {
-                skywire.print("AT+CGDCONT?\r");
+                skywire->print("AT+CGDCONT?\r");
             }
             sent_timestamp = now;
         }

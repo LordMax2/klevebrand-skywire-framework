@@ -7,7 +7,7 @@
 class SkywireStepWorker 
 {
 public:
-    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
+    SkywireStepWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
         step_count(step_count),
         skywire(skywire_serial),
 		timeout_milliseconds(timeout_milliseconds) {} 
@@ -17,7 +17,7 @@ public:
 
     int step_count = 0;
 
-	HardwareSerial skywire;
+	HardwareSerial* skywire;
 
 	SkywireStep **steps;
 

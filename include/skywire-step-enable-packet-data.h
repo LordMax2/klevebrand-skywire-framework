@@ -6,7 +6,7 @@
 class EnablePacketDataSkywireStep : public SkywireStep
 {
 public:
-    EnablePacketDataSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT#SGACT=1,1", debug_mode, on_completed_function) {}
+    EnablePacketDataSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT#SGACT=1,1", debug_mode, on_completed_function) {}
 
     bool okReceived() override
     {

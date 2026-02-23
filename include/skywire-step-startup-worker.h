@@ -16,7 +16,7 @@ class SkywireStepStartupWorker : public SkywireStepWorker
 {
 public:
     SkywireStepStartupWorker(
-        HardwareSerial &skywire_serial,
+        HardwareSerial* skywire_serial,
         bool debug_mode = false) : SkywireStepWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
     {
         this->steps = new SkywireStep *[STEP_COUNT];

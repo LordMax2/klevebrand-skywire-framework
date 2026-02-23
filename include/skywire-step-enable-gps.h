@@ -6,7 +6,7 @@
 class EnableGpsSkywireStep : public SkywireStep
 {
 public:
-    EnableGpsSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT$GPSP=1", debug_mode, on_completed_function) {}
+    EnableGpsSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT$GPSP=1", debug_mode, on_completed_function) {}
 
     bool okReceived() override
     {

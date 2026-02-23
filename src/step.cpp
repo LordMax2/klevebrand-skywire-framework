@@ -3,9 +3,9 @@
 
 void SkywireStep::serialReadToRxBuffer()
 {
-    while (skywire.available())
+    while (skywire->available())
     {
-        char c = skywire.read();
+        char c = skywire->read();
         rx_buffer += c;
     }
 }
@@ -43,7 +43,7 @@ SkywireResponseResult_t SkywireStep::process()
 
     if (!sent)
     {
-        skywire.print(command + "\r");
+        skywire->print(command + "\r");
 
         sent = true;
         sent_timestamp = millis();

@@ -5,9 +5,8 @@
 
 class AtSkywireStep : public SkywireStep {
 public:
-    AtSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT", debug_mode, on_completed_function) {}
+    AtSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT", debug_mode, on_completed_function) {}
 
-    // send AT commands repeatedly once per second until a response arrives
     virtual SkywireResponseResult_t process() override
     {
         if (completed())
@@ -19,7 +18,7 @@ public:
 
         if (!sent)
         {
-            skywire.print(command + "\r");
+            skywire->print(command + "\r");
             sent = true;
             sent_timestamp = now;
             return SkywireResponseResult_t(false, "");
@@ -50,7 +49,7 @@ public:
             {
                 Serial.println("AT command did not receive a response; retrying...");
             }
-            skywire.print(command + "\r");
+            skywire->print(command + "\r");
             sent_timestamp = now;
         }
 
