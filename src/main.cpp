@@ -4,7 +4,6 @@
 #include "skywire-step-at.h"
 #include "skywire-step-disable-echo.h"
 #include "skywire-step-set-hologram-apn.h"
-#include "skywire-step-query-apn.h"
 #include "skywire-step-network-connect.h"
 #include "skywire-step-enable-packet-data.h"
 #include "skywire-step-enable-gps.h"

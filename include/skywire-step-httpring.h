@@ -8,7 +8,7 @@
 class HttpRingSkywireStep : public SkywireStep
 {
 public:
-	HttpRingSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+	HttpRingSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
 	SkywireResponseResult_t process() override
 	{
 		if (completed())

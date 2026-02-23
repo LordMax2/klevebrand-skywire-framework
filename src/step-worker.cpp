@@ -8,15 +8,6 @@ void SkywireStepWorker::resetState()
 	}
 }
 
-bool SkywireStepWorker::start()
-{
-	skywire.start();
-
-	skywire.enableGps();
-
-	return true;
-}
-
 bool SkywireStepWorker::run()
 {
 	for (int i = 0; i < step_count; i++)

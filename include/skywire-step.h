@@ -2,18 +2,18 @@
 #define SKYWIRE_HTTP_STEPPER_CLIENT_STEP_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
+#include "skywire-response-result.h"
 
 class SkywireStep
 {
 public:
-	SkywireStep(Skywire &skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
+	SkywireStep(HardwareSerial &skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content)) : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {}
 
 	virtual bool completed();
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
 
-	Skywire &skywire;
+	HardwareSerial &skywire;
 	String command;
 	bool debug_mode;
 

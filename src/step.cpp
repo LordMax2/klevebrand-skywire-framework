@@ -1,4 +1,5 @@
 #include "skywire-step.h"
+#include "skywire-step-at.h"  // required for AtSkywireStep::process implementation
 
 void SkywireStep::serialReadToRxBuffer()
 {
@@ -73,3 +74,4 @@ SkywireResponseResult_t SkywireStep::process()
 
     return SkywireResponseResult_t(false, "");
 }
+

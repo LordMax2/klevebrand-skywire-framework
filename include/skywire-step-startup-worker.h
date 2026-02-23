@@ -6,12 +6,11 @@
 #include "skywire-step-at.h"
 #include "skywire-step-disable-echo.h"
 #include "skywire-step-set-hologram-apn.h"
-#include "skywire-step-query-apn.h"
 #include "skywire-step-network-connect.h"
 #include "skywire-step-enable-packet-data.h"
 #include "skywire-step-enable-gps.h"
 
-#define STEP_COUNT 7
+#define STEP_COUNT 6
 
 class SkywireStepStartupWorker : public SkywireStepWorker
 {
@@ -25,10 +24,9 @@ public:
         this->steps[0] = new AtSkywireStep(skywire, debug_mode, onAtCommandCompleted);
         this->steps[1] = new DisableEchoSkywireStep(skywire, debug_mode, onDisableEchoCommandCompleted);
         this->steps[2] = new SetApnHologramSkywireStep(skywire, debug_mode, onSetApnCommandCompleted);
-        this->steps[3] = new QueryApnSkywireStep(skywire, debug_mode, onQueryApnCommandCompleted);
-        this->steps[4] = new NetworkConnectSkywireStep(skywire, debug_mode, onNetworkConnectCommandCompleted);
-        this->steps[5] = new EnablePacketDataSkywireStep(skywire, debug_mode, onEnablePacketDataCommandCompleted);
-        this->steps[6] = new EnableGpsSkywireStep(skywire, debug_mode, onEnableGpsCommandCompleted);
+        this->steps[3] = new NetworkConnectSkywireStep(skywire, debug_mode, onNetworkConnectCommandCompleted);
+        this->steps[4] = new EnablePacketDataSkywireStep(skywire, debug_mode, onEnablePacketDataCommandCompleted);
+        this->steps[5] = new EnableGpsSkywireStep(skywire, debug_mode, onEnableGpsCommandCompleted);
     }
 
     static void onAtCommandCompleted(String &result_content)
@@ -46,10 +44,6 @@ public:
         Serial.println("Set APN command completed with result: " + result_content);
     }
 
-    static void onQueryApnCommandCompleted(String &result_content)
-    {
-        Serial.println("Query APN command completed with result: " + result_content);
-    }
 
     static void onNetworkConnectCommandCompleted(String &result_content)
     {

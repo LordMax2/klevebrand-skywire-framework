@@ -2,7 +2,6 @@
 #define KLEVEBRAND_SKYWIRE_STEP_WORKER_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
 #include "skywire-step.h"
 
 class SkywireStepWorker 
@@ -10,16 +9,15 @@ class SkywireStepWorker
 public:
     SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
         step_count(step_count),
-        skywire(skywire_serial, debug_mode),
+        skywire(skywire_serial),
 		timeout_milliseconds(timeout_milliseconds) {} 
 
-	virtual bool start();
 	virtual bool run();
 	void resetState();
 
     int step_count = 0;
 
-	Skywire skywire;
+	HardwareSerial skywire;
 
 	SkywireStep **steps;
 

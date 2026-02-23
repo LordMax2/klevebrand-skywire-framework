@@ -2,13 +2,12 @@
 #define SKYWIRE_STEP_NETWORK_CONNECT_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
 #include "skywire-step.h"
 
 class NetworkConnectSkywireStep : public SkywireStep
 {
 public:
-    NetworkConnectSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+    NetworkConnectSkywireStep(HardwareSerial &skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
 
     SkywireResponseResult_t process() override
     {
