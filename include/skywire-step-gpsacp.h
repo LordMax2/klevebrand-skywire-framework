@@ -2,7 +2,6 @@
 #define WAIT_FOR_GPS_ACP_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
 #include "skywire-step.h"
 
 class GpsAcpSkywireStep : public SkywireStep

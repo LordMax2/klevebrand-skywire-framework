@@ -2,7 +2,6 @@
 #define WAIT_FOR_HTTP_RCV_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
 #include "skywire-step.h"
 
 class HttpRcvSkywireStep : public SkywireStep

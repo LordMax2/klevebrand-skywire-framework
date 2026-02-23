@@ -2,7 +2,6 @@
 #define WAIT_FOR_HTTP_RING_H
 
 #include "Arduino.h"
-#include "klevebrand-skywire-framework.h"
 #include "skywire-step.h"
 
 class HttpRingSkywireStep : public SkywireStep
