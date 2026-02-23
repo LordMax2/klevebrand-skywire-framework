@@ -8,7 +8,7 @@
 class HttpRingSkywireStep : public SkywireStep
 {
 public:
-	HttpRingSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+	HttpRingSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
 	SkywireResponseResult_t process() override
 	{
 		if (completed())
@@ -16,14 +16,18 @@ public:
 			return SkywireResponseResult_t(true, rx_buffer);
 		}
 
-		sent = true;
+		if (!sent)
+		{
+			sent = true;
+			sent_timestamp = millis();
+		}
 
 		serialReadToRxBuffer();
 
 		if (debug_mode && okReceived())
 		{
 			Serial.println(rx_buffer);
-			Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK");
+			Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + rx_buffer);
 		}
 
 		return SkywireResponseResult_t(false, "");
@@ -31,7 +35,12 @@ public:
 
 	bool okReceived() override
 	{
-		return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1 && !skywire.available();
+		return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1;
+	}
+
+	bool completed() override
+	{
+		return sent && okReceived() && (millis() - sent_timestamp) > 1000;
 	}
 };
 

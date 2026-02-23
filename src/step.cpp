@@ -16,7 +16,7 @@ void SkywireStep::resetRxBuffer()
 
 bool SkywireStep::okReceived() 
 {
-    return rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1 && !skywire.available();
+    return rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1;
 }
 
 void SkywireStep::resetState()

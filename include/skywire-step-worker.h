@@ -8,9 +8,10 @@
 class SkywireStepWorker 
 {
 public:
-    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, int step_count) : 
+    SkywireStepWorker(HardwareSerial& skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
         step_count(step_count),
-        skywire(skywire_serial, debug_mode) {} 
+        skywire(skywire_serial, debug_mode),
+		timeout_milliseconds(timeout_milliseconds) {} 
 
 	bool start();
 	void run();
@@ -21,6 +22,9 @@ public:
 	Skywire skywire;
 
 	SkywireStep **steps;
+
+	unsigned long last_run_timestamp = 0;
+	unsigned long timeout_milliseconds = 0;
 };
 
 #endif // KLEVEBRAND_SKYWIRE_STEP_WORKER_H

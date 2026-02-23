@@ -8,7 +8,7 @@
 class HttpRcvSkywireStep : public SkywireStep
 {
 public:
-    HttpRcvSkywireStep(Skywire &skywire, bool debug_mode, void (*on_oompleted_function)(String result_content)) : SkywireStep(skywire, "", debug_mode, on_oompleted_function) {}
+    HttpRcvSkywireStep(Skywire &skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
     SkywireResponseResult_t process() override
     {
 		if(completed())
@@ -18,7 +18,7 @@ public:
 
         if(!sent)
         {
-            skywire.print("AT#HTTPRCV=0\r");
+            skywire.print("AT#HTTPRCV=0,64\r");
 
             sent = true;
 
@@ -27,11 +27,11 @@ public:
             return SkywireResponseResult_t(false, "");
         }
 
-        if (sent && millis() - timestamp_milliseconds > 200)
+        if (sent && millis() - timestamp_milliseconds > 200 && !skywire.available())
         {
             timestamp_milliseconds = millis();
 
-            skywire.print("AT#HTTPRCV=0\r");
+            skywire.print("AT#HTTPRCV=0,64\r");
         }
 
         serialReadToRxBuffer();
@@ -51,6 +51,11 @@ public:
 
         return SkywireResponseResult_t(false, "");
     };
+
+    bool okReceived() override
+    {
+        return rx_buffer.indexOf("ERROR") != -1;
+    }
 
 private:
     unsigned long timestamp_milliseconds = 0;

@@ -23,9 +23,17 @@ void SkywireStepWorker::run()
 	{
 		SkywireResponseResult_t step_result = steps[i]->process();
 
-		if (!step_result.is_success)
+		// Dont go further if not successful.
+		// Also, add do not go to the next step until 100ms has passed
+		if (!step_result.is_success || millis() - steps[i]->sent_timestamp < 100)
 		{
 			break;
+		}
+
+		// If timeout on a step, force reset everything and start over
+		if (millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+		{
+			resetState();
 		}
 	}
 
