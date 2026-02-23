@@ -5,7 +5,7 @@
 #define BASE_WAIT_FOR_RESPONSE_DELAY 5000
 
 #include "Arduino.h"
-#include "klevebrand-skywire-response-result.h"
+#include "response-result.h"
 
 class Skywire
 {

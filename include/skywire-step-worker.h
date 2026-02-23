@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "klevebrand-skywire-framework.h"
-#include "klevebrand-skywire-framework-step.h"
+#include "skywire-step.h"
 
 class SkywireStepWorker 
 {

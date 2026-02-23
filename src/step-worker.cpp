@@ -1,4 +1,4 @@
-#include "klevebrand-skywire-framework-step-worker.h"
+#include "skywire-step-worker.h"
 
 void SkywireStepWorker::resetState()
 {

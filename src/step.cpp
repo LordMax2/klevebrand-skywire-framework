@@ -1,4 +1,4 @@
-#include "klevebrand-skywire-framework-step.h"
+#include "skywire-step.h"
 
 void SkywireStep::serialReadToRxBuffer()
 {
