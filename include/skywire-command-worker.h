@@ -1,13 +1,13 @@
-#ifndef KLEVEBRAND_SKYWIRE_STEP_WORKER_H
-#define KLEVEBRAND_SKYWIRE_STEP_WORKER_H
+#ifndef SKYWIRE_STEP_WORKER_H
+#define SKYWIRE_STEP_WORKER_H
 
 #include "Arduino.h"
-#include "skywire-step.h"
+#include "skywire-command.h"
 
-class SkywireStepWorker 
+class SkywireCommandWorker 
 {
 public:
-    SkywireStepWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
+    SkywireCommandWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
         step_count(step_count),
         skywire(skywire_serial),
 		timeout_milliseconds(timeout_milliseconds) {} 
@@ -19,10 +19,10 @@ public:
 
 	HardwareSerial* skywire;
 
-	SkywireStep **steps;
+	SkywireCommand **steps;
 
 	unsigned long last_run_timestamp = 0;
 	unsigned long timeout_milliseconds = 0;
 };
 
-#endif // KLEVEBRAND_SKYWIRE_STEP_WORKER_H
+#endif // SKYWIRE_STEP_WORKER_H

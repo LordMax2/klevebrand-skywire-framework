@@ -1,13 +1,13 @@
 #include "Arduino.h"
-#include "skywire-step-startup-worker.h"
-#include "skywire-step-worker.h"
-#include "skywire-step-at.h"
-#include "skywire-step-disable-echo.h"
-#include "skywire-step-set-hologram-apn.h"
-#include "skywire-step-network-connect.h"
-#include "skywire-step-enable-packet-data.h"
-#include "skywire-step-enable-gps.h"
-#include "skywire-step.h"
+#include "skywire-command-startup-worker.h"
+#include "skywire-command-worker.h"
+#include "skywire-command-at.h"
+#include "skywire-command-disable-echo.h"
+#include "skywire-command-set-hologram-apn.h"
+#include "skywire-command-network-connect.h"
+#include "skywire-command-enable-packet-data.h"
+#include "skywire-command-enable-gps.h"
+#include "skywire-command.h"
 
 void setup() {
     /*
@@ -15,7 +15,7 @@ void setup() {
 
     Serial.println("Starting Skywire modem...");
 
-    SkywireStepStartupWorker startupWorker(&Serial3, true);
+    SkywireCommandStartupWorker startupWorker(&Serial3, true);
 
     Serial3.begin(115200);
 

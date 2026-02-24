@@ -1,11 +1,11 @@
-#ifndef STEP_AT
-#define STEP_AT
+#ifndef SKYWIRE_STEP_AT
+#define SKYWIRE_STEP_AT
 
-#include "skywire-step.h"
+#include "skywire-command.h"
 
-class AtSkywireStep : public SkywireStep {
+class AtSkywireCommand : public SkywireCommand {
 public:
-    AtSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireStep(skywire, "AT", debug_mode, on_completed_function) {}
+    AtSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function) {}
 
     virtual SkywireResponseResult_t process() override
     {
@@ -57,4 +57,4 @@ public:
     }
 };
 
-#endif // STEP_AT
+#endif // SKYWIRE_STEP_AT

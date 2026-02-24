@@ -2,31 +2,31 @@
 #define SKYWIRE_STEP_STARTUP_WORKER_H
 
 #include "Arduino.h"
-#include "skywire-step-worker.h"
-#include "skywire-step-at.h"
-#include "skywire-step-disable-echo.h"
-#include "skywire-step-set-hologram-apn.h"
-#include "skywire-step-network-connect.h"
-#include "skywire-step-enable-packet-data.h"
-#include "skywire-step-enable-gps.h"
+#include "skywire-command-worker.h"
+#include "skywire-command-at.h"
+#include "skywire-command-disable-echo.h"
+#include "skywire-command-set-hologram-apn.h"
+#include "skywire-command-network-connect.h"
+#include "skywire-command-enable-packet-data.h"
+#include "skywire-command-enable-gps.h"
 
 #define STEP_COUNT 6
 
-class SkywireStepStartupWorker : public SkywireStepWorker
+class SkywireCommandStartupWorker : public SkywireCommandWorker
 {
 public:
-    SkywireStepStartupWorker(
+    SkywireCommandStartupWorker(
         HardwareSerial* skywire_serial,
-        bool debug_mode = false) : SkywireStepWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
+        bool debug_mode = false) : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
     {
-        this->steps = new SkywireStep *[STEP_COUNT];
+        this->steps = new SkywireCommand *[STEP_COUNT];
 
-        this->steps[0] = new AtSkywireStep(skywire, debug_mode, onAtCommandCompleted);
-        this->steps[1] = new DisableEchoSkywireStep(skywire, debug_mode, onDisableEchoCommandCompleted);
-        this->steps[2] = new SetApnHologramSkywireStep(skywire, debug_mode, onSetApnCommandCompleted);
-        this->steps[3] = new NetworkConnectSkywireStep(skywire, debug_mode, onNetworkConnectCommandCompleted);
-        this->steps[4] = new EnablePacketDataSkywireStep(skywire, debug_mode, onEnablePacketDataCommandCompleted);
-        this->steps[5] = new EnableGpsSkywireStep(skywire, debug_mode, onEnableGpsCommandCompleted);
+        this->steps[0] = new AtSkywireCommand(skywire, debug_mode, onAtCommandCompleted);
+        this->steps[1] = new DisableEchoSkywireCommand(skywire, debug_mode, onDisableEchoCommandCompleted);
+        this->steps[2] = new SetApnHologramSkywireCommand(skywire, debug_mode, onSetApnCommandCompleted);
+        this->steps[3] = new NetworkConnectSkywireCommand(skywire, debug_mode, onNetworkConnectCommandCompleted);
+        this->steps[4] = new EnablePacketDataSkywireCommand(skywire, debug_mode, onEnablePacketDataCommandCompleted);
+        this->steps[5] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
     }
 
     static void onAtCommandCompleted(String &result_content)
@@ -76,7 +76,9 @@ public:
             // If timeout on a step, force reset everything and start over
             if (millis() - steps[i]->sent_timestamp > timeout_milliseconds)
             {
-                //resetState();
+                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence.");
+
+                resetState();
             }
         }
 

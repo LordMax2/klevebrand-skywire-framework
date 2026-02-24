@@ -1,7 +1,6 @@
-#include "skywire-step.h"
-#include "skywire-step-at.h"  // required for AtSkywireStep::process implementation
+#include "skywire-command.h"
 
-void SkywireStep::serialReadToRxBuffer()
+void SkywireCommand::serialReadToRxBuffer()
 {
     while (skywire->available())
     {
@@ -10,17 +9,17 @@ void SkywireStep::serialReadToRxBuffer()
     }
 }
 
-void SkywireStep::resetRxBuffer()
+void SkywireCommand::resetRxBuffer()
 {
     rx_buffer = "";
 }
 
-bool SkywireStep::okReceived() 
+bool SkywireCommand::okReceived() 
 {
     return rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1;
 }
 
-void SkywireStep::resetState()
+void SkywireCommand::resetState()
 {
     sent = false;
     sent_timestamp = 0;
@@ -29,12 +28,12 @@ void SkywireStep::resetState()
     resetRxBuffer();
 }
 
-bool SkywireStep::completed()
+bool SkywireCommand::completed()
 {
     return sent && okReceived();
 }
 
-SkywireResponseResult_t SkywireStep::process()
+SkywireResponseResult_t SkywireCommand::process()
 {
     if (completed())
     {

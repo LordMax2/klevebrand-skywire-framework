@@ -1,13 +1,13 @@
-#ifndef WAIT_FOR_GPS_ACP_H
-#define WAIT_FOR_GPS_ACP_H
+#ifndef SKYWIRE_STEP_GPS_ACP_H
+#define SKYWIRE_STEP_GPS_ACP_H
 
 #include "Arduino.h"
-#include "skywire-step.h"
+#include "skywire-command.h"
 
-class GpsAcpSkywireStep : public SkywireStep
+class GpsAcpSkywireCommand : public SkywireCommand
 {
 public:
-    GpsAcpSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireStep(skywire, "", debug_mode, on_completed_function) {}
+    GpsAcpSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content)) : SkywireCommand(skywire, "", debug_mode, on_completed_function) {}
     SkywireResponseResult_t process() override
     {
         if (completed())
@@ -45,4 +45,4 @@ public:
     };
 };
 
-#endif // WAIT_FOR_GPS_ACP_H
+#endif // SKYWIRE_STEP_GPS_ACP_H 

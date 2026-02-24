@@ -1,13 +1,13 @@
 #ifndef SKYWIRE_STEP_SET_APN_H
 #define SKYWIRE_STEP_SET_APN_H
 
-#include "skywire-step.h"
+#include "skywire-command.h"
 
-class SetApnHologramSkywireStep : public SkywireStep
+class SetApnHologramSkywireCommand : public SkywireCommand
 {
 public:
-    SetApnHologramSkywireStep(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
-        : SkywireStep(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
+    SetApnHologramSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+        : SkywireCommand(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
           state(State::SEND_SET)
     {
     }

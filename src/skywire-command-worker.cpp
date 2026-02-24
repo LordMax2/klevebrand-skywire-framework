@@ -1,6 +1,6 @@
-#include "skywire-step-worker.h"
+#include "skywire-command-worker.h"
 
-void SkywireStepWorker::resetState()
+void SkywireCommandWorker::resetState()
 {
 	for (int i = 0; i < step_count; i++)
 	{
@@ -8,7 +8,7 @@ void SkywireStepWorker::resetState()
 	}
 }
 
-bool SkywireStepWorker::run()
+bool SkywireCommandWorker::run()
 {
 	for (int i = 0; i < step_count; i++)
 	{
