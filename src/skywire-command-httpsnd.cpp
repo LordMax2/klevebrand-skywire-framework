@@ -58,5 +58,5 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
 bool HttpSndSkywireCommand::completed()
 {
-    return sent && okReceived() && arrowsReceived() && payload_sent;
+    return (sent && okReceived() && arrowsReceived() && payload_sent) || getPayload() == "";
 }
