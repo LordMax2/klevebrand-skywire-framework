@@ -1,5 +1,10 @@
 #include "skywire-command-worker.h"
 
+SkywireCommandWorker::SkywireCommandWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count)
+	: step_count(step_count), skywire(skywire_serial), timeout_milliseconds(timeout_milliseconds)
+{
+}
+
 void SkywireCommandWorker::resetState()
 {
 	for (int i = 0; i < step_count; i++)

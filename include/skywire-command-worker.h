@@ -7,10 +7,7 @@
 class SkywireCommandWorker 
 {
 public:
-    SkywireCommandWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count) : 
-        step_count(step_count),
-        skywire(skywire_serial),
-		timeout_milliseconds(timeout_milliseconds) {} 
+	SkywireCommandWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count);
 
 	virtual bool run();
 	void resetState();
