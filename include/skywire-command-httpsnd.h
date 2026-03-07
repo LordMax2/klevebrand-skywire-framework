@@ -5,9 +5,18 @@
 
 class HttpSndSkywireCommand : public SkywireCommand {
 public:
-    HttpSndSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    HttpSndSkywireCommand(HardwareSerial* skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content));
 
-    virtual SkywireResponseResult_t process() override;
+    SkywireResponseResult_t process(String payload);
+
+    bool completed() override;
+
+    bool arrowsReceived() 
+    {
+        return rx_buffer.indexOf(">>>") != -1 && rx_buffer.indexOf("\r\n") != -1;
+    }
+
+    bool payload_sent = false;
 };
 
 #endif 

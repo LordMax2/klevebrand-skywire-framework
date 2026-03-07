@@ -1,11 +1,11 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
-    : SkywireCommand(skywire, "AT#HTTPSND=1,0", debug_mode, on_completed_function)
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial* skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content))
+    : SkywireCommand(skywire, "AT#HTTPSND=0,0," + path, debug_mode, on_completed_function)
 {
 }
 
-SkywireResponseResult_t HttpSndSkywireCommand::process()
+SkywireResponseResult_t HttpSndSkywireCommand::process(String payload)
 {
     if (completed())
     {
@@ -14,7 +14,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
     if (!sent)
     {
-        skywire->print(command + "\r");
+        skywire->print(command + "," + String(payload.length()) + "\r\x1A");
 
         sent = true;
 
@@ -24,6 +24,19 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     }
 
     serialReadToRxBuffer();
+
+    if(debug_mode && arrowsReceived())
+    {
+        Serial.println(rx_buffer);
+        Serial.println("STEPPER CLIENT RECEIVED >>>: " + rx_buffer);
+    }
+
+    if(arrowsReceived() && !payload_sent)
+    {
+        skywire->print(payload + "\r");
+
+        payload_sent = true;
+    }
 
     if (debug_mode && okReceived())
     {
@@ -39,4 +52,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     }
 
     return SkywireResponseResult_t(false, "");
+}
+
+bool HttpSndSkywireCommand::completed()
+{
+    return sent && okReceived() && arrowsReceived() && payload_sent;
 }
