@@ -5,12 +5,14 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial* skywire, bool debug
 {
 }
 
-SkywireResponseResult_t HttpSndSkywireCommand::process(String payload)
+SkywireResponseResult_t HttpSndSkywireCommand::process()
 {
     if (completed())
     {
         return SkywireResponseResult_t(true, rx_buffer);
     }
+
+    String payload = getPayload();
 
     if (!sent)
     {

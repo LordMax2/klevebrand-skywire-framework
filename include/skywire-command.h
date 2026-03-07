@@ -27,7 +27,7 @@ public:
 
 	void serialReadToRxBuffer();
 	void resetRxBuffer();
-	void resetState();
+	virtual void resetState();
 };
 
 #endif 
