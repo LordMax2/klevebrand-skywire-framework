@@ -14,4 +14,4 @@ struct SkywireResponseResult_t
     String response_content;
 };
 
-#endif // SKYWIRE_RESPONSE_RESULT
+#endif

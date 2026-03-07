@@ -22,4 +22,4 @@ public:
 	unsigned long timeout_milliseconds = 0;
 };
 
-#endif // SKYWIRE_STEP_WORKER_H
+#endif

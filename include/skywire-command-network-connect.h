@@ -15,4 +15,4 @@ private:
     bool isNetworkConnected();
 };
 
-#endif // SKYWIRE_STEP_NETWORK_CONNECT_H
+#endif 

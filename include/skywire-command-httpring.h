@@ -15,4 +15,4 @@ public:
 	bool completed() override;
 };
 
-#endif // SKYWIRE_STEP_HTTP_RING_H
+#endif 

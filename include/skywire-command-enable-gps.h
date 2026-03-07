@@ -11,4 +11,4 @@ public:
     bool okReceived() override;
 };
 
-#endif // SKYWIRE_STEP_ENABLE_GPS_H
+#endif 
