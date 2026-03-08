@@ -5,6 +5,27 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial* skywire, bool debug
 {
 }
 
+bool HttpSndSkywireCommand::arrowsReceived()
+{
+    return rx_buffer.indexOf(">>>") != -1 || millis() - sent_timestamp > 200;
+}
+
+void HttpSndSkywireCommand::setPayload(String payload)
+{
+    this->payload = payload;
+}
+
+String HttpSndSkywireCommand::getPayload()
+{
+    return payload;
+}
+
+void HttpSndSkywireCommand::resetState()
+{
+    SkywireCommand::resetState();
+    payload_sent = false;
+}
+
 SkywireResponseResult_t HttpSndSkywireCommand::process()
 {
     if (completed())
