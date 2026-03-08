@@ -28,7 +28,7 @@ public:
 
 	String rx_buffer = "";
 
-	void serialReadToRxBuffer();
+	void serialReadToRxBuffer(size_t max_bytes_per_call = 32);
 	void resetRxBuffer();
 	virtual void resetState();
 };

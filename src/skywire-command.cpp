@@ -5,12 +5,14 @@ SkywireCommand::SkywireCommand(HardwareSerial* skywire, String command, bool deb
 {
 }
 
-void SkywireCommand::serialReadToRxBuffer()
+void SkywireCommand::serialReadToRxBuffer(size_t max_bytes_per_call)
 {
-    while (skywire->available())
+    size_t bytes_read = 0;
+    while (skywire->available() && (max_bytes_per_call == 0 || bytes_read < max_bytes_per_call))
     {
         char c = skywire->read();
         rx_buffer += c;
+        bytes_read++;
     }
 }
 
