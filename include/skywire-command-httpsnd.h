@@ -11,9 +11,9 @@ public:
 
     bool completed() override;
 
-    bool arrowsReceived() 
+    bool arrowsReceived()
     {
-        return rx_buffer.indexOf(">>>") != -1 && rx_buffer.indexOf("\r\n") != -1;
+        return rx_buffer.indexOf(">>>") != -1 || millis() - sent_timestamp > 200;
     }
 
     String payload = "";
@@ -34,7 +34,6 @@ public:
     {
         SkywireCommand::resetState();
         payload_sent = false;
-        setPayload("");
     }
 };
 

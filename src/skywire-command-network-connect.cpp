@@ -18,13 +18,18 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
         first_process_call_timestamp = millis();
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 100)
+    if (!sent && millis() - first_process_call_timestamp > 200)
     {
         skywire->print("AT+CEREG?\r");
 
         sent = true;
         sent_timestamp = millis();
 
+        return SkywireResponseResult_t(false, "");
+    }
+
+    if (!sent)
+    {
         return SkywireResponseResult_t(false, "");
     }
 

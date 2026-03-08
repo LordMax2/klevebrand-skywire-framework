@@ -1,7 +1,7 @@
 #include "skywire-command-httpring.h"
 
 HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content))
-    : SkywireCommand(skywire, "", debug_mode, on_completed_function)
+    : SkywireCommand(skywire, "HTTPRING", debug_mode, on_completed_function)
 {
 }
 
@@ -12,13 +12,7 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if(first_process_call)
-    {
-        first_process_call = false;
-        first_process_call_timestamp = millis();
-    }
-
-    if (!sent && millis() - first_process_call_timestamp > 100)
+    if (!sent)
     {
         sent = true;
         sent_timestamp = millis();

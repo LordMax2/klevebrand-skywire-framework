@@ -21,7 +21,7 @@ void SkywireCommand::resetRxBuffer()
 
 bool SkywireCommand::okReceived() 
 {
-    return rx_buffer.indexOf("OK") != -1 && rx_buffer.indexOf("\r\n") != -1;
+    return true;
 }
 
 void SkywireCommand::resetState()
@@ -53,7 +53,7 @@ SkywireResponseResult_t SkywireCommand::process()
         first_process_call_timestamp = millis();
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 100)
+    if (!sent && millis() - first_process_call_timestamp > 200)
     {
         skywire->print(command + "\r");
 
@@ -63,6 +63,10 @@ SkywireResponseResult_t SkywireCommand::process()
         return SkywireResponseResult_t(false, "");
     }
 
+    if (!sent)
+    {
+        return SkywireResponseResult_t(false, "");
+    }
 
     serialReadToRxBuffer();
 

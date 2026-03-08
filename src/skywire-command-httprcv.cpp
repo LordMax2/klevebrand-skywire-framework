@@ -18,7 +18,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
         first_process_call_timestamp = millis();
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 100)
+    if (!sent && millis() - first_process_call_timestamp > 200)
     {
         skywire->print("AT#HTTPRCV=0,64\r");
 
@@ -29,7 +29,12 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
         return SkywireResponseResult_t(false, "");
     }
 
-    if (sent && millis() - timestamp_milliseconds > 200 && !skywire->available())
+    if (!sent)
+    {
+        return SkywireResponseResult_t(false, "");
+    }
+
+    if (millis() - timestamp_milliseconds > 200 && !skywire->available())
     {
         timestamp_milliseconds = millis();
 

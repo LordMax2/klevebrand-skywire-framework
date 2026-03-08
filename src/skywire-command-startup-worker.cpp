@@ -48,31 +48,26 @@ bool SkywireCommandStartupWorker::run()
 {
     for (int i = 0; i < step_count; i++)
     {
-        // If timeout on a step, force reset everything and start over
-        if ((millis() - steps[i]->sent_timestamp > timeout_milliseconds && steps[i]->sent_timestamp != 0) && !steps[i]->completed())
-        {
-            Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
-
-            resetState();
-
-            skywire->begin(115200);
-
-            break;
-        }
-
-        SkywireResponseResult_t step_result = steps[i]->process();
-    }
-
-    bool all_completed = true;
-
-    for (int i = 0; i < step_count; i++)
-    {
         if (!steps[i]->completed())
         {
-            all_completed = false;
-            break;
+            if (steps[i]->sent_timestamp != 0 &&
+                millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+            {
+                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
+                Serial.println("rx_buffer at timeout: [" + steps[i]->rx_buffer + "]");
+
+                resetState();
+
+                skywire->begin(115200);
+            }
+            else
+            {
+                steps[i]->process();
+            }
+
+            return false;
         }
     }
 
-    return all_completed;
+    return true;
 }
