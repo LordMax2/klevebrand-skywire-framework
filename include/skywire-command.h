@@ -23,6 +23,9 @@ public:
 	unsigned long sent_timestamp = 0;
 	bool on_completed_called = false;
 
+	bool first_process_call = true;
+	unsigned long first_process_call_timestamp = 0;
+
 	String rx_buffer = "";
 
 	void serialReadToRxBuffer();

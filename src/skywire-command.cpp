@@ -29,6 +29,8 @@ void SkywireCommand::resetState()
     sent = false;
     sent_timestamp = 0;
     on_completed_called = false;
+    first_process_call = true;
+    first_process_call_timestamp = 0;
 
     resetRxBuffer();
 }
@@ -45,7 +47,13 @@ SkywireResponseResult_t SkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if (!sent)
+    if(first_process_call)
+    {
+        first_process_call = false;
+        first_process_call_timestamp = millis();
+    }
+
+    if (!sent && millis() - first_process_call_timestamp > 100)
     {
         skywire->print(command + "\r");
 

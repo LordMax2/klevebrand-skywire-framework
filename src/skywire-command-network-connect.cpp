@@ -12,7 +12,13 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if (!sent)
+    if(first_process_call)
+    {
+        first_process_call = false;
+        first_process_call_timestamp = millis();
+    }
+
+    if (!sent && millis() - first_process_call_timestamp > 100)
     {
         skywire->print("AT+CEREG?\r");
 

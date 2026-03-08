@@ -1,6 +1,6 @@
 #include "skywire-command-set-hologram-apn.h"
 
-SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
     : SkywireCommand(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
       state(State::SEND_SET)
 {
@@ -13,14 +13,20 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     switch (state)
     {
     case State::SEND_SET:
-        if (!sent)
+        if (first_process_call)
+        {
+            first_process_call = false;
+            first_process_call_timestamp = millis();
+        }
+
+        if (!sent && millis() - first_process_call_timestamp > 100)
         {
             skywire->print(command + "\r");
             sent = true;
             sent_timestamp = now;
-        }
 
-        state = State::WAIT_SET;
+            state = State::WAIT_SET;
+        }
 
         break;
 
