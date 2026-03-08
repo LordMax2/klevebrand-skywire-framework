@@ -15,16 +15,11 @@ void SkywireCommandWorker::resetState()
 
 bool SkywireCommandWorker::run()
 {
-	// Process only the first incomplete step. All steps share the same
-	// HardwareSerial, so calling process() on multiple steps per run()
-	// causes their serialReadToRxBuffer() calls to race on the same UART
-	// RX buffer and steal bytes from each other, producing garbled output.
 	for (int i = 0; i < step_count; i++)
 	{
 		if (!steps[i]->completed())
 		{
-			if (steps[i]->sent_timestamp != 0 &&
-				millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+			if (steps[i]->sent_timestamp != 0 && millis() - steps[i]->sent_timestamp > timeout_milliseconds)
 			{
 				Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
 				Serial.println("rx_buffer at timeout: [" + steps[i]->rx_buffer + "], previous step rx_buffer: [" + (i > 0 ? steps[i - 1]->rx_buffer : "N/A") + "]");
