@@ -50,7 +50,7 @@ bool SkywireCommandStartupWorker::run()
     for (int i = 0; i < step_count; i++)
     {
         // If timeout on a step, force reset everything and start over
-        if (millis() - steps[i]->sent_timestamp > timeout_milliseconds && !steps[i]->completed())
+        if (steps[i]->sent && millis() - steps[i]->sent_timestamp > timeout_milliseconds && !steps[i]->completed())
         {
             Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence.");
 
