@@ -45,7 +45,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         serialReadToRxBuffer();
     }
 
-    if(millis() - sent_timestamp > 200 && !payload_sent)
+    if(millis() - sent_timestamp > 500 && !payload_sent)
     {
         if(debug_mode)
         {
