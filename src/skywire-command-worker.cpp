@@ -17,20 +17,19 @@ bool SkywireCommandWorker::run()
 {
 	for (int i = 0; i < step_count; i++)
 	{
-		SkywireResponseResult_t step_result = steps[i]->process();
+        // If timeout on a step, force reset everything and start over
+        if ((millis() - steps[i]->sent_timestamp > timeout_milliseconds && steps[i]->sent_timestamp != 0) && !steps[i]->completed())
+        {
+            Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
 
-		// Dont go further if not successful.
-		// Also, add do not go to the next step until 100ms has passed
-		if (!step_result.is_success || millis() - steps[i]->sent_timestamp < 100)
-		{
-			break;
-		}
+            resetState();
 
-		// If timeout on a step, force reset everything and start over
-		if (millis() - steps[i]->sent_timestamp > timeout_milliseconds)
-		{
-			resetState();
-		}
+            skywire->begin(115200);
+
+            break;
+        }
+
+		steps[i]->process();
 	}
 
 	bool all_completed = true;
