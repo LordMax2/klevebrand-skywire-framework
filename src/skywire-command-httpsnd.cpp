@@ -33,25 +33,25 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    String payload = getPayload();
+    const String payload = getPayload();
+    const unsigned long now = millis();
 
-    if(first_process_call)
+    if (first_process_call)
     {
         first_process_call = false;
-        first_process_call_timestamp = millis();
+        first_process_call_timestamp = now;
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 200)
+    if (!sent && now - first_process_call_timestamp > 200)
     {
-        if(debug_mode)
+        if (debug_mode)
         {
             Serial.println("HTTPSND Sending command: " + command + "," + String(payload.length()) + "\r");
         }
         skywire->print(command + "," + String(payload.length()) + "\r");
 
         sent = true;
-
-        sent_timestamp = millis();
+        sent_timestamp = now;
 
         return SkywireResponseResult_t(false, "");
     }
@@ -66,9 +66,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         serialReadToRxBuffer();
     }
 
-    if(millis() - sent_timestamp > 500 && !payload_sent)
+    if (now - sent_timestamp > 500 && !payload_sent)
     {
-        if(debug_mode)
+        if (debug_mode)
         {
             Serial.println("HTTPSND Sending payload: " + payload);
         }
@@ -76,15 +76,16 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
         payload_sent = true;
 
-        if(debug_mode)
+        if (debug_mode)
         {
             Serial.println("HTTPSND is completed: " + String(completed()));
         }
     }
 
-    if (completed() && on_completed_function != nullptr && !on_completed_called)
+    const bool is_complete = completed();
+    if (is_complete && on_completed_function != nullptr && !on_completed_called)
     {
-        if(debug_mode)
+        if (debug_mode)
         {
             Serial.println("STEPPER CLIENT RECEIVED HTTPSND OK: " + rx_buffer);
         }

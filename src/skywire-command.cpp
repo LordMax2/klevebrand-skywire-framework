@@ -47,18 +47,20 @@ SkywireResponseResult_t SkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if(first_process_call)
+    const unsigned long now = millis();
+
+    if (first_process_call)
     {
         first_process_call = false;
-        first_process_call_timestamp = millis();
+        first_process_call_timestamp = now;
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 200)
+    if (!sent && now - first_process_call_timestamp > 200)
     {
         skywire->print(command + "\r");
 
         sent = true;
-        sent_timestamp = millis();
+        sent_timestamp = now;
 
         return SkywireResponseResult_t(false, "");
     }
@@ -70,7 +72,8 @@ SkywireResponseResult_t SkywireCommand::process()
 
     serialReadToRxBuffer();
 
-    if (okReceived())
+    const bool has_ok = okReceived();
+    if (has_ok)
     {
         if (debug_mode)
         {
@@ -78,7 +81,8 @@ SkywireResponseResult_t SkywireCommand::process()
             Serial.println("STEPPER CLIENT STEP: " + command + "RECEIVED OK");
         }
 
-        if(completed() && on_completed_function != nullptr && !on_completed_called)
+        const bool is_complete = completed();
+        if (is_complete && on_completed_function != nullptr && !on_completed_called)
         {
             on_completed_function(rx_buffer);
 

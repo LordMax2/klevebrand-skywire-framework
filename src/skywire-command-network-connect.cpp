@@ -12,18 +12,20 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if(first_process_call)
+    const unsigned long now = millis();
+
+    if (first_process_call)
     {
         first_process_call = false;
-        first_process_call_timestamp = millis();
+        first_process_call_timestamp = now;
     }
 
-    if (!sent && millis() - first_process_call_timestamp > 200)
+    if (!sent && now - first_process_call_timestamp > 200)
     {
         skywire->print("AT+CEREG?\r");
 
         sent = true;
-        sent_timestamp = millis();
+        sent_timestamp = now;
 
         return SkywireResponseResult_t(false, "");
     }
@@ -35,7 +37,8 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     serialReadToRxBuffer();
 
-    if (debug_mode && okReceived())
+    const bool has_ok = okReceived();
+    if (debug_mode && has_ok)
     {
         Serial.println(rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED CEREG");

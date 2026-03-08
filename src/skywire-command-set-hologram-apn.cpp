@@ -8,7 +8,7 @@ SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywi
 
 SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 {
-    unsigned long now = millis();
+    const unsigned long now = millis();
 
     switch (state)
     {
@@ -55,7 +55,9 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     case State::WAIT_QUERY:
         serialReadToRxBuffer();
 
-        if ((rx_buffer.indexOf("hologram") != -1 && rx_buffer.indexOf("OK") != -1) || rx_buffer.indexOf("context already activated") != -1)
+        const bool has_hologram_ok = (rx_buffer.indexOf("hologram") != -1 && rx_buffer.indexOf("OK") != -1);
+        const bool already_active = (rx_buffer.indexOf("context already activated") != -1);
+        if (has_hologram_ok || already_active)
         {
             state = State::DONE;
 
@@ -71,7 +73,6 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         if (okReceived())
         {
             resetState();
-
             state = State::SEND_SET;
         }
         break;

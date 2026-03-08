@@ -12,15 +12,18 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
+    const unsigned long now = millis();
+
     if (!sent)
     {
         sent = true;
-        sent_timestamp = millis();
+        sent_timestamp = now;
     }
 
     serialReadToRxBuffer();
 
-    if (debug_mode && okReceived())
+    const bool has_ok = okReceived();
+    if (debug_mode && has_ok)
     {
         Serial.println(rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + rx_buffer);
