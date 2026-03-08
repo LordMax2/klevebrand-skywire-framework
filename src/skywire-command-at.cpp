@@ -41,15 +41,5 @@ SkywireResponseResult_t AtSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if (now - sent_timestamp >= 1000)
-    {
-        if (debug_mode)
-        {
-            Serial.println("AT command did not receive a response; retrying...");
-        }
-        skywire->print(command + "\r");
-        sent_timestamp = now;
-    }
-
     return SkywireResponseResult_t(false, "");
 }

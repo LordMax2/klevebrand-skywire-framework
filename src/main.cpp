@@ -13,14 +13,11 @@
 #include "skywire-command.h"
 
 void setup() {
-    /*
     Serial.begin(115200);
 
     Serial.println("Starting Skywire modem...");
 
     SkywireCommandStartupWorker startupWorker(&Serial3, true);
-
-    Serial3.begin(115200);
 
     while (!startupWorker.run())
     {
@@ -33,7 +30,6 @@ void setup() {
     {
         // Do nothing, just keep the program running.
     }
-    */
 }   
 
 void loop() {
