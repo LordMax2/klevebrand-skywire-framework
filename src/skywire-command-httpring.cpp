@@ -36,5 +36,5 @@ bool HttpRingSkywireCommand::okReceived()
 
 bool HttpRingSkywireCommand::completed()
 {
-    return sent && okReceived() && (millis() - sent_timestamp) > 1000;
+    return sent && okReceived() && (millis() - sent_timestamp) > 500;
 }
