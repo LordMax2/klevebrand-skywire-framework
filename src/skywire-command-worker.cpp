@@ -5,11 +5,11 @@ SkywireCommandWorker::SkywireCommandWorker(HardwareSerial* skywire_serial, bool 
 {
 }
 
-void SkywireCommandWorker::resetState()
+void SkywireCommandWorker::reset()
 {
 	for (int i = 0; i < step_count; i++)
 	{
-		steps[i]->resetState();
+		steps[i]->reset();
 	}
 }
 
@@ -19,12 +19,12 @@ bool SkywireCommandWorker::run()
 	{
 		if (!steps[i]->completed())
 		{
-			if (steps[i]->sent_timestamp != 0 && millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+			if (steps[i]->_sent_timestamp != 0 && millis() - steps[i]->_sent_timestamp > timeout_milliseconds)
 			{
-				Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
-				Serial.println("rx_buffer at timeout: [" + steps[i]->rx_buffer + "], previous step rx_buffer: [" + (i > 0 ? steps[i - 1]->rx_buffer : "N/A") + "]");
+				Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->_sent_timestamp + ", current timestamp: " + millis());
+				Serial.println("rx_buffer at timeout: [" + steps[i]->_rx_buffer + "], previous step rx_buffer: [" + (i > 0 ? steps[i - 1]->_rx_buffer : "N/A") + "]");
 
-				resetState();
+				reset();
 
 				skywire->begin(115200);
 			}
@@ -37,7 +37,7 @@ bool SkywireCommandWorker::run()
 		}
 	}
 
-	resetState();
+	reset();
 
 	return true;
 }

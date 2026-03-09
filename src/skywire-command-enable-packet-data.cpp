@@ -7,7 +7,7 @@ EnablePacketDataSkywireCommand::EnablePacketDataSkywireCommand(HardwareSerial* s
 
 bool EnablePacketDataSkywireCommand::okReceived()
 {
-    if (SkywireCommand::okReceived() || rx_buffer.indexOf("ERROR") != -1)
+    if (SkywireCommand::okReceived() || _rx_buffer.indexOf("ERROR") != -1)
     {
         return true;
     }

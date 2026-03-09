@@ -9,15 +9,15 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
 {
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return SkywireResponseResult_t(true, _rx_buffer);
     }
 
     const unsigned long now = millis();
 
-    if (!sent)
+    if (!_sent)
     {
-        sent = true;
-        sent_timestamp = now;
+        _sent = true;
+        _sent_timestamp = now;
     }
 
     serialReadToRxBuffer();
@@ -25,8 +25,8 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println(rx_buffer);
-        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + rx_buffer);
+        Serial.println(_rx_buffer);
+        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + _rx_buffer);
     }
 
     return SkywireResponseResult_t(false, "");
@@ -34,10 +34,10 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
 
 bool HttpRingSkywireCommand::okReceived()
 {
-    return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1;
+    return _rx_buffer.indexOf("HTTPRING") != -1 && _rx_buffer.indexOf("\r\n") != -1;
 }
 
 bool HttpRingSkywireCommand::completed()
 {
-    return sent && okReceived() && (millis() - sent_timestamp) > 500;
+    return _sent && okReceived() && (millis() - _sent_timestamp) > 500;
 }

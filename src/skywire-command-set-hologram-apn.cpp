@@ -13,17 +13,17 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     switch (state)
     {
     case State::SEND_SET:
-        if (first_process_call)
+        if (_first_process_call)
         {
-            first_process_call = false;
-            first_process_call_timestamp = millis();
+            _first_process_call = false;
+            _first_process_call_timestamp = millis();
         }
 
-        if (!sent && millis() - first_process_call_timestamp > 200)
+        if (!_sent && millis() - _first_process_call_timestamp > 200)
         {
             skywire->print(command + "\r");
-            sent = true;
-            sent_timestamp = now;
+            _sent = true;
+            _sent_timestamp = now;
 
             state = State::WAIT_SET;
         }
@@ -36,17 +36,17 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         if (okReceived())
         {
             state = State::SEND_QUERY;
-            sent = false;
-            rx_buffer = "";
+            _sent = false;
+            _rx_buffer = "";
         }
         break;
 
     case State::SEND_QUERY:
-        if (!sent)
+        if (!_sent)
         {
             skywire->print("AT+CGDCONT?\r");
-            sent = true;
-            sent_timestamp = now;
+            _sent = true;
+            _sent_timestamp = now;
         }
 
         state = State::WAIT_QUERY;
@@ -55,33 +55,33 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     case State::WAIT_QUERY:
         serialReadToRxBuffer();
 
-        const bool has_hologram_ok = (rx_buffer.indexOf("hologram") != -1 && rx_buffer.indexOf("OK") != -1);
-        const bool already_active = (rx_buffer.indexOf("context already activated") != -1);
+        const bool has_hologram_ok = (_rx_buffer.indexOf("hologram") != -1 && _rx_buffer.indexOf("OK") != -1);
+        const bool already_active = (_rx_buffer.indexOf("context already activated") != -1);
         if (has_hologram_ok || already_active)
         {
             state = State::DONE;
 
-            if (on_completed_function && !on_completed_called)
+            if (on_completed_function && !_on_completed_called)
             {
-                on_completed_function(rx_buffer);
-                on_completed_called = true;
+                on_completed_function(_rx_buffer);
+                _on_completed_called = true;
             }
 
-            return SkywireResponseResult_t(true, rx_buffer);
+            return SkywireResponseResult_t(true, _rx_buffer);
         }
 
         if (okReceived())
         {
-            resetState();
+            reset();
             state = State::SEND_SET;
         }
         break;
 
     case State::DONE:
-        return SkywireResponseResult_t(true, rx_buffer);
+        return SkywireResponseResult_t(true, _rx_buffer);
     }
 
-    if (sent && now - sent_timestamp >= 1000)
+    if (_sent && now - _sent_timestamp >= 1000)
     {
         if (state == State::WAIT_SET)
         {
@@ -91,7 +91,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             skywire->print("AT+CGDCONT?\r");
         }
-        sent_timestamp = now;
+        _sent_timestamp = now;
     }
 
     return SkywireResponseResult_t(false, "");

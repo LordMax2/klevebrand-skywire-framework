@@ -50,13 +50,13 @@ bool SkywireCommandStartupWorker::run()
     {
         if (!steps[i]->completed())
         {
-            if (steps[i]->sent_timestamp != 0 &&
-                millis() - steps[i]->sent_timestamp > timeout_milliseconds)
+            if (steps[i]->_sent_timestamp != 0 &&
+                millis() - steps[i]->_sent_timestamp > timeout_milliseconds)
             {
-                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->sent_timestamp + ", current timestamp: " + millis());
-                Serial.println("rx_buffer at timeout: [" + steps[i]->rx_buffer + "]");
+                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->_sent_timestamp + ", current timestamp: " + millis());
+                Serial.println("rx_buffer at timeout: [" + steps[i]->_rx_buffer + "]");
 
-                resetState();
+                reset();
 
                 skywire->begin(115200);
             }

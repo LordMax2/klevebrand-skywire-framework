@@ -13,7 +13,7 @@ public:
     bool arrowsReceived();
     void setPayload(String payload);
     String getPayload();
-    void resetState() override;
+    void reset() override;
 
 private:
     String payload = "";

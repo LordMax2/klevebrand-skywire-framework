@@ -9,28 +9,28 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 {
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return SkywireResponseResult_t(true, _rx_buffer);
     }
 
     const unsigned long now = millis();
 
-    if (first_process_call)
+    if (_first_process_call)
     {
-        first_process_call = false;
-        first_process_call_timestamp = now;
+        _first_process_call = false;
+        _first_process_call_timestamp = now;
     }
 
-    if (!sent && now - first_process_call_timestamp > 200)
+    if (!_sent && now - _first_process_call_timestamp > 200)
     {
         skywire->print("AT+CEREG?\r");
 
-        sent = true;
-        sent_timestamp = now;
+        _sent = true;
+        _sent_timestamp = now;
 
         return SkywireResponseResult_t(false, "");
     }
 
-    if (!sent)
+    if (!_sent)
     {
         return SkywireResponseResult_t(false, "");
     }
@@ -40,19 +40,19 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println(rx_buffer);
+        Serial.println(_rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED CEREG");
     }
 
     if (isNetworkConnected())
     {
-        if (on_completed_function != nullptr && !on_completed_called)
+        if (on_completed_function != nullptr && !_on_completed_called)
         {
-            on_completed_function(rx_buffer);
-            on_completed_called = true;
+            on_completed_function(_rx_buffer);
+            _on_completed_called = true;
         }
 
-        return SkywireResponseResult_t(true, rx_buffer);
+        return SkywireResponseResult_t(true, _rx_buffer);
     }
 
     return SkywireResponseResult_t(false, "");
@@ -60,14 +60,14 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
 bool NetworkConnectSkywireCommand::isNetworkConnected()
 {
-    int cereg_index = rx_buffer.indexOf("+CEREG:");
+    int cereg_index = _rx_buffer.indexOf("+CEREG:");
 
     if (cereg_index == -1)
     {
         return false;
     }
 
-    String remainder = rx_buffer.substring(cereg_index);
+    String remainder = _rx_buffer.substring(cereg_index);
     int first_comma = remainder.indexOf(',');
 
     if (first_comma == -1)

@@ -1,49 +1,33 @@
 #include "skywire-command.h"
 
-SkywireCommand::SkywireCommand(HardwareSerial* skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content))
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, String command, bool debug_mode, void (*on_completed_function)(String &result_content))
     : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
 }
 
-void SkywireCommand::serialReadToRxBuffer(size_t max_bytes_per_call)
+String SkywireCommand::getRxBuffer()
 {
-    size_t bytes_read = 0;
-    while (skywire->available() && (max_bytes_per_call == 0 || bytes_read < max_bytes_per_call))
+    return _rx_buffer;
+}
+
+void SkywireCommand::appendToRxBuffer(char c)
+{
+    _rx_buffer += c;
+}
+
+void SkywireCommand::serialReadToRxBuffer()
+{
+    while (skywire->available())
     {
         char c = skywire->read();
-        rx_buffer += c;
-        bytes_read++;
+        appendToRxBuffer(c);
     }
-}
-
-void SkywireCommand::resetRxBuffer()
-{
-    rx_buffer = "";
-}
-
-bool SkywireCommand::okReceived() 
-{
-    return true;
-}
-
-void SkywireCommand::resetState()
-{
-    sent = false;
-    sent_timestamp = 0;
-    on_completed_called = false;
-    first_process_call = true;
-    first_process_call_timestamp = 0;
-
-    resetRxBuffer();
-}
-
-bool SkywireCommand::completed()
-{
-    return sent && okReceived();
 }
 
 SkywireResponseResult_t SkywireCommand::process()
 {
+    auto rx_buffer = getRxBuffer();
+
     if (completed())
     {
         return SkywireResponseResult_t(true, rx_buffer);
@@ -51,30 +35,26 @@ SkywireResponseResult_t SkywireCommand::process()
 
     const unsigned long now = millis();
 
-    if (first_process_call)
+    setFirstProcessCall();
+
+    if (!isSent())
     {
-        first_process_call = false;
-        first_process_call_timestamp = now;
-    }
+        if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0))
+        {
+            skywire->print(command + "\r");
 
-    if (!sent && now - first_process_call_timestamp > 200)
-    {
-        skywire->print(command + "\r");
+            setSent(true);
+        }
 
-        sent = true;
-        sent_timestamp = now;
-
-        return SkywireResponseResult_t(false, "");
-    }
-
-    if (!sent)
-    {
         return SkywireResponseResult_t(false, "");
     }
 
     serialReadToRxBuffer();
 
+    rx_buffer = getRxBuffer();
+
     const bool has_ok = okReceived();
+
     if (has_ok)
     {
         if (debug_mode)
@@ -84,11 +64,11 @@ SkywireResponseResult_t SkywireCommand::process()
         }
 
         const bool is_complete = completed();
-        if (is_complete && on_completed_function != nullptr && !on_completed_called)
+        if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
         {
             on_completed_function(rx_buffer);
 
-            on_completed_called = true;
+            setOnCompletedCalled(true);
         }
 
         return SkywireResponseResult_t(true, rx_buffer);
@@ -97,3 +77,76 @@ SkywireResponseResult_t SkywireCommand::process()
     return SkywireResponseResult_t(false, "");
 }
 
+void SkywireCommand::resetRxBuffer()
+{
+    _rx_buffer = "";
+}
+
+bool SkywireCommand::okReceived()
+{
+    return _rx_buffer.indexOf("OK") != -1;
+}
+
+void SkywireCommand::reset()
+{
+    _sent = false;
+    _sent_timestamp = 0;
+    _on_completed_called = false;
+    _first_process_call = true;
+    _first_process_call_timestamp = 0;
+
+    resetRxBuffer();
+}
+
+bool SkywireCommand::completed()
+{
+    return _sent && okReceived();
+}
+
+void SkywireCommand::setFirstProcessCall()
+{
+    if (_first_process_call)
+    {
+        _first_process_call_timestamp = millis();
+        _first_process_call = false;
+    }
+}
+
+bool SkywireCommand::isFirstProcessCalled()
+{
+    return !_first_process_call;
+}
+
+unsigned long SkywireCommand::getFirstProcessCallTimestamp()
+{
+    return _first_process_call_timestamp;
+}
+
+void SkywireCommand::setSent(bool sent)
+{
+    _sent = sent;
+    if (sent)
+    {
+        _sent_timestamp = millis();
+    }
+}
+
+bool SkywireCommand::isSent()
+{
+    return _sent;
+}
+
+unsigned long SkywireCommand::getSentTimestamp()
+{
+    return _sent_timestamp;
+}
+
+bool SkywireCommand::isOnCompletedCalled()
+{
+    return _on_completed_called;
+}
+
+void SkywireCommand::setOnCompletedCalled(bool on_completed_called)
+{
+    _on_completed_called = on_completed_called;
+}

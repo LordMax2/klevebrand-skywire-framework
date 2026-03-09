@@ -6,12 +6,23 @@
 
 class SkywireCommand
 {
+private:
+	bool _sent = false;
+	unsigned long _sent_timestamp = 0;
+	bool _on_completed_called = false;
+
+	bool _first_process_call = true;
+	unsigned long _first_process_call_timestamp = 0;
+
+	String _rx_buffer = "";
+
 public:
 	SkywireCommand(HardwareSerial* skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content));
 
-	virtual bool completed();
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
+	virtual bool completed();
+	virtual void reset();
 
 	HardwareSerial* skywire;
 	String command;
@@ -19,18 +30,22 @@ public:
 
 	void (*on_completed_function)(String& result_content);
 
-	bool sent = false;
-	unsigned long sent_timestamp = 0;
-	bool on_completed_called = false;
+	void setSent(bool sent);
+	bool isSent();
+	unsigned long getSentTimestamp();
 
-	bool first_process_call = true;
-	unsigned long first_process_call_timestamp = 0;
+	void setOnCompletedCalled(bool on_completed_called);
+	bool isOnCompletedCalled();
 
-	String rx_buffer = "";
+	void setFirstProcessCall();
+	bool isFirstProcessCalled();
+	unsigned long getFirstProcessCallTimestamp();
 
-	void serialReadToRxBuffer(size_t max_bytes_per_call = 32);
+	String getRxBuffer();
+	void appendToRxBuffer(char c);
+	void serialReadToRxBuffer();
 	void resetRxBuffer();
-	virtual void resetState();
+
 };
 
 #endif 
