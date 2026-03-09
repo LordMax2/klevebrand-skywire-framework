@@ -1,10 +1,10 @@
 #include "skywire-command.h"
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, char* command, bool debug_mode, void (*on_completed_function)(char* result_content))
-    : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function)
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, char command[256], bool debug_mode, void (*on_completed_function)(char result_content[4096]))
+    : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
-    _rx_buffer = new char[2048]; 
-    command = new char[256];
+    strncpy(this->command, command, sizeof(this->command) - 1);
+    this->command[sizeof(this->command) - 1] = '\0';
 }
 
 char* SkywireCommand::getRxBuffer()
@@ -14,7 +14,15 @@ char* SkywireCommand::getRxBuffer()
 
 void SkywireCommand::appendToRxBuffer(char c)
 {
-    _rx_buffer += c;
+    if (_rx_buffer_cursor_index < sizeof(_rx_buffer) - 1)
+    {
+        _rx_buffer[_rx_buffer_cursor_index++] = c;
+        _rx_buffer[_rx_buffer_cursor_index] = '\0';
+    }
+    else
+    {
+        Serial.println("RX buffer overflow. Character not appended.");
+    }
 }
 
 void SkywireCommand::serialReadToRxBuffer()
@@ -43,7 +51,8 @@ SkywireResponseResult_t SkywireCommand::process()
     {
         if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0))
         {
-            skywire->print(command + "\r");
+            skywire->print(command);
+            skywire->print("\r");
 
             setSent(true);
         }
@@ -81,12 +90,13 @@ SkywireResponseResult_t SkywireCommand::process()
 
 void SkywireCommand::resetRxBuffer()
 {
-    _rx_buffer = "";
+    _rx_buffer_cursor_index = 0;
+    _rx_buffer[0] = '\0';
 }
 
 bool SkywireCommand::okReceived()
 {
-    return _rx_buffer.indexOf("OK") != -1;
+    return strstr(_rx_buffer, "OK") != nullptr;
 }
 
 void SkywireCommand::reset()

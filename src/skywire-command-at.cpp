@@ -1,6 +1,6 @@
 #include "skywire-command-at.h"
 
-AtSkywireCommand::AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function)
+AtSkywireCommand::AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(char* result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function)
 {
 }
 
