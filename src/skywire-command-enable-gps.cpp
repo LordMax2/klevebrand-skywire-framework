@@ -7,7 +7,9 @@ EnableGpsSkywireCommand::EnableGpsSkywireCommand(HardwareSerial* skywire, bool d
 
 bool EnableGpsSkywireCommand::okReceived()
 {
-    if (SkywireCommand::okReceived() || _rx_buffer.indexOf("ERROR") != -1)
+    auto rx_buffer = getRxBuffer();
+
+    if (SkywireCommand::okReceived() || rx_buffer.indexOf("ERROR") != -1)
     {
         return true;
     }

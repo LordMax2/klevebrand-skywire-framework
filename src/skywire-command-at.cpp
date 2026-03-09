@@ -7,61 +7,63 @@ AtSkywireCommand::AtSkywireCommand(HardwareSerial* skywire, bool debug_mode, voi
 
 SkywireResponseResult_t AtSkywireCommand::process()
 {
+    auto rx_buffer = getRxBuffer();
+
     if (completed())
     {
-        return SkywireResponseResult_t(true, _rx_buffer);
+        return SkywireResponseResult_t(true, rx_buffer);
     }
 
     const unsigned long now = millis();
 
-    if (_first_process_call)
-    {
-        _first_process_call = false;
-        _first_process_call_timestamp = now;
-    }
+    setFirstProcessCall();
 
-    if (!_sent && now - _first_process_call_timestamp > 200)
+    if (!isSent())
     {
-        skywire->print(command + "\r");
-        _sent = true;
-        _sent_timestamp = now;
-        return SkywireResponseResult_t(false, "");
-    }
+        if(now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        {
+            skywire->print(command + "\r");
 
-    if (!_sent)
-    {
+            setSent(true);
+        }
+
         return SkywireResponseResult_t(false, "");
     }
 
     serialReadToRxBuffer();
 
+    rx_buffer = getRxBuffer();
     const bool has_ok = okReceived();
+
     if (has_ok)
     {
         if (debug_mode)
         {
-            Serial.println(_rx_buffer);
+            Serial.println(rx_buffer);
             Serial.println("STEPPER CLIENT STEP: " + command + " RECEIVED OK");
         }
 
         const bool is_complete = completed();
-        if (is_complete && on_completed_function != nullptr && !_on_completed_called)
+        if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
         {
-            on_completed_function(_rx_buffer);
-            _on_completed_called = true;
+            on_completed_function(rx_buffer);
+
+            setOnCompletedCalled(true);
         }
 
-        return SkywireResponseResult_t(true, _rx_buffer);
+        return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    if (now - _sent_timestamp >= 1000)
+    if (now - getSentTimestamp() >= 1000)
     {
         if (debug_mode)
         {
             Serial.println("AT command did not receive a response; retrying...");
         }
+
         skywire->print(command + "\r");
-        _sent_timestamp = now;
+
+        setSent(true);
     }
 
     return SkywireResponseResult_t(false, "");
