@@ -3,11 +3,12 @@
 
 #include "skywire-command.h"
 
-class AtSkywireCommand : public SkywireCommand {
+class AtSkywireCommand : public SkywireCommand
+{
 public:
-    AtSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
 
     virtual SkywireResponseResult_t process() override;
 };
 
-#endif 
+#endif

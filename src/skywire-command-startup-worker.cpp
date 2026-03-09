@@ -1,6 +1,6 @@
 #include "skywire-command-startup-worker.h"
 
-SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial* skywire_serial, bool debug_mode)
+SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
     : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
 {
     this->steps = new SkywireCommand *[STEP_COUNT];
@@ -50,11 +50,14 @@ bool SkywireCommandStartupWorker::run()
     {
         if (!steps[i]->completed())
         {
-            if (steps[i]->_sent_timestamp != 0 &&
-                millis() - steps[i]->_sent_timestamp > timeout_milliseconds)
+            const auto sent_timestamp = steps[i]->getSentTimestamp();
+            const auto rx_buffer = steps[i]->getRxBuffer();
+
+            if (sent_timestamp != 0 &&
+                millis() - sent_timestamp > timeout_milliseconds)
             {
-                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + steps[i]->_sent_timestamp + ", current timestamp: " + millis());
-                Serial.println("rx_buffer at timeout: [" + steps[i]->_rx_buffer + "]");
+                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + sent_timestamp + ", current timestamp: " + millis());
+                Serial.println("rx_buffer at timeout: [" + rx_buffer + "]");
 
                 reset();
 

@@ -17,18 +17,18 @@ private:
 	String _rx_buffer = "";
 
 public:
-	SkywireCommand(HardwareSerial* skywire, String command, bool debug_mode, void (*on_completed_function)(String& result_content));
+	SkywireCommand(HardwareSerial *skywire, String command, bool debug_mode, void (*on_completed_function)(String &result_content));
 
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
 	virtual bool completed();
 	virtual void reset();
 
-	HardwareSerial* skywire;
+	HardwareSerial *skywire;
 	String command;
 	bool debug_mode;
 
-	void (*on_completed_function)(String& result_content);
+	void (*on_completed_function)(String &result_content);
 
 	void setSent(bool sent);
 	bool isSent();
@@ -45,7 +45,6 @@ public:
 	void appendToRxBuffer(char c);
 	void serialReadToRxBuffer();
 	void resetRxBuffer();
-
 };
 
-#endif 
+#endif

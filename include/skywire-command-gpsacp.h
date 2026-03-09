@@ -7,7 +7,7 @@
 class GpsAcpSkywireCommand : public SkywireCommand
 {
 public:
-    GpsAcpSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content));
+    GpsAcpSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
     SkywireResponseResult_t process() override;
 };
 

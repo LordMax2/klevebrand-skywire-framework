@@ -4,17 +4,17 @@
 #include "Arduino.h"
 #include "skywire-command.h"
 
-class SkywireCommandWorker 
+class SkywireCommandWorker
 {
 public:
-	SkywireCommandWorker(HardwareSerial* skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count);
+	SkywireCommandWorker(HardwareSerial *skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count);
 
 	virtual bool run();
-	void resetState();
+	void reset();
 
-    int step_count = 0;
+	int step_count = 0;
 
-	HardwareSerial* skywire;
+	HardwareSerial *skywire;
 
 	SkywireCommand **steps;
 

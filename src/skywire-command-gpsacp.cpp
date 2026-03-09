@@ -4,4 +4,3 @@ GpsAcpSkywireCommand::GpsAcpSkywireCommand(HardwareSerial *skywire, bool debug_m
     : SkywireCommand(skywire, "AT$GPSACP", debug_mode, on_completed_function)
 {
 }
-

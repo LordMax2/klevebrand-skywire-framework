@@ -16,7 +16,7 @@ class SkywireCommandStartupWorker : public SkywireCommandWorker
 {
 public:
     SkywireCommandStartupWorker(
-        HardwareSerial* skywire_serial,
+        HardwareSerial *skywire_serial,
         bool debug_mode = false);
 
     static void onAtCommandCompleted(String &result_content);
@@ -34,4 +34,4 @@ public:
     bool run() override;
 };
 
-#endif 
+#endif

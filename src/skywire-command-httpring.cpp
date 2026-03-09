@@ -1,6 +1,6 @@
 #include "skywire-command-httpring.h"
 
-HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content))
+HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
     : SkywireCommand(skywire, "HTTPRING", debug_mode, on_completed_function)
 {
 }
@@ -18,7 +18,8 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
 
     setFirstProcessCall();
 
-    if(!isSent()) setSent(true);
+    if (!isSent())
+        setSent(true);
 
     serialReadToRxBuffer();
 

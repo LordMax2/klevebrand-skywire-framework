@@ -1,8 +1,7 @@
 #include "skywire-command-at.h"
 
-AtSkywireCommand::AtSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function) 
+AtSkywireCommand::AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function)
 {
-
 }
 
 SkywireResponseResult_t AtSkywireCommand::process()
@@ -20,7 +19,7 @@ SkywireResponseResult_t AtSkywireCommand::process()
 
     if (!isSent())
     {
-        if(now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {
             skywire->print(command + "\r");
 

@@ -1,37 +1,36 @@
 #include "skywire-command-httprcv.h"
 
-HttpRcvSkywireCommand::HttpRcvSkywireCommand(HardwareSerial* skywire, bool debug_mode, void (*on_completed_function)(String& result_content))
+HttpRcvSkywireCommand::HttpRcvSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
     : SkywireCommand(skywire, "", debug_mode, on_completed_function)
 {
 }
 
 SkywireResponseResult_t HttpRcvSkywireCommand::process()
 {
+    auto rx_buffer = getRxBuffer();
+
     if (completed())
     {
-        return SkywireResponseResult_t(true, _rx_buffer);
+        return SkywireResponseResult_t(true, rx_buffer);
     }
 
     const unsigned long now = millis();
 
-    if (_first_process_call)
+    setFirstProcessCall();
+
+    if (!isSent())
     {
-        _first_process_call = false;
-        _first_process_call_timestamp = now;
-    }
+        if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        {
+            if (debug_mode)
+            {
+                Serial.println("HTTPRCV Sending command: AT#HTTPRCV=0,64\r");
+            }
+            skywire->print("AT#HTTPRCV=0,64\r");
 
-    if (!_sent && now - _first_process_call_timestamp > 200)
-    {
-        skywire->print("AT#HTTPRCV=0,64\r");
+            setSent(true);
+        }
 
-        _sent = true;
-        timestamp_milliseconds = now;
-
-        return SkywireResponseResult_t(false, "");
-    }
-
-    if (!_sent)
-    {
         return SkywireResponseResult_t(false, "");
     }
 
@@ -47,16 +46,16 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println(_rx_buffer);
+        Serial.println(rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED HTTPRCV CONTENT");
     }
 
     const bool is_complete = completed();
-    if (is_complete && on_completed_function != nullptr && !_on_completed_called)
+    if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
     {
-        on_completed_function(_rx_buffer);
+        on_completed_function(rx_buffer);
 
-        _on_completed_called = true;
+        setOnCompletedCalled(true);
     }
 
     return SkywireResponseResult_t(false, "");
@@ -64,5 +63,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
 
 bool HttpRcvSkywireCommand::okReceived()
 {
-    return _rx_buffer.indexOf("ERROR") != -1;
+    const auto rx_buffer = getRxBuffer();
+
+    return rx_buffer.indexOf("ERROR") != -1;
 }
