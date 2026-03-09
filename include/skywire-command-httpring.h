@@ -7,7 +7,7 @@
 class HttpRingSkywireCommand : public SkywireCommand
 {
 public:
-	HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+	HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 	SkywireResponseResult_t process() override;
 
 	bool okReceived() override;

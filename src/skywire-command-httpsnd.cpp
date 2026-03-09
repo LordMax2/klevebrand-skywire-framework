@@ -1,23 +1,26 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content))
-    : SkywireCommand(skywire, "AT#HTTPSND=0,0," + path, debug_mode, on_completed_function)
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, char path[256], OnCompletedFunction on_completed_function)
+    : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function)
 {
+    strncpy(this->path, path, sizeof(this->path) - 1);
+    this->path[sizeof(this->path) - 1] = '\0';
 }
 
 bool HttpSndSkywireCommand::arrowsReceived()
 {
     auto rx_buffer = getRxBuffer();
 
-    return rx_buffer.indexOf(">>>") != -1 || millis() - getSentTimestamp() > 200;
+    return strstr(rx_buffer, ">>>") != nullptr || millis() - getSentTimestamp() > 200;
 }
 
-void HttpSndSkywireCommand::setPayload(String payload)
+void HttpSndSkywireCommand::setPayload(char payload[1024])
 {
-    this->payload = payload;
+    strncpy(this->payload, payload, sizeof(this->payload) - 1);
+    this->payload[sizeof(this->payload) - 1] = '\0';
 }
 
-String HttpSndSkywireCommand::getPayload()
+char* HttpSndSkywireCommand::getPayload()
 {
     return payload;
 }
@@ -49,9 +52,12 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
             if (debug_mode)
             {
-                Serial.println("HTTPSND Sending command: " + command + "," + String(payload.length()) + "\r");
+                Serial.println("HTTPSND Sending command: " + String(command) + "," + String(payload.length()) + "\r");
             }
-            skywire->print(command + "," + String(payload.length()) + "\r");
+            skywire->print(command);
+            skywire->print(",");
+            skywire->print(payload.length());
+            skywire->print("\r");
 
             setSent(true);
         }
@@ -85,7 +91,8 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     {
         if (debug_mode)
         {
-            Serial.println("STEPPER CLIENT RECEIVED HTTPSND OK: " + rx_buffer);
+            Serial.print("STEPPER CLIENT RECEIVED HTTPSND OK: ");
+            Serial.println(rx_buffer);
         }
 
         on_completed_function(rx_buffer);

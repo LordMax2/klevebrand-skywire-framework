@@ -6,18 +6,19 @@
 class HttpSndSkywireCommand : public SkywireCommand
 {
 public:
-    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content));
+    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, char path[256], OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process() override;
     bool completed() override;
 
     bool arrowsReceived();
-    void setPayload(String payload);
-    String getPayload();
+    void setPayload(char payload[1024]);
+    char* getPayload();
     void reset() override;
 
 private:
-    String payload = "";
+    char payload[1024];
+    char path[256];
     bool payload_sent = false;
 };
 

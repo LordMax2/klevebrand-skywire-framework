@@ -1,6 +1,6 @@
 #include "skywire-command-set-hologram-apn.h"
 
-SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
       state(State::SEND_SET)
 {
@@ -19,7 +19,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 
         if (!isSent() && millis() - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {
-            skywire->print(command + "\r");
+            skywire->print(command);
+            skywire->print('\r');
             setSent(true);
 
             state = State::WAIT_SET;
@@ -55,8 +56,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 
         rx_buffer = getRxBuffer();
 
-        const bool has_hologram_ok = (rx_buffer.indexOf("hologram") != -1 && rx_buffer.indexOf("OK") != -1);
-        const bool already_active = (rx_buffer.indexOf("context already activated") != -1);
+        const bool has_hologram_ok = (strstr(rx_buffer, "hologram") != nullptr && strstr(rx_buffer, "OK") != nullptr);
+        const bool already_active = (strstr(rx_buffer, "context already activated") != nullptr);
 
         if (has_hologram_ok || already_active)
         {
@@ -86,7 +87,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     {
         if (state == State::WAIT_SET)
         {
-            skywire->print(command + "\r");
+            skywire->print(command);
+            skywire->print('\r');
         }
         else if (state == State::WAIT_QUERY)
         {

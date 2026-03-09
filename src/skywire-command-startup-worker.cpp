@@ -14,34 +14,40 @@ SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire
     this->steps[6] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
 }
 
-void SkywireCommandStartupWorker::onAtCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onAtCommandCompleted(char* result_content)
 {
-    Serial.println("AT command completed with result: " + result_content);
+    Serial.print("AT command completed with result: ");
+    Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onDisableEchoCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onDisableEchoCommandCompleted(char* result_content)
 {
-    Serial.println("Disable echo command completed with result: " + result_content);
+    Serial.print("Disable echo command completed with result: ");
+    Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onSetApnCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onSetApnCommandCompleted(char* result_content)
 {
-    Serial.println("Set APN command completed with result: " + result_content);
+    Serial.print("Set APN command completed with result: ");
+    Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onNetworkConnectCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onNetworkConnectCommandCompleted(char* result_content)
 {
-    Serial.println("Network connect command completed with result: " + result_content);
+    Serial.print("Network connect command completed with result: ");
+    Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onEnablePacketDataCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onEnablePacketDataCommandCompleted(char* result_content)
 {
-    Serial.println("Enable packet data command completed with result: " + result_content);
+    Serial.print("Enable packet data command completed with result: ");
+    Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(String &result_content)
+void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(char* result_content)
 {
-    Serial.println("Enable GPS command completed with result: " + result_content);
+    Serial.print("Enable GPS command completed with result: ");
+    Serial.println(result_content);
 }
 
 bool SkywireCommandStartupWorker::run()

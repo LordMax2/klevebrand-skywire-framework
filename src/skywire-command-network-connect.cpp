@@ -1,6 +1,6 @@
 #include "skywire-command-network-connect.h"
 
-NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "", debug_mode, on_completed_function)
 {
 }
@@ -59,36 +59,22 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
     return SkywireResponseResult_t(false, "");
 }
 
-bool NetworkConnectSkywireCommand::isNetworkConnected()
-{
-    auto rx_buffer = getRxBuffer();
+bool NetworkConnectSkywireCommand::isNetworkConnected() {
+    auto rx_ptr = getRxBuffer(); 
 
-    int cereg_index = rx_buffer.indexOf("+CEREG:");
-
-    if (cereg_index == -1)
-    {
+    char* cereg_pos = strstr(rx_ptr, "+CEREG:");
+    if (!cereg_pos) {
         return false;
     }
 
-    String remainder = rx_buffer.substring(cereg_index);
-    int first_comma = remainder.indexOf(',');
-
-    if (first_comma == -1)
-    {
+    char* first_comma = strchr(cereg_pos, ',');
+    if (!first_comma) {
         return false;
     }
 
-    String status_section = remainder.substring(first_comma + 1);
+    char status_char = *(first_comma + 1);
 
-    if (status_section.length() == 0)
-    {
-        return false;
-    }
-
-    char status_char = status_section[0];
-
-    if (status_char == '1' || status_char == '5')
-    {
+    if (status_char == '1' || status_char == '5') {
         return true;
     }
 

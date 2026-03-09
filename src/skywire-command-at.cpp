@@ -1,6 +1,6 @@
 #include "skywire-command-at.h"
 
-AtSkywireCommand::AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(char* result_content)) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function)
+AtSkywireCommand::AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function) : SkywireCommand(skywire, "AT", debug_mode, on_completed_function)
 {
 }
 
@@ -21,7 +21,8 @@ SkywireResponseResult_t AtSkywireCommand::process()
     {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {
-            skywire->print(command + "\r");
+            skywire->print(command);
+            skywire->print("\r");
 
             setSent(true);
         }
@@ -39,7 +40,7 @@ SkywireResponseResult_t AtSkywireCommand::process()
         if (debug_mode)
         {
             Serial.println(rx_buffer);
-            Serial.println("STEPPER CLIENT STEP: " + command + " RECEIVED OK");
+            Serial.println("STEPPER CLIENT STEP: " + String(command) + " RECEIVED OK");
         }
 
         const bool is_complete = completed();
@@ -60,7 +61,8 @@ SkywireResponseResult_t AtSkywireCommand::process()
             Serial.println("AT command did not receive a response; retrying...");
         }
 
-        skywire->print(command + "\r");
+        skywire->print(command);
+        skywire->print("\r");
 
         setSent(true);
     }

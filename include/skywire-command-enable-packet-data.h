@@ -6,7 +6,7 @@
 class EnablePacketDataSkywireCommand : public SkywireCommand
 {
 public:
-    EnablePacketDataSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    EnablePacketDataSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function) ;
 
     bool okReceived() override;
 };
