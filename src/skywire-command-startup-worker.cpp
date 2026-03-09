@@ -56,7 +56,7 @@ bool SkywireCommandStartupWorker::run()
             if (sent_timestamp != 0 && millis() - sent_timestamp > timeout_milliseconds)
             {
                 Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + sent_timestamp + ", current timestamp: " + millis());
-                Serial.println("rx_buffer at timeout: [" + rx_buffer + "]");
+                Serial.println("rx_buffer at timeout: [" + String(rx_buffer) + "]");
 
                 reset();
 

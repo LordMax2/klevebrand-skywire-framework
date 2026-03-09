@@ -3,6 +3,8 @@
 SkywireCommand::SkywireCommand(HardwareSerial *skywire, char* command, bool debug_mode, void (*on_completed_function)(char* result_content))
     : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
+    _rx_buffer = new char[2048]; 
+    command = new char[256];
 }
 
 char* SkywireCommand::getRxBuffer()
@@ -60,7 +62,7 @@ SkywireResponseResult_t SkywireCommand::process()
         if (debug_mode)
         {
             Serial.println(rx_buffer);
-            Serial.println("STEPPER CLIENT STEP: " + command + "RECEIVED OK");
+            Serial.println("STEPPER CLIENT STEP: " + String(command) + "RECEIVED OK");
         }
 
         const bool is_complete = completed();
