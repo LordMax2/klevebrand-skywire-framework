@@ -1,13 +1,15 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial* skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content))
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, String path, void (*on_completed_function)(String &result_content))
     : SkywireCommand(skywire, "AT#HTTPSND=0,0," + path, debug_mode, on_completed_function)
 {
 }
 
 bool HttpSndSkywireCommand::arrowsReceived()
 {
-    return _rx_buffer.indexOf(">>>") != -1 || millis() - _sent_timestamp > 200;
+    auto rx_buffer = getRxBuffer();
+
+    return rx_buffer.indexOf(">>>") != -1 || millis() - getSentTimestamp() > 200;
 }
 
 void HttpSndSkywireCommand::setPayload(String payload)
@@ -28,36 +30,32 @@ void HttpSndSkywireCommand::reset()
 
 SkywireResponseResult_t HttpSndSkywireCommand::process()
 {
+    auto rx_buffer = getRxBuffer();
+
     if (completed())
     {
-        return SkywireResponseResult_t(true, _rx_buffer);
+        return SkywireResponseResult_t(true, rx_buffer);
     }
 
     const String payload = getPayload();
     const unsigned long now = millis();
 
-    if (_first_process_call)
-    {
-        _first_process_call = false;
-        _first_process_call_timestamp = now;
-    }
+    setFirstProcessCall();
 
-    if (!_sent && now - _first_process_call_timestamp > 200)
+    if (!isSent())
     {
-        if (debug_mode)
+        if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {
-            Serial.println("HTTPSND Sending command: " + command + "," + String(payload.length()) + "\r");
+
+            if (debug_mode)
+            {
+                Serial.println("HTTPSND Sending command: " + command + "," + String(payload.length()) + "\r");
+            }
+            skywire->print(command + "," + String(payload.length()) + "\r");
+
+            setSent(true);
         }
-        skywire->print(command + "," + String(payload.length()) + "\r");
 
-        _sent = true;
-        _sent_timestamp = now;
-
-        return SkywireResponseResult_t(false, "");
-    }
-
-    if (!_sent)
-    {
         return SkywireResponseResult_t(false, "");
     }
 
@@ -66,7 +64,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         serialReadToRxBuffer();
     }
 
-    if (now - _sent_timestamp > 500 && !payload_sent)
+    if (now - getSentTimestamp() > 500 && !payload_sent)
     {
         if (debug_mode)
         {
@@ -83,16 +81,16 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     }
 
     const bool is_complete = completed();
-    if (is_complete && on_completed_function != nullptr && !_on_completed_called)
+    if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
     {
         if (debug_mode)
         {
-            Serial.println("STEPPER CLIENT RECEIVED HTTPSND OK: " + _rx_buffer);
+            Serial.println("STEPPER CLIENT RECEIVED HTTPSND OK: " + rx_buffer);
         }
 
-        on_completed_function(_rx_buffer);
+        on_completed_function(rx_buffer);
 
-        _on_completed_called = true;
+        setOnCompletedCalled(true);
     }
 
     return SkywireResponseResult_t(false, "");
@@ -100,5 +98,5 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
 bool HttpSndSkywireCommand::completed()
 {
-    return (_sent && okReceived() && arrowsReceived() && payload_sent) || getPayload() == "";
+    return (isSent() && okReceived() && arrowsReceived() && payload_sent) || getPayload() == "";
 }
