@@ -14,10 +14,10 @@ private:
 	bool _first_process_call = true;
 	unsigned long _first_process_call_timestamp = 0;
 
-	String _rx_buffer = "";
+	char* _rx_buffer;
 
 public:
-	SkywireCommand(HardwareSerial *skywire, String command, bool debug_mode, void (*on_completed_function)(String &result_content));
+	SkywireCommand(HardwareSerial *skywire, char* command, bool debug_mode, void (*on_completed_function)(char* result_content));
 
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
@@ -25,10 +25,10 @@ public:
 	virtual void reset();
 
 	HardwareSerial *skywire;
-	String command;
+	char* command;
 	bool debug_mode;
 
-	void (*on_completed_function)(String &result_content);
+	void (*on_completed_function)(char* result_content);
 
 	void setSent(bool sent);
 	bool isSent();
@@ -41,7 +41,7 @@ public:
 	bool isFirstProcessCalled();
 	unsigned long getFirstProcessCallTimestamp();
 
-	String getRxBuffer();
+	char* getRxBuffer();
 	void appendToRxBuffer(char c);
 	void serialReadToRxBuffer();
 	void resetRxBuffer();

@@ -1,11 +1,11 @@
 #include "skywire-command.h"
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, String command, bool debug_mode, void (*on_completed_function)(String &result_content))
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, char* command, bool debug_mode, void (*on_completed_function)(char* result_content))
     : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
 }
 
-String SkywireCommand::getRxBuffer()
+char* SkywireCommand::getRxBuffer()
 {
     return _rx_buffer;
 }
