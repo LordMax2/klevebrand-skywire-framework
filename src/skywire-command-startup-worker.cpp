@@ -1,9 +1,9 @@
 #include "skywire-command-startup-worker.h"
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
-    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STEP_COUNT)
+    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT)
 {
-    this->steps = new SkywireCommand *[STEP_COUNT];
+    this->steps = new SkywireCommand *[STARTUP_STEP_COUNT];
 
     this->steps[0] = new AtSkywireCommand(skywire, debug_mode, onAtCommandCompleted);
     this->steps[1] = new SkywireCommand(skywire, "AT+CMEE=2", debug_mode, onAtCommandCompleted);
@@ -51,7 +51,7 @@ void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(char *result_conte
 }
 
 // The difference with this worker is that it only runs "once", it never "resets" the cursor when it is done.
-bool SkywireCommandWorker::run()
+bool SkywireCommandStartupWorker::run()
 {
     if (step_cursor_index >= step_count)
     {

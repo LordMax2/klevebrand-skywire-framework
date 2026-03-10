@@ -1,6 +1,6 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, char path[256], OnCompletedFunction on_completed_function)
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[256], OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function)
 {
     strncpy(this->path, path, sizeof(this->path) - 1);

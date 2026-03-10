@@ -1,6 +1,6 @@
 #include "skywire-command-gpsacp.h"
 
-GpsAcpSkywireCommand::GpsAcpSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+GpsAcpSkywireCommand::GpsAcpSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT$GPSACP", debug_mode, on_completed_function)
 {
 }

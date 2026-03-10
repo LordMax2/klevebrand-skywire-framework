@@ -4,8 +4,7 @@
 #include "Arduino.h"
 #include "skywire-response-result.h"
 
-
-typedef void (*OnCompletedFunction)(char result_content[4096]);
+typedef void (*OnCompletedFunction)(char result_content[512]);
 
 class SkywireCommand
 {
@@ -18,10 +17,12 @@ private:
 	unsigned long _first_process_call_timestamp = 0;
 
 	int _rx_buffer_cursor_index = 0;
-	char _rx_buffer[4096];
+	static char _rx_buffer[512];
+
+	bool _is_completed = false;
 
 public:
-	SkywireCommand(HardwareSerial *skywire, char command[256], bool debug_mode, OnCompletedFunction on_completed_function);
+	SkywireCommand(HardwareSerial *skywire, const char command[256], bool debug_mode, OnCompletedFunction on_completed_function);
 
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
@@ -49,6 +50,8 @@ public:
 	void appendToRxBuffer(char c);
 	void serialReadToRxBuffer();
 	void resetRxBuffer();
+
+	void setCompleted(bool completed);
 };
 
 #endif

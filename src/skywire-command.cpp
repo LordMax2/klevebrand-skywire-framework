@@ -1,6 +1,8 @@
 #include "skywire-command.h"
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, char command[256], bool debug_mode, OnCompletedFunction on_completed_function)
+char SkywireCommand::_rx_buffer[512] = {0};
+
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[256], bool debug_mode, OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
     strncpy(this->command, command, sizeof(this->command) - 1);
@@ -104,6 +106,7 @@ void SkywireCommand::reset()
     _sent = false;
     _sent_timestamp = 0;
     _on_completed_called = false;
+    _is_completed = false;
     _first_process_call = true;
     _first_process_call_timestamp = 0;
 
@@ -112,7 +115,7 @@ void SkywireCommand::reset()
 
 bool SkywireCommand::completed()
 {
-    return _sent && okReceived();
+    return (_sent && okReceived()) || _is_completed;
 }
 
 void SkywireCommand::setFirstProcessCall()
@@ -161,4 +164,11 @@ bool SkywireCommand::isOnCompletedCalled()
 void SkywireCommand::setOnCompletedCalled(bool on_completed_called)
 {
     _on_completed_called = on_completed_called;
+}
+
+void SkywireCommand::setCompleted(bool completed)
+{
+    _is_completed = completed;
+
+    resetRxBuffer();
 }

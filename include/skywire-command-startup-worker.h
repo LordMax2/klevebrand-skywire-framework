@@ -10,7 +10,7 @@
 #include "skywire-command-enable-packet-data.h"
 #include "skywire-command-enable-gps.h"
 
-#define STEP_COUNT 7
+#define STARTUP_STEP_COUNT 7
 
 class SkywireCommandStartupWorker : public SkywireCommandWorker
 {
