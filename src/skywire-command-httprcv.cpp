@@ -46,8 +46,9 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println(rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED HTTPRCV CONTENT");
+        Serial.println(rx_buffer);
+        Serial.println("--- END OF RX BUFFER ---");
     }
 
     const bool is_complete = completed();

@@ -24,9 +24,9 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
+        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: ");
         Serial.println(rx_buffer);
-        Serial.print("STEPPER CLIENT RECEIVED HTTPRING OK: ");
-        Serial.println(rx_buffer);
+        Serial.println("--- END OF RX BUFFER ---");
     }
 
     return SkywireResponseResult_t(false, "");

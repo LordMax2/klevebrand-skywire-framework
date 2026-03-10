@@ -93,6 +93,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         {
             Serial.print("STEPPER CLIENT RECEIVED HTTPSND OK: ");
             Serial.println(rx_buffer);
+            Serial.println("--- END OF RX BUFFER ---");
         }
 
         on_completed_function(rx_buffer);

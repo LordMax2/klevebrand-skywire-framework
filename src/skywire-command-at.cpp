@@ -39,8 +39,9 @@ SkywireResponseResult_t AtSkywireCommand::process()
     {
         if (debug_mode)
         {
-            Serial.println(rx_buffer);
             Serial.println("STEPPER CLIENT STEP: " + String(command) + " RECEIVED OK");
+            Serial.println(rx_buffer);
+            Serial.println("--- END OF RX BUFFER ---");
         }
 
         const bool is_complete = completed();
