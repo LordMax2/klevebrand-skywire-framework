@@ -5,16 +5,26 @@ char SkywireCommand::_rx_buffer[256] = {0};
 SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[32], bool debug_mode, OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
+    strncpy(this->command, command, sizeof(this->command) - 1);
+    this->command[sizeof(this->command) - 1] = '\0';
 }
 
-String SkywireCommand::getRxBuffer()
+char* SkywireCommand::getRxBuffer()
 {
     return _rx_buffer;
 }
 
 void SkywireCommand::appendToRxBuffer(char c)
 {
-    _rx_buffer += c;
+    if (_rx_buffer_cursor_index < sizeof(_rx_buffer) - 1)
+    {
+        _rx_buffer[_rx_buffer_cursor_index++] = c;
+        _rx_buffer[_rx_buffer_cursor_index] = '\0';
+    }
+    else
+    {
+        Serial.println("RX buffer overflow. Character not appended.");
+    }
 }
 
 void SkywireCommand::serialReadToRxBuffer()
@@ -43,7 +53,8 @@ SkywireResponseResult_t SkywireCommand::process()
     {
         if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0))
         {
-            skywire->print(command + "\r");
+            skywire->print(command);
+            skywire->print("\r");
 
             setSent(true);
         }
@@ -61,8 +72,9 @@ SkywireResponseResult_t SkywireCommand::process()
     {
         if (debug_mode)
         {
+            Serial.println("STEPPER CLIENT STEP: " + String(command) + " RECEIVED OK, RX BUFFER:");
             Serial.println(rx_buffer);
-            Serial.println("STEPPER CLIENT STEP: " + command + "RECEIVED OK");
+            Serial.println("--- END OF RX BUFFER ---");
         }
 
         const bool is_complete = completed();
@@ -81,12 +93,13 @@ SkywireResponseResult_t SkywireCommand::process()
 
 void SkywireCommand::resetRxBuffer()
 {
-    _rx_buffer = "";
+    _rx_buffer_cursor_index = 0;
+    _rx_buffer[0] = '\0';
 }
 
 bool SkywireCommand::okReceived()
 {
-    return _rx_buffer.indexOf("OK") != -1;
+    return strstr(_rx_buffer, "OK") != nullptr;
 }
 
 void SkywireCommand::reset()
@@ -94,6 +107,7 @@ void SkywireCommand::reset()
     _sent = false;
     _sent_timestamp = 0;
     _on_completed_called = false;
+    _is_completed = false;
     _first_process_call = true;
     _first_process_call_timestamp = 0;
 
@@ -102,7 +116,7 @@ void SkywireCommand::reset()
 
 bool SkywireCommand::completed()
 {
-    return _sent && okReceived();
+    return (_sent && okReceived()) || _is_completed;
 }
 
 void SkywireCommand::setFirstProcessCall()
@@ -151,4 +165,11 @@ bool SkywireCommand::isOnCompletedCalled()
 void SkywireCommand::setOnCompletedCalled(bool on_completed_called)
 {
     _on_completed_called = on_completed_called;
+}
+
+void SkywireCommand::setCompleted(bool completed)
+{
+    _is_completed = completed;
+
+    resetRxBuffer();
 }

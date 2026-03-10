@@ -33,7 +33,7 @@ public:
 	char command[32];
 	bool debug_mode;
 
-	void (*on_completed_function)(String &result_content);
+	OnCompletedFunction on_completed_function;
 
 	void setSent(bool sent);
 	bool isSent();
@@ -46,10 +46,12 @@ public:
 	bool isFirstProcessCalled();
 	unsigned long getFirstProcessCallTimestamp();
 
-	String getRxBuffer();
+	char* getRxBuffer();
 	void appendToRxBuffer(char c);
 	void serialReadToRxBuffer();
 	void resetRxBuffer();
+
+	void setCompleted(bool completed);
 };
 
 #endif

@@ -6,7 +6,7 @@
 class SetApnHologramSkywireCommand : public SkywireCommand
 {
 public:
-    SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
     virtual SkywireResponseResult_t process() override;
     virtual void reset() override;

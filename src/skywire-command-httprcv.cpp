@@ -1,7 +1,7 @@
 #include "skywire-command-httprcv.h"
 
-HttpRcvSkywireCommand::HttpRcvSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
-    : SkywireCommand(skywire, "", debug_mode, on_completed_function)
+HttpRcvSkywireCommand::HttpRcvSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
+    : SkywireCommand(skywire, "HTTPRCV", debug_mode, on_completed_function)
 {
 }
 
@@ -46,8 +46,9 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println(rx_buffer);
         Serial.println("STEPPER CLIENT RECEIVED HTTPRCV CONTENT");
+        Serial.println(rx_buffer);
+        Serial.println("--- END OF RX BUFFER ---");
     }
 
     const bool is_complete = completed();
@@ -65,5 +66,5 @@ bool HttpRcvSkywireCommand::okReceived()
 {
     const auto rx_buffer = getRxBuffer();
 
-    return rx_buffer.indexOf("ERROR") != -1;
+    return strstr(rx_buffer, "ERROR") != nullptr;
 }

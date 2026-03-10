@@ -1,6 +1,6 @@
 #include "skywire-command-httpring.h"
 
-HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content))
+HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "HTTPRING", debug_mode, on_completed_function)
 {
 }
@@ -14,8 +14,6 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    const unsigned long now = millis();
-
     setFirstProcessCall();
 
     if (!isSent())
@@ -26,8 +24,9 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
+        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: ");
         Serial.println(rx_buffer);
-        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: " + rx_buffer);
+        Serial.println("--- END OF RX BUFFER ---");
     }
 
     return SkywireResponseResult_t(false, "");
@@ -37,12 +36,10 @@ bool HttpRingSkywireCommand::okReceived()
 {
     auto rx_buffer = getRxBuffer();
 
-    return rx_buffer.indexOf("HTTPRING") != -1 && rx_buffer.indexOf("\r\n") != -1;
+    return strstr(rx_buffer, "HTTPRING") != nullptr && strstr(rx_buffer, "\r\n") != nullptr;
 }
 
 bool HttpRingSkywireCommand::completed()
 {
-    auto rx_buffer = getRxBuffer();
-
     return isSent() && okReceived() && (millis() - getSentTimestamp()) > 500;
 }

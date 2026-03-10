@@ -6,7 +6,7 @@
 class EnableGpsSkywireCommand : public SkywireCommand
 {
 public:
-    EnableGpsSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    EnableGpsSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
     bool okReceived() override;
 };

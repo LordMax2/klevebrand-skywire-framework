@@ -18,6 +18,8 @@ public:
 
 	SkywireCommand *steps[32];
 
+	int step_cursor_index = 0;
+
 	unsigned long last_run_timestamp = 0;
 	unsigned long timeout_milliseconds = 0;
 };

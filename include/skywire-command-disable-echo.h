@@ -6,7 +6,7 @@
 class DisableEchoSkywireCommand : public SkywireCommand
 {
 public:
-	DisableEchoSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+	DisableEchoSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 };
 
 #endif

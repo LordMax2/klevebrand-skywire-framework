@@ -7,7 +7,7 @@
 class NetworkConnectSkywireCommand : public SkywireCommand
 {
 public:
-    NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, void (*on_completed_function)(String &result_content));
+    NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process() override;
 
