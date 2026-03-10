@@ -16,7 +16,7 @@ private:
 	bool _first_process_call = true;
 	unsigned long _first_process_call_timestamp = 0;
 
-	int _rx_buffer_cursor_index = 0;
+	size_t _rx_buffer_cursor_index = 0;
 	static char _rx_buffer[512];
 
 	bool _is_completed = false;

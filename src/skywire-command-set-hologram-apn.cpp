@@ -38,6 +38,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
             setSent(false);
             resetRxBuffer();
         }
+
         break;
 
     case State::SEND_QUERY:
@@ -49,9 +50,11 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         }
 
         state = State::WAIT_QUERY;
+
         break;
 
     case State::WAIT_QUERY:
+    {
         serialReadToRxBuffer();
 
         rx_buffer = getRxBuffer();
@@ -77,7 +80,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             reset();
         }
-        break;
+    }
+    break;
 
     case State::DONE:
         return SkywireResponseResult_t(true, rx_buffer);

@@ -14,8 +14,6 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
         return SkywireResponseResult_t(true, rx_buffer);
     }
 
-    const unsigned long now = millis();
-
     setFirstProcessCall();
 
     if (!isSent())
