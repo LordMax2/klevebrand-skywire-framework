@@ -1,8 +1,8 @@
 #include "skywire-command.h"
 
-char SkywireCommand::_rx_buffer[512] = {0};
+char SkywireCommand::_rx_buffer[256] = {0};
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[256], bool debug_mode, OnCompletedFunction on_completed_function)
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[32], bool debug_mode, OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
     strncpy(this->command, command, sizeof(this->command) - 1);

@@ -1,10 +1,8 @@
 #include "skywire-command-startup-worker.h"
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
-    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT)
+    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, 7)
 {
-    this->steps = new SkywireCommand *[STARTUP_STEP_COUNT];
-
     this->steps[0] = new AtSkywireCommand(skywire, debug_mode, onAtCommandCompleted);
     this->steps[1] = new SkywireCommand(skywire, "AT+CMEE=2", debug_mode, onAtCommandCompleted);
     this->steps[2] = new DisableEchoSkywireCommand(skywire, debug_mode, onDisableEchoCommandCompleted);

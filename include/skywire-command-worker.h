@@ -16,7 +16,7 @@ public:
 
 	HardwareSerial *skywire;
 
-	SkywireCommand **steps;
+	SkywireCommand *steps[32];
 
 	int step_cursor_index = 0;
 
