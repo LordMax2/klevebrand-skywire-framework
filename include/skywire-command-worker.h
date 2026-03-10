@@ -16,7 +16,7 @@ public:
 
 	HardwareSerial *skywire;
 
-	SkywireCommand **steps;
+	SkywireCommand *steps[32];
 
 	unsigned long last_run_timestamp = 0;
 	unsigned long timeout_milliseconds = 0;
