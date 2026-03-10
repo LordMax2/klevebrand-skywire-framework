@@ -14,68 +14,75 @@ SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire
     this->steps[6] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
 }
 
-void SkywireCommandStartupWorker::onAtCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onAtCommandCompleted(char *result_content)
 {
     Serial.print("AT command completed with result: ");
     Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onDisableEchoCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onDisableEchoCommandCompleted(char *result_content)
 {
     Serial.print("Disable echo command completed with result: ");
     Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onSetApnCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onSetApnCommandCompleted(char *result_content)
 {
     Serial.print("Set APN command completed with result: ");
     Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onNetworkConnectCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onNetworkConnectCommandCompleted(char *result_content)
 {
     Serial.print("Network connect command completed with result: ");
     Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onEnablePacketDataCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onEnablePacketDataCommandCompleted(char *result_content)
 {
     Serial.print("Enable packet data command completed with result: ");
     Serial.println(result_content);
 }
 
-void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(char* result_content)
+void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(char *result_content)
 {
     Serial.print("Enable GPS command completed with result: ");
     Serial.println(result_content);
 }
 
-bool SkywireCommandStartupWorker::run()
+// The difference with this worker is that it only runs "once", it never "resets" the cursor when it is done.
+bool SkywireCommandWorker::run()
 {
-    for (int i = 0; i < step_count; i++)
+    if (step_cursor_index >= step_count)
     {
-        if (!steps[i]->completed())
+        return true;
+    }
+
+    auto step = steps[step_cursor_index];
+
+    if (step->completed())
+    {
+        step_cursor_index++;
+    }
+    else
+    {
+        const auto sent_timestamp = step->getSentTimestamp();
+        const auto rx_buffer = step->getRxBuffer();
+
+        if (sent_timestamp != 0 && millis() - sent_timestamp > timeout_milliseconds)
         {
-            const auto sent_timestamp = steps[i]->getSentTimestamp();
-            const auto rx_buffer = steps[i]->getRxBuffer();
+            Serial.println("Skywire command step: " + String(step->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + sent_timestamp + ", current timestamp: " + millis());
+            Serial.println("rx_buffer at timeout: [" + String(rx_buffer) + "], previous step rx_buffer: [" + (step_cursor_index > 0 ? String(steps[step_cursor_index - 1]->getRxBuffer()) : "N/A") + "]");
 
-            if (sent_timestamp != 0 && millis() - sent_timestamp > timeout_milliseconds)
-            {
-                Serial.println("Skywire command step: " + String(steps[i]->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + sent_timestamp + ", current timestamp: " + millis());
-                Serial.println("rx_buffer at timeout: [" + String(rx_buffer) + "]");
+            reset();
 
-                reset();
-
-                skywire->begin(115200);
-            }
-            else
-            {
-                steps[i]->process();
-            }
-
-            return false;
+            skywire->begin(115200);
+        }
+        else
+        {
+            step->process();
         }
     }
 
-    return true;
+    return false;
 }
