@@ -1,6 +1,6 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[256], OnCompletedFunction on_completed_function)
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[32], const OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function)
 {
     strncpy(this->path, path, sizeof(this->path) - 1);
@@ -14,7 +14,7 @@ bool HttpSndSkywireCommand::arrowsReceived()
     return strstr(rx_buffer, ">>>") != nullptr || millis() - getSentTimestamp() > 200;
 }
 
-void HttpSndSkywireCommand::setPayload(char payload[1024])
+void HttpSndSkywireCommand::setPayload(char payload[128])
 {
     strncpy(this->payload, payload, sizeof(this->payload) - 1);
     this->payload[sizeof(this->payload) - 1] = '\0';
@@ -37,10 +37,10 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
-    const String payload = getPayload();
+    const String payload_to_send = getPayload();
     const unsigned long now = millis();
 
     setFirstProcessCall();
@@ -52,17 +52,17 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
             if (debug_mode)
             {
-                Serial.println("HTTPSND Sending command: " + String(command) + "," + String(payload.length()) + "\r");
+                Serial.println("HTTPSND Sending command: " + String(command) + "," + String(payload_to_send.length()) + "\r");
             }
             skywire->print(command);
             skywire->print(",");
-            skywire->print(payload.length());
+            skywire->print(payload_to_send.length());
             skywire->print("\r");
 
             setSent(true);
         }
 
-        return SkywireResponseResult_t(false, "");
+        return {false, ""};
     }
 
     if (!payload_sent)
@@ -74,9 +74,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     {
         if (debug_mode)
         {
-            Serial.println("HTTPSND Sending payload: " + payload);
+            Serial.println("HTTPSND Sending payload: " + payload_to_send);
         }
-        skywire->print(payload + "\x1A");
+        skywire->print(payload_to_send + "\x1A");
 
         payload_sent = true;
 
@@ -98,7 +98,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         }
     }
 
-    return SkywireResponseResult_t(false, "");
+    return {false, ""};
 }
 
 bool HttpSndSkywireCommand::completed()

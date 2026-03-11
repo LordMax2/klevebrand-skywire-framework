@@ -2,7 +2,7 @@
 
 char SkywireCommand::_rx_buffer[256] = {0};
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[32], bool debug_mode, OnCompletedFunction on_completed_function)
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], bool debug_mode, OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
     strncpy(this->command, command, sizeof(this->command) - 1);
@@ -24,6 +24,7 @@ void SkywireCommand::appendToRxBuffer(char c)
     else
     {
         Serial.println("RX buffer overflow. Character not appended.");
+        Serial.println("Size: " + String(sizeof(_rx_buffer) - 1));
     }
 }
 

@@ -21,7 +21,12 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             skywire->print(command);
             skywire->print('\r');
+
             setSent(true);
+
+            if (debug_mode) {
+                Serial.println(command);
+            }
 
             state = State::WAIT_SET;
         }
@@ -45,6 +50,10 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         if (!isSent())
         {
             skywire->print("AT+CGDCONT?\r");
+
+            if (debug_mode) {
+                Serial.println("AT+CGDCONT?");
+            }
 
             setSent(true);
         }
@@ -74,7 +83,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
                 setOnCompletedCalled(true);
             }
 
-            return SkywireResponseResult_t(true, rx_buffer);
+            return {true, rx_buffer};
         }
 
         if (okReceived())
@@ -85,7 +94,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     break;
 
     case State::DONE:
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
     if (isSent() && now - getSentTimestamp() >= 1000)
@@ -94,16 +103,24 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             skywire->print(command);
             skywire->print('\r');
+
+            if (debug_mode) {
+                Serial.println(command);
+            }
         }
         else if (state == State::WAIT_QUERY)
         {
             skywire->print("AT+CGDCONT?\r");
+
+            if (debug_mode) {
+                Serial.println("AT+CGDCONT?");
+            }
         }
 
         setSent(true);
     }
 
-    return SkywireResponseResult_t(false, "");
+    return {false, ""};
 }
 
 void SetApnHologramSkywireCommand::reset()

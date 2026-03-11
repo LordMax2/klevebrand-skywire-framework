@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include "skywire-response-result.h"
 
+#define COMMAND_SIZE 128
+
 typedef void (*OnCompletedFunction)(char result_content[128]);
 
 class SkywireCommand
@@ -22,7 +24,9 @@ private:
 	bool _is_completed = false;
 
 public:
-	SkywireCommand(HardwareSerial *skywire, const char command[32], bool debug_mode, OnCompletedFunction on_completed_function);
+	virtual ~SkywireCommand() = default;
+
+	SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], bool debug_mode, OnCompletedFunction on_completed_function);
 
 	virtual SkywireResponseResult_t process();
 	virtual bool okReceived();
@@ -30,7 +34,7 @@ public:
 	virtual void reset();
 
 	HardwareSerial *skywire;
-	char command[32];
+	char command[COMMAND_SIZE]{};
 	bool debug_mode;
 
 	OnCompletedFunction on_completed_function;
@@ -46,7 +50,7 @@ public:
 	bool isFirstProcessCalled();
 	unsigned long getFirstProcessCallTimestamp();
 
-	char* getRxBuffer();
+	static char* getRxBuffer();
 	void appendToRxBuffer(char c);
 	void serialReadToRxBuffer();
 	void resetRxBuffer();

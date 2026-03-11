@@ -7,16 +7,18 @@
 class SkywireCommandWorker
 {
 public:
+	virtual ~SkywireCommandWorker() = default;
+
 	SkywireCommandWorker(HardwareSerial *skywire_serial, bool debug_mode, unsigned long timeout_milliseconds, int step_count);
 
 	virtual bool run();
-	void reset();
+	void reset() const;
 
 	int step_count = 0;
 
 	HardwareSerial *skywire;
 
-	SkywireCommand *steps[32];
+	SkywireCommand *steps[32]{};
 
 	int step_cursor_index = 0;
 

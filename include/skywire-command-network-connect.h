@@ -12,7 +12,7 @@ public:
     SkywireResponseResult_t process() override;
 
 private:
-    bool isNetworkConnected();
+    static bool isNetworkConnected();
 };
 
 #endif

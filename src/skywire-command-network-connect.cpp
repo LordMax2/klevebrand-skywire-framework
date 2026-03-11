@@ -1,6 +1,6 @@
 #include "skywire-command-network-connect.h"
 
-NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
+NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "", debug_mode, on_completed_function)
 {
 }
@@ -11,7 +11,7 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
     setFirstProcessCall();
@@ -29,7 +29,7 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
             setSent(true);
         }
 
-        return SkywireResponseResult_t(false, "");
+        return {false, ""};
     }
 
     serialReadToRxBuffer();
@@ -54,29 +54,29 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
             setOnCompletedCalled(true);
         }
 
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
-    return SkywireResponseResult_t(false, "");
+    return {false, ""};
 }
 
 bool NetworkConnectSkywireCommand::isNetworkConnected()
 {
-    auto rx_ptr = getRxBuffer();
+    const auto rx_ptr = getRxBuffer();
 
-    char *cereg_pos = strstr(rx_ptr, "+CEREG:");
+    const char *cereg_pos = strstr(rx_ptr, "+CEREG:");
     if (!cereg_pos)
     {
         return false;
     }
 
-    char *first_comma = strchr(cereg_pos, ',');
+    const char *first_comma = strchr(cereg_pos, ',');
     if (!first_comma)
     {
         return false;
     }
 
-    char status_char = *(first_comma + 1);
+    const char status_char = *(first_comma + 1);
 
     if (status_char == '1' || status_char == '5')
     {

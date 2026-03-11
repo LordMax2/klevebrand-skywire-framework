@@ -17,8 +17,8 @@ public:
     void reset() override;
 
 private:
-    char payload[128];
-    char path[32];
+    char payload[128]{};
+    char path[32]{};
     bool payload_sent = false;
 };
 

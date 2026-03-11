@@ -15,7 +15,7 @@
 class SkywireCommandStartupWorker : public SkywireCommandWorker
 {
 public:
-    SkywireCommandStartupWorker(
+    explicit SkywireCommandStartupWorker(
         HardwareSerial *skywire_serial,
         bool debug_mode = false);
 

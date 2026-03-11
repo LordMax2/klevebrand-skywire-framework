@@ -1,6 +1,6 @@
 #include "skywire-command-httpring.h"
 
-HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
+HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "HTTPRING", debug_mode, on_completed_function)
 {
 }
@@ -11,7 +11,7 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
 
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
     setFirstProcessCall();
@@ -41,12 +41,12 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
         }
     }
 
-    return SkywireResponseResult_t(false, "");
+    return {false, ""};
 }
 
 bool HttpRingSkywireCommand::okReceived()
 {
-    auto rx_buffer = getRxBuffer();
+    const auto rx_buffer = getRxBuffer();
 
     return strstr(rx_buffer, "HTTPRING") != nullptr && strstr(rx_buffer, "\r\n") != nullptr;
 }
