@@ -43,7 +43,7 @@ SkywireResponseResult_t SkywireCommand::process()
 
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
     const unsigned long now = millis();
@@ -60,7 +60,7 @@ SkywireResponseResult_t SkywireCommand::process()
             setSent(true);
         }
 
-        return SkywireResponseResult_t(false, "");
+        return {false, ""};
     }
 
     serialReadToRxBuffer();
@@ -90,10 +90,10 @@ SkywireResponseResult_t SkywireCommand::process()
             }
         }
 
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
-    return SkywireResponseResult_t(false, "");
+    return {false, ""};
 }
 
 void SkywireCommand::resetRxBuffer()

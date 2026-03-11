@@ -48,7 +48,11 @@ bool HttpRingSkywireCommand::okReceived()
 {
     const auto rx_buffer = getRxBuffer();
 
-    return strstr(rx_buffer, "HTTPRING") != nullptr && strstr(rx_buffer, "\r\n") != nullptr;
+    const char* ring = strstr(rx_buffer, "HTTPRING");
+    if (ring == nullptr)
+        return false;
+
+    return strchr(ring, '\r') != nullptr;
 }
 
 bool HttpRingSkywireCommand::completed()

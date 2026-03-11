@@ -6,7 +6,7 @@
 class HttpSndSkywireCommand : public SkywireCommand
 {
 public:
-    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[32], OnCompletedFunction on_completed_function);
+    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[48], OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process() override;
     bool completed() override;
@@ -18,7 +18,7 @@ public:
 
 private:
     char payload[128]{};
-    char path[32]{};
+    char path[48]{};
     bool payload_sent = false;
 };
 
