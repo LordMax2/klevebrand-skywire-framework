@@ -11,7 +11,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
 
     if (completed())
     {
-        return SkywireResponseResult_t(true, rx_buffer);
+        return {true, rx_buffer};
     }
 
     const unsigned long now = millis();
