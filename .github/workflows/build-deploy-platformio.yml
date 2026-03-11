@@ -1,6 +1,8 @@
 name: PlatformIO upload package
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build-and-publish:
