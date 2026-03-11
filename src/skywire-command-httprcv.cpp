@@ -52,11 +52,15 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
     }
 
     const bool is_complete = completed();
-    if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
+    if (is_complete)
     {
-        on_completed_function(rx_buffer);
+        setCompleted(true);
 
-        setOnCompletedCalled(true);
+        if (on_completed_function != nullptr && !isOnCompletedCalled())
+        {
+            on_completed_function(rx_buffer);
+            setOnCompletedCalled(true);
+        }
     }
 
     return SkywireResponseResult_t(false, "");

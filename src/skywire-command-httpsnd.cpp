@@ -20,7 +20,7 @@ void HttpSndSkywireCommand::setPayload(char payload[1024])
     this->payload[sizeof(this->payload) - 1] = '\0';
 }
 
-char* HttpSndSkywireCommand::getPayload()
+char *HttpSndSkywireCommand::getPayload()
 {
     return payload;
 }
@@ -87,18 +87,15 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     }
 
     const bool is_complete = completed();
-    if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
+    if (is_complete)
     {
-        if (debug_mode)
+        setCompleted(true);
+
+        if (on_completed_function != nullptr && !isOnCompletedCalled())
         {
-            Serial.print("STEPPER CLIENT RECEIVED HTTPSND OK: ");
-            Serial.println(rx_buffer);
-            Serial.println("--- END OF RX BUFFER ---");
+            on_completed_function(rx_buffer);
+            setOnCompletedCalled(true);
         }
-
-        on_completed_function(rx_buffer);
-
-        setOnCompletedCalled(true);
     }
 
     return SkywireResponseResult_t(false, "");

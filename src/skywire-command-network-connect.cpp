@@ -46,6 +46,8 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     if (isNetworkConnected())
     {
+        setCompleted(true);
+
         if (on_completed_function != nullptr && !isOnCompletedCalled())
         {
             on_completed_function(rx_buffer);
@@ -58,22 +60,26 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
     return SkywireResponseResult_t(false, "");
 }
 
-bool NetworkConnectSkywireCommand::isNetworkConnected() {
-    auto rx_ptr = getRxBuffer(); 
+bool NetworkConnectSkywireCommand::isNetworkConnected()
+{
+    auto rx_ptr = getRxBuffer();
 
-    char* cereg_pos = strstr(rx_ptr, "+CEREG:");
-    if (!cereg_pos) {
+    char *cereg_pos = strstr(rx_ptr, "+CEREG:");
+    if (!cereg_pos)
+    {
         return false;
     }
 
-    char* first_comma = strchr(cereg_pos, ',');
-    if (!first_comma) {
+    char *first_comma = strchr(cereg_pos, ',');
+    if (!first_comma)
+    {
         return false;
     }
 
     char status_char = *(first_comma + 1);
 
-    if (status_char == '1' || status_char == '5') {
+    if (status_char == '1' || status_char == '5')
+    {
         return true;
     }
 

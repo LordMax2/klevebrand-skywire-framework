@@ -66,10 +66,11 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             state = State::DONE;
 
-            if (on_completed_function && !isOnCompletedCalled())
+            setCompleted(true);
+
+            if(on_completed_function != nullptr && !isOnCompletedCalled())
             {
                 on_completed_function(rx_buffer);
-
                 setOnCompletedCalled(true);
             }
 

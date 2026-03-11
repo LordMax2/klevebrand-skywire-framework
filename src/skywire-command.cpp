@@ -78,11 +78,15 @@ SkywireResponseResult_t SkywireCommand::process()
         }
 
         const bool is_complete = completed();
-        if (is_complete && on_completed_function != nullptr && !isOnCompletedCalled())
+        if (is_complete)
         {
-            on_completed_function(rx_buffer);
+            setCompleted(true);
 
-            setOnCompletedCalled(true);
+            if(on_completed_function != nullptr && !isOnCompletedCalled())
+            {
+                on_completed_function(rx_buffer);
+                setOnCompletedCalled(true);
+            }
         }
 
         return SkywireResponseResult_t(true, rx_buffer);
@@ -116,7 +120,7 @@ void SkywireCommand::reset()
 
 bool SkywireCommand::completed()
 {
-    return (_sent && okReceived()) || _is_completed;
+    return _is_completed || (_sent && okReceived());
 }
 
 void SkywireCommand::setFirstProcessCall()

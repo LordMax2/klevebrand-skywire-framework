@@ -7,8 +7,6 @@ class AtSkywireCommand : public SkywireCommand
 {
 public:
     AtSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
-
-    virtual SkywireResponseResult_t process() override;
 };
 
 #endif
