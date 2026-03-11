@@ -3,10 +3,12 @@
 
 #include "skywire-command.h"
 
+#define HTTP_SND_PATH_SIZE 64
+
 class HttpSndSkywireCommand : public SkywireCommand
 {
 public:
-    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[48], OnCompletedFunction on_completed_function);
+    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[HTTP_SND_PATH_SIZE], OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process() override;
     bool completed() override;
@@ -18,7 +20,7 @@ public:
 
 private:
     char payload[128]{};
-    char path[48]{};
+    char path[HTTP_SND_PATH_SIZE]{};
     bool payload_sent = false;
 };
 

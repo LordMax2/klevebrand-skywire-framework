@@ -21,7 +21,6 @@ private:
 	size_t _rx_buffer_cursor_index = 0;
 	static char _rx_buffer[256];
 
-	bool _is_completed = false;
 
 public:
 	virtual ~SkywireCommand() = default;
@@ -56,6 +55,7 @@ public:
 	void resetRxBuffer();
 
 	void setCompleted(bool completed);
+	bool _is_completed = false;
 };
 
 #endif

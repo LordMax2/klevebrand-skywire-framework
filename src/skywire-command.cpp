@@ -57,6 +57,10 @@ SkywireResponseResult_t SkywireCommand::process()
             skywire->print(command);
             skywire->print("\r");
 
+            if (debug_mode) {
+                Serial.println(command);
+            }
+
             setSent(true);
         }
 

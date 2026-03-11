@@ -39,12 +39,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
 
     setFirstProcessCall();
 
-    Serial.println("gum");
     if (!isSent()) {
-        Serial.println("bubbel");
         if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
             if (debug_mode) {
-                Serial.println("bacon");
                 Serial.print(command);
                 Serial.print(path);
                 Serial.print(",");
@@ -52,7 +49,6 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
                 Serial.print("\r");
             }
             skywire->print(command);
-            skywire->print(",");
             skywire->print(path);
             skywire->print(",");
             skywire->print(payload_to_send.length());
@@ -68,13 +64,15 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
         serialReadToRxBuffer();
     }
 
-    if (now - getSentTimestamp() > 500 && !payload_sent) {
+    if (isSent() && now - getSentTimestamp() > 500 && !payload_sent) {
         if (debug_mode) {
             Serial.println("HTTPSND Sending payload: " + payload_to_send);
         }
         skywire->print(payload_to_send + "\x1A");
 
         payload_sent = true;
+
+        setCompleted(true);
 
         if (debug_mode) {
             Serial.println("HTTPSND is completed: " + String(completed()));
@@ -96,5 +94,5 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
 }
 
 bool HttpSndSkywireCommand::completed() {
-    return (isSent() && okReceived() && arrowsReceived() && payload_sent) || getPayload()[0] == '\0';
+    return _is_completed || ((isSent() && okReceived() && arrowsReceived() && payload_sent) || getPayload()[0] == '\0');
 }
