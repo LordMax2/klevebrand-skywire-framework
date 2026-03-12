@@ -39,15 +39,15 @@ public:
 	OnCompletedFunction on_completed_function;
 
 	void setSent(bool sent);
-	bool isSent();
-	unsigned long getSentTimestamp();
+	bool isSent() const;
+	unsigned long getSentTimestamp() const;
 
 	void setOnCompletedCalled(bool on_completed_called);
-	bool isOnCompletedCalled();
+	bool isOnCompletedCalled() const;
 
 	void setFirstProcessCall();
-	bool isFirstProcessCalled();
-	unsigned long getFirstProcessCallTimestamp();
+	bool isFirstProcessCalled() const;
+	unsigned long getFirstProcessCallTimestamp() const;
 
 	static char* getRxBuffer();
 	void appendToRxBuffer(char c);

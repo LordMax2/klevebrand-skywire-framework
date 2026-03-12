@@ -7,7 +7,7 @@ EnableGpsSkywireCommand::EnableGpsSkywireCommand(HardwareSerial *skywire, const 
 
 bool EnableGpsSkywireCommand::okReceived()
 {
-    auto rx_buffer = getRxBuffer();
+    const auto rx_buffer = getRxBuffer();
 
     if (SkywireCommand::okReceived() || strstr(rx_buffer, "ERROR") != nullptr)
     {

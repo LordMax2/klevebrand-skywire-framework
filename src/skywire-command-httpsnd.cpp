@@ -1,20 +1,20 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[48],
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[HTTP_SND_PATH_SIZE],
                                              const OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function) {
     strncpy(this->path, path, sizeof(this->path) - 1);
     this->path[sizeof(this->path) - 1] = '\0';
 }
 
-bool HttpSndSkywireCommand::arrowsReceived() {
-    auto rx_buffer = getRxBuffer();
+bool HttpSndSkywireCommand::arrowsReceived() const {
+    const auto rx_buffer = getRxBuffer();
 
     return strstr(rx_buffer, ">>>") != nullptr || millis() - getSentTimestamp() > 200;
 }
 
-void HttpSndSkywireCommand::setPayload(char payload[128]) {
-    strncpy(this->payload, payload, sizeof(this->payload) - 1);
+void HttpSndSkywireCommand::setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]) {
+    strncpy(this->payload, payload_to_send, sizeof(this->payload) - 1);
     this->payload[sizeof(this->payload) - 1] = '\0';
 }
 
@@ -35,7 +35,6 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
     }
 
     const String payload_to_send = getPayload();
-    const unsigned long now = millis();
 
     setFirstProcessCall();
 

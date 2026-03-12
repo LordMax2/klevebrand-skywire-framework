@@ -2,7 +2,7 @@
 
 char SkywireCommand::_rx_buffer[256] = {0};
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], bool debug_mode, OnCompletedFunction on_completed_function)
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], const bool debug_mode, const OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
 {
     strncpy(this->command, command, sizeof(this->command) - 1);
@@ -32,7 +32,7 @@ void SkywireCommand::serialReadToRxBuffer()
 {
     while (skywire->available())
     {
-        char c = skywire->read();
+        const char c = skywire->read();
         appendToRxBuffer(c);
     }
 }
@@ -137,17 +137,17 @@ void SkywireCommand::setFirstProcessCall()
     }
 }
 
-bool SkywireCommand::isFirstProcessCalled()
+bool SkywireCommand::isFirstProcessCalled() const
 {
     return !_first_process_call;
 }
 
-unsigned long SkywireCommand::getFirstProcessCallTimestamp()
+unsigned long SkywireCommand::getFirstProcessCallTimestamp() const
 {
     return _first_process_call_timestamp;
 }
 
-void SkywireCommand::setSent(bool sent)
+void SkywireCommand::setSent(const bool sent)
 {
     _sent = sent;
     if (sent)
@@ -156,27 +156,27 @@ void SkywireCommand::setSent(bool sent)
     }
 }
 
-bool SkywireCommand::isSent()
+bool SkywireCommand::isSent() const
 {
     return _sent;
 }
 
-unsigned long SkywireCommand::getSentTimestamp()
+unsigned long SkywireCommand::getSentTimestamp() const
 {
     return _sent_timestamp;
 }
 
-bool SkywireCommand::isOnCompletedCalled()
+bool SkywireCommand::isOnCompletedCalled() const
 {
     return _on_completed_called;
 }
 
-void SkywireCommand::setOnCompletedCalled(bool on_completed_called)
+void SkywireCommand::setOnCompletedCalled(const bool on_completed_called)
 {
     _on_completed_called = on_completed_called;
 }
 
-void SkywireCommand::setCompleted(bool completed)
+void SkywireCommand::setCompleted(const bool completed)
 {
     _is_completed = completed;
 
