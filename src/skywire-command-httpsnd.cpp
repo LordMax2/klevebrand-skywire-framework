@@ -64,7 +64,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
         serialReadToRxBuffer();
     }
 
-    if (isSent() && now - getSentTimestamp() > 500 && !payload_sent) {
+    if (isSent() && arrowsReceived() && !payload_sent) {
         if (debug_mode) {
             Serial.println("HTTPSND Sending payload: " + payload_to_send);
         }
@@ -75,7 +75,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
         setCompleted(true);
 
         if (debug_mode) {
-            Serial.println("HTTPSND is completed: " + String(completed()));
+            Serial.println("HTTPSND is completed: " + String(completed() ? "true" : "false"));
             Serial.println(rx_buffer);
         }
     }
