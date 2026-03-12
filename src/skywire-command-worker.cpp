@@ -5,11 +5,13 @@ SkywireCommandWorker::SkywireCommandWorker(HardwareSerial *skywire_serial, bool 
 {
 }
 
-void SkywireCommandWorker::reset() const {
+void SkywireCommandWorker::reset() {
 	for (int i = 0; i < step_count; i++)
 	{
 		steps[i]->reset();
 	}
+
+	step_cursor_index = 0;
 }
 
 bool SkywireCommandWorker::run()
@@ -22,8 +24,6 @@ bool SkywireCommandWorker::run()
 
 		if (step_cursor_index >= step_count)
 		{
-			step_cursor_index = 0;
-
 			reset();
 
 			return true;
