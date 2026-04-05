@@ -20,7 +20,7 @@ public:
     void reset() override;
 
 private:
-    char payload[128]{};
+    char payload[HTTP_SND_PAYLOAD_TO_SEND_SIZE]{};
     char path[HTTP_SND_PATH_SIZE]{};
     bool payload_sent = false;
 };

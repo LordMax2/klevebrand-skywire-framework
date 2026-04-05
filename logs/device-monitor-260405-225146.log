@@ -1,0 +1,179 @@
+Starting Skywire modem...
+AT
+STEPPER CLIENT STEP: AT RECEIVED OK, RX BUFFER:
+AT
+OK
+--- END OF RX BUFFER ---
+AT command completed with result: 
+AT+CMEE=2
+STEPPER CLIENT STEP: AT+CMEE=2 RECEIVED OK, RX BUFFER:
+
+AT+CMEE=2
+OK
+--- END OF RX BUFFER ---
+AT command completed with result: 
+ATE0
+STEPPER CLIENT STEP: ATE0 RECEIVED OK, RX BUFFER:
+
+ATE0
+OK
+--- END OF RX BUFFER ---
+Disable echo command completed with result: 
+AT+CGDCONT=1,"IPV4V6","hologram"
+AT+CGDCONT?
+AT+CGDCONT?
+Set APN command completed with result: 
+NETWORK CONNECT Sending command: AT+CEREG?
+Network connect command completed with result: 
+AT#SGACT=1,1
+STEPPER CLIENT STEP: AT#SGACT=1,1 RECEIVED OK, RX BUFFER:
+
+
+OK
+
+--- END OF RX BUFFER ---
+Enable packet data command completed with result: 
+AT$GPSP=1
+STEPPER CLIENT STEP: AT$GPSP=1 RECEIVED OK, RX BUFFER:
+
+#SGACT: 100.76.184.107,
+
+OK
+
+--- END OF RX BUFFER ---
+Enable GPS command completed with result: 
+Startup completed!
+AT#HTTPCFG=0,"flightcontroltower.klevebrand.se",80,0,"","",0,5
+STEPPER CLIENT STEP: AT#HTTPCFG=0,"flightcontroltower.klevebrand.se",80,0,"","",0,5 RECEIVED OK, RX BUFFER:
+
+OK
+
+--- END OF RX BUFFER ---
+AT#HTTPQRY=0,0,"/api/v1/dronerequest/1337"
+STEPPER CLIENT STEP: AT#HTTPQRY=0,0,"/api/v1/dronerequest/1337" RECEIVED OK, RX BUFFER:
+
+OK
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+STEPPER CLIENT RECEIVED HTTPRING OK: 
+
+OK
+
+#HTTPRING: 0,200,"text/plain; charset=utf-8",0
+
+--- END OF RX BUFFER ---
+HTTPRCV Sending command: AT#HTTPRCV=0,64
+HTTPRCV Sending command: AT#HTTPRCV=0,64
+HTTPRCV Sending command: AT#HTTPRCV=0,64
+HTTPRCV Sending command: AT#HTTPRCV=0,64
+STEPPER CLIENT RECEIVED HTTPRCV CONTENT
+
+<<<0,1,1,0,0
+OK
+
+<<<
+OK
+
++CME ERROR: 
+--- END OF RX BUFFER ---
+AT#HTTPCFG=0,"flightcontroltower.klevebrand.se",80,0,"","",0,5
+STEPPER CLIENT STEP: AT#HTTPCFG=0,"flightcontroltower.klevebrand.se",80,0,"","",0,5 RECEIVED OK, RX BUFFER:
+wrong state
+
+OK
+
+--- END OF RX BUFFER ---
+AT#HTTPSND=0,0,"/api/v1/drone/1337/setstate",58Skywire command step: AT#HTTPSND=0,0,, after 20000ms, restarting startup sequence. Sent timestamp: 3097, current timestamp: 23098
+rx_buffer at timeout: []
+AT#HTTPCFG=0,"flightcontroltower.klevebrand.se",80,0,"","",0,5

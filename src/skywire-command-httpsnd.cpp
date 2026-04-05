@@ -10,7 +10,7 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug
 bool HttpSndSkywireCommand::arrowsReceived() const {
     const auto rx_buffer = getRxBuffer();
 
-    return strstr(rx_buffer, ">>>") != nullptr || millis() - getSentTimestamp() > 200;
+    return strstr(rx_buffer, ">>>") != nullptr;
 }
 
 void HttpSndSkywireCommand::setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]) {
