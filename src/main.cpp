@@ -19,9 +19,9 @@ void setup() {
     Serial.println("Starting Skywire modem...");
 
     SkywireCommandStartupWorker startupWorker(&Serial3, false);
-    SkywireTcpGpsStepWorker tcpGpsWorker(&Serial3, "flightcontroltower.klevebrand.se", 13000, 20000, true);
+    SkywireTcpGpsStepWorker tcpGpsWorker(&Serial3, "flightcontroltower.klevebrand.se", 13000, 20000, false);
 
-    Serial3.begin(true);
+    Serial3.begin(115200);
 
     while (!startupWorker.run()) {
         // Do nothing until startup is completed.

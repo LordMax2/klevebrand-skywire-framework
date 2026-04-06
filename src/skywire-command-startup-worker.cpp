@@ -2,15 +2,15 @@
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
     : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT),
-      at_command(skywire_serial, debug_mode, onAtCommandCompleted),
-      cmee_command(skywire_serial, "AT+CMEE=2", debug_mode, onAtCommandCompleted),
-      disable_echo_command(skywire_serial, debug_mode, onDisableEchoCommandCompleted),
-      flow_control_command(skywire_serial, "AT&K0", true, onAtCommandCompleted),
-      interface_control_command(skywire_serial, "AT+IFC=0,0", true, onAtCommandCompleted),
-      set_apn_command(skywire_serial, debug_mode, onSetApnCommandCompleted),
-      network_connect_command(skywire_serial, debug_mode, onNetworkConnectCommandCompleted),
-      enable_packet_data_command(skywire_serial, debug_mode, onEnablePacketDataCommandCompleted),
-      enable_gps_command(skywire_serial, debug_mode, onEnableGpsCommandCompleted)
+      at_command(skywire_serial, debug_mode, nullptr),
+      cmee_command(skywire_serial, "AT+CMEE=2", debug_mode, nullptr),
+      disable_echo_command(skywire_serial, debug_mode, nullptr),
+      flow_control_command(skywire_serial, "AT&K0", debug_mode, nullptr),
+      interface_control_command(skywire_serial, "AT+IFC=0,0", debug_mode, nullptr),
+      set_apn_command(skywire_serial, debug_mode, nullptr),
+      network_connect_command(skywire_serial, debug_mode, nullptr),
+      enable_packet_data_command(skywire_serial, debug_mode, nullptr),
+      enable_gps_command(skywire_serial, debug_mode, nullptr)
 {
     this->steps[0] = &at_command;
     this->steps[1] = &cmee_command;
@@ -21,42 +21,6 @@ SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire
     this->steps[6] = &network_connect_command;
     this->steps[7] = &enable_packet_data_command;
     this->steps[8] = &enable_gps_command;
-}
-
-void SkywireCommandStartupWorker::onAtCommandCompleted(char *result_content)
-{
-    Serial.print("AT command completed with result: ");
-    Serial.println(result_content);
-}
-
-void SkywireCommandStartupWorker::onDisableEchoCommandCompleted(char *result_content)
-{
-    Serial.print("Disable echo command completed with result: ");
-    Serial.println(result_content);
-}
-
-void SkywireCommandStartupWorker::onSetApnCommandCompleted(char *result_content)
-{
-    Serial.print("Set APN command completed with result: ");
-    Serial.println(result_content);
-}
-
-void SkywireCommandStartupWorker::onNetworkConnectCommandCompleted(char *result_content)
-{
-    Serial.print("Network connect command completed with result: ");
-    Serial.println(result_content);
-}
-
-void SkywireCommandStartupWorker::onEnablePacketDataCommandCompleted(char *result_content)
-{
-    Serial.print("Enable packet data command completed with result: ");
-    Serial.println(result_content);
-}
-
-void SkywireCommandStartupWorker::onEnableGpsCommandCompleted(char *result_content)
-{
-    Serial.print("Enable GPS command completed with result: ");
-    Serial.println(result_content);
 }
 
 // The difference with this worker is that it only runs "once", it never "resets" the cursor when it is done.

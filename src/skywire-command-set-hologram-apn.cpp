@@ -8,6 +8,10 @@ SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywi
 
 SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 {
+    if (completed()) {
+        return {true, ""};
+    }
+
     const unsigned long now = millis();
 
     auto rx_buffer = getRxBuffer();
@@ -43,7 +47,6 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
             state = State::SEND_QUERY;
 
             setSent(false);
-            resetRxBuffer();
         }
 
         break;
@@ -71,8 +74,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 
         rx_buffer = getRxBuffer();
 
-        const bool has_hologram_ok = (strstr(rx_buffer, "hologram") != nullptr);
-        const bool already_active = (strstr(rx_buffer, "context already activated") != nullptr);
+        const bool has_hologram_ok = strstr(rx_buffer, "hologram") != nullptr;
+        const bool already_active = strstr(rx_buffer, "+CME ERROR: context already activated") != nullptr;
 
         if (has_hologram_ok || already_active)
         {

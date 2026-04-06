@@ -2,68 +2,51 @@
 
 char SkywireCommand::_rx_buffer[SKYWIRE_RX_BUFFER_SIZE] = {0};
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
-{
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], const bool debug_mode,
+                               const OnCompletedFunction on_completed_function)
+    : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function) {
     strncpy(this->command, command, sizeof(this->command) - 1);
     this->command[sizeof(this->command) - 1] = '\0';
 }
 
-char* SkywireCommand::getRxBuffer()
-{
+char *SkywireCommand::getRxBuffer() {
     return _rx_buffer;
 }
 
-void SkywireCommand::appendToRxBuffer(char c)
-{
-    if (_rx_buffer_cursor_index < sizeof(_rx_buffer) - 1)
-    {
+void SkywireCommand::appendToRxBuffer(char c) {
+    if (_rx_buffer_cursor_index < sizeof(_rx_buffer) - 1) {
         _rx_buffer[_rx_buffer_cursor_index++] = c;
         _rx_buffer[_rx_buffer_cursor_index] = '\0';
-    }
-    else
-    {
-        Serial.println(F("RX buffer overflow. Character not appended."));
-        Serial.print(F("Size: "));
-        Serial.println(sizeof(_rx_buffer) - 1);
-    }
+    } else if (debug_mode)
+        if (debug_mode) {
+            Serial.println(F("RX buffer overflow. Character not appended."));
+            Serial.print(F("Size: "));
+            Serial.println(sizeof(_rx_buffer) - 1);
+        }
 }
 
-void SkywireCommand::serialReadToRxBuffer()
-{
-    while (skywire->available())
-    {
+void SkywireCommand::serialReadToRxBuffer() {
+    while (skywire->available()) {
         const char c = skywire->read();
         appendToRxBuffer(c);
 
-        if (debug_mode)
-        {
+        if (debug_mode) {
             const uint8_t byte_value = static_cast<uint8_t>(c);
             Serial.print("RX BYTE 0x");
-            if (byte_value < 0x10)
-            {
+            if (byte_value < 0x10) {
                 Serial.print("0");
             }
             Serial.print(byte_value, HEX);
             Serial.print(" '");
-            if (byte_value == '\r')
-            {
+            if (byte_value == '\r') {
                 Serial.print("CR");
-            }
-            else if (byte_value == '\n')
-            {
+            } else if (byte_value == '\n') {
                 Serial.print("LF");
-            }
-            else if (byte_value == '\t')
-            {
+            } else if (byte_value == '\t') {
                 Serial.print("TAB");
-            }
-            else if (byte_value >= 32 && byte_value <= 126)
-            {
+            } else if (byte_value >= 32 && byte_value <= 126) {
                 Serial.print(static_cast<char>(byte_value));
-            }
-            else
-            {
+            } else {
                 Serial.print(".");
             }
             Serial.println("'");
@@ -71,12 +54,10 @@ void SkywireCommand::serialReadToRxBuffer()
     }
 }
 
-SkywireResponseResult_t SkywireCommand::process()
-{
+SkywireResponseResult_t SkywireCommand::process() {
     auto rx_buffer = getRxBuffer();
 
-    if (completed())
-    {
+    if (completed()) {
         return {true, rx_buffer};
     }
 
@@ -84,10 +65,8 @@ SkywireResponseResult_t SkywireCommand::process()
 
     setFirstProcessCall();
 
-    if (!isSent())
-    {
-        if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0))
-        {
+    if (!isSent()) {
+        if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)) {
             resetRxBuffer();
             skywire->print(command);
             skywire->print("\r");
@@ -108,10 +87,8 @@ SkywireResponseResult_t SkywireCommand::process()
 
     const bool has_ok = okReceived();
 
-    if (has_ok)
-    {
-        if (debug_mode)
-        {
+    if (has_ok) {
+        if (debug_mode) {
             Serial.print(F("STEPPER CLIENT STEP: "));
             Serial.print(command);
             Serial.println(F(" RECEIVED OK, RX BUFFER:"));
@@ -120,10 +97,8 @@ SkywireResponseResult_t SkywireCommand::process()
         }
 
         const bool is_complete = completed();
-        if (is_complete)
-        {
-            if(on_completed_function != nullptr && !isOnCompletedCalled())
-            {
+        if (is_complete) {
+            if (on_completed_function != nullptr && !isOnCompletedCalled()) {
                 on_completed_function(rx_buffer);
                 setOnCompletedCalled(true);
             }
@@ -137,19 +112,17 @@ SkywireResponseResult_t SkywireCommand::process()
     return {false, ""};
 }
 
-void SkywireCommand::resetRxBuffer()
-{
+void SkywireCommand::resetRxBuffer() {
     _rx_buffer_cursor_index = 0;
     _rx_buffer[0] = '\0';
 }
 
-bool SkywireCommand::okReceived()
-{
-    return strstr(_rx_buffer, "\r\nOK\r\n") != nullptr;
+bool SkywireCommand::okReceived() {
+    return strstr(_rx_buffer, "\r\nOK\r\n") != nullptr || strstr(_rx_buffer, "+CME ERROR: context already activated") !=
+           nullptr;
 }
 
-void SkywireCommand::reset()
-{
+void SkywireCommand::reset() {
     _sent = false;
     _sent_timestamp = 0;
     _on_completed_called = false;
@@ -160,60 +133,48 @@ void SkywireCommand::reset()
     resetRxBuffer();
 }
 
-bool SkywireCommand::completed()
-{
+bool SkywireCommand::completed() {
     return _is_completed || (_sent && okReceived());
 }
 
-void SkywireCommand::setFirstProcessCall()
-{
-    if (_first_process_call)
-    {
+void SkywireCommand::setFirstProcessCall() {
+    if (_first_process_call) {
         _first_process_call_timestamp = millis();
         _first_process_call = false;
     }
 }
 
-bool SkywireCommand::isFirstProcessCalled() const
-{
+bool SkywireCommand::isFirstProcessCalled() const {
     return !_first_process_call;
 }
 
-unsigned long SkywireCommand::getFirstProcessCallTimestamp() const
-{
+unsigned long SkywireCommand::getFirstProcessCallTimestamp() const {
     return _first_process_call_timestamp;
 }
 
-void SkywireCommand::setSent(const bool sent)
-{
+void SkywireCommand::setSent(const bool sent) {
     _sent = sent;
-    if (sent)
-    {
+    if (sent) {
         _sent_timestamp = millis();
     }
 }
 
-bool SkywireCommand::isSent() const
-{
+bool SkywireCommand::isSent() const {
     return _sent;
 }
 
-unsigned long SkywireCommand::getSentTimestamp() const
-{
+unsigned long SkywireCommand::getSentTimestamp() const {
     return _sent_timestamp;
 }
 
-bool SkywireCommand::isOnCompletedCalled() const
-{
+bool SkywireCommand::isOnCompletedCalled() const {
     return _on_completed_called;
 }
 
-void SkywireCommand::setOnCompletedCalled(const bool on_completed_called)
-{
+void SkywireCommand::setOnCompletedCalled(const bool on_completed_called) {
     _on_completed_called = on_completed_called;
 }
 
-void SkywireCommand::setCompleted(const bool completed)
-{
+void SkywireCommand::setCompleted(const bool completed) {
     _is_completed = completed;
 }

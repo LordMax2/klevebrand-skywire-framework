@@ -19,18 +19,6 @@ public:
         HardwareSerial *skywire_serial,
         bool debug_mode = false);
 
-    static void onAtCommandCompleted(char* result_content);
-
-    static void onDisableEchoCommandCompleted(char* result_content);
-
-    static void onSetApnCommandCompleted(char* result_content);
-
-    static void onNetworkConnectCommandCompleted(char* result_content);
-
-    static void onEnablePacketDataCommandCompleted(char* result_content);
-
-    static void onEnableGpsCommandCompleted(char* result_content);
-
     bool run() override;
 
 private:

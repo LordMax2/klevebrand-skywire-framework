@@ -9,7 +9,7 @@ bool EnablePacketDataSkywireCommand::okReceived()
 {
     const auto rx_buffer = getRxBuffer();
 
-    if (SkywireCommand::okReceived() || strstr(rx_buffer, "ERROR") != nullptr)
+    if (SkywireCommand::okReceived() || strstr(rx_buffer, "ERROR") != nullptr || strstr(rx_buffer, "+CME ERROR: context already activated") != nullptr)
     {
         return true;
     }
