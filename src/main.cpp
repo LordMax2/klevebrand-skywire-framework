@@ -11,7 +11,7 @@
 #include "skywire-command-enable-packet-data.h"
 #include "skywire-command-enable-gps.h"
 #include "skywire-command.h"
-#include "skywire-tcp-gps-step-worker.h"
+#include "skywire-command-tcp-gps-step-worker.h"
 
 void setup() {
     Serial.begin(115200);

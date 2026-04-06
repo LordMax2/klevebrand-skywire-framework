@@ -1,4 +1,4 @@
-#include "skywire-tcp-gps-step-worker.h"
+#include "skywire-command-tcp-gps-step-worker.h"
 
 DroneRequest_t SkywireTcpGpsStepWorker::_latest_drone_request_response = DroneRequest_t::empty();
 GpsLocationInfo_t SkywireTcpGpsStepWorker::_latest_gps_response = GpsLocationInfo_t::empty();
