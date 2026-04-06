@@ -18,8 +18,9 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
 
     if (!isSent()) {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
+            resetRxBuffer();
             if (debug_mode) {
-                Serial.println("HTTPRCV Sending command: AT#HTTPRCV=0,64\r");
+                Serial.println(F("HTTPRCV Sending command: AT#HTTPRCV=0,64\r"));
             }
             skywire->print("AT#HTTPRCV=0,64\r");
 
@@ -32,10 +33,11 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
     if (now - timestamp_milliseconds > 200 && !skywire->available()) {
         timestamp_milliseconds = now;
 
+        resetRxBuffer();
         skywire->print("AT#HTTPRCV=0,64\r");
 
         if (debug_mode) {
-            Serial.println("HTTPRCV Sending command: AT#HTTPRCV=0,64\r");
+            Serial.println(F("HTTPRCV Sending command: AT#HTTPRCV=0,64\r"));
         }
     }
 
@@ -43,9 +45,9 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
 
     const bool has_ok = okReceived();
     if (debug_mode && has_ok) {
-        Serial.println("STEPPER CLIENT RECEIVED HTTPRCV CONTENT");
+        Serial.println(F("STEPPER CLIENT RECEIVED HTTPRCV CONTENT"));
         Serial.println(rx_buffer);
-        Serial.println("--- END OF RX BUFFER ---");
+        Serial.println(F("--- END OF RX BUFFER ---"));
     }
 
     const bool is_complete = completed();

@@ -34,7 +34,7 @@ void SocketSendSkywireCommand::readSocketResponse() {
     response_requested = true;
 
     if (debug_mode) {
-        Serial.println("AT#SRECV=1,255");
+        Serial.println(F("AT#SRECV=1,255"));
     }
 }
 
@@ -50,6 +50,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process() {
 
     if (!isSent()) {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
+            resetRxBuffer();
             skywire->print(command);
             skywire->print("\r");
 
@@ -76,7 +77,8 @@ SkywireResponseResult_t SocketSendSkywireCommand::process() {
         payload_sent = true;
 
         if (debug_mode) {
-            Serial.println("Socket payload: " + String(getMessage()));
+            Serial.print(F("Socket payload: "));
+            Serial.println(getMessage());
         }
 
         resetRxBuffer();

@@ -5,9 +5,9 @@
 
 struct SkywireResponseResult_t
 {
-    SkywireResponseResult_t(bool is_success, String response_content);
+    SkywireResponseResult_t(bool is_success, const char *response_content);
     bool is_success;
-    String response_content;
+    const char *response_content;
 };
 
 #endif

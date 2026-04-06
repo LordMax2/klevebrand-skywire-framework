@@ -1,6 +1,6 @@
 #include "skywire-command.h"
 
-char SkywireCommand::_rx_buffer[256] = {0};
+char SkywireCommand::_rx_buffer[SKYWIRE_RX_BUFFER_SIZE] = {0};
 
 SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], const bool debug_mode, const OnCompletedFunction on_completed_function)
     : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function)
@@ -23,8 +23,9 @@ void SkywireCommand::appendToRxBuffer(char c)
     }
     else
     {
-        Serial.println("RX buffer overflow. Character not appended.");
-        Serial.println("Size: " + String(sizeof(_rx_buffer) - 1));
+        Serial.println(F("RX buffer overflow. Character not appended."));
+        Serial.print(F("Size: "));
+        Serial.println(sizeof(_rx_buffer) - 1);
     }
 }
 
@@ -87,6 +88,7 @@ SkywireResponseResult_t SkywireCommand::process()
     {
         if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0))
         {
+            resetRxBuffer();
             skywire->print(command);
             skywire->print("\r");
 
@@ -110,9 +112,11 @@ SkywireResponseResult_t SkywireCommand::process()
     {
         if (debug_mode)
         {
-            Serial.println("STEPPER CLIENT STEP: " + String(command) + " RECEIVED OK, RX BUFFER:");
+            Serial.print(F("STEPPER CLIENT STEP: "));
+            Serial.print(command);
+            Serial.println(F(" RECEIVED OK, RX BUFFER:"));
             Serial.println(rx_buffer);
-            Serial.println("--- END OF RX BUFFER ---");
+            Serial.println(F("--- END OF RX BUFFER ---"));
         }
 
         const bool is_complete = completed();
@@ -212,9 +216,4 @@ void SkywireCommand::setOnCompletedCalled(const bool on_completed_called)
 void SkywireCommand::setCompleted(const bool completed)
 {
     _is_completed = completed;
-
-    if (completed)
-    {
-        resetRxBuffer();
-    }
 }

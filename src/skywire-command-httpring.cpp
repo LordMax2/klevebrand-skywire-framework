@@ -15,15 +15,18 @@ SkywireResponseResult_t HttpRingSkywireCommand::process() {
     setFirstProcessCall();
 
     if (!isSent())
+    {
+        resetRxBuffer();
         setSent(true);
+    }
 
     serialReadToRxBuffer();
 
     const bool has_ok = okReceived();
     if (debug_mode && has_ok) {
-        Serial.println("STEPPER CLIENT RECEIVED HTTPRING OK: ");
+        Serial.println(F("STEPPER CLIENT RECEIVED HTTPRING OK: "));
         Serial.println(rx_buffer);
-        Serial.println("--- END OF RX BUFFER ---");
+        Serial.println(F("--- END OF RX BUFFER ---"));
     }
 
     const bool is_complete = completed();

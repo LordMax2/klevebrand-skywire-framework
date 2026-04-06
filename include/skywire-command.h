@@ -5,8 +5,9 @@
 #include "skywire-response-result.h"
 
 #define COMMAND_SIZE 128
+#define SKYWIRE_RX_BUFFER_SIZE 512
 
-typedef void (*OnCompletedFunction)(char result_content[128]);
+typedef void (*OnCompletedFunction)(char *result_content);
 
 class SkywireCommand
 {
@@ -19,7 +20,7 @@ private:
 	unsigned long _first_process_call_timestamp = 0;
 
 	size_t _rx_buffer_cursor_index = 0;
-	static char _rx_buffer[256];
+	static char _rx_buffer[SKYWIRE_RX_BUFFER_SIZE];
 
 
 public:

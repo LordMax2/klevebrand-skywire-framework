@@ -32,6 +32,17 @@ public:
     static void onEnableGpsCommandCompleted(char* result_content);
 
     bool run() override;
+
+private:
+    AtSkywireCommand at_command;
+    SkywireCommand cmee_command;
+    DisableEchoSkywireCommand disable_echo_command;
+    SkywireCommand flow_control_command;
+    SkywireCommand interface_control_command;
+    SetApnHologramSkywireCommand set_apn_command;
+    NetworkConnectSkywireCommand network_connect_command;
+    EnablePacketDataSkywireCommand enable_packet_data_command;
+    EnableGpsSkywireCommand enable_gps_command;
 };
 
 #endif

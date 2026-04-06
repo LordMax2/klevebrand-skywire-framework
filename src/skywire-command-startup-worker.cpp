@@ -1,17 +1,26 @@
 #include "skywire-command-startup-worker.h"
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
-    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT)
+    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT),
+      at_command(skywire_serial, debug_mode, onAtCommandCompleted),
+      cmee_command(skywire_serial, "AT+CMEE=2", debug_mode, onAtCommandCompleted),
+      disable_echo_command(skywire_serial, debug_mode, onDisableEchoCommandCompleted),
+      flow_control_command(skywire_serial, "AT&K0", true, onAtCommandCompleted),
+      interface_control_command(skywire_serial, "AT+IFC=0,0", true, onAtCommandCompleted),
+      set_apn_command(skywire_serial, debug_mode, onSetApnCommandCompleted),
+      network_connect_command(skywire_serial, debug_mode, onNetworkConnectCommandCompleted),
+      enable_packet_data_command(skywire_serial, debug_mode, onEnablePacketDataCommandCompleted),
+      enable_gps_command(skywire_serial, debug_mode, onEnableGpsCommandCompleted)
 {
-    this->steps[0] = new AtSkywireCommand(skywire, debug_mode, onAtCommandCompleted);
-    this->steps[1] = new SkywireCommand(skywire, "AT+CMEE=2", debug_mode, onAtCommandCompleted);
-    this->steps[2] = new DisableEchoSkywireCommand(skywire, debug_mode, onDisableEchoCommandCompleted);
-    this->steps[3] = new SkywireCommand(skywire, "AT&K0", true, onAtCommandCompleted);
-    this->steps[4] = new SkywireCommand(skywire, "AT+IFC=0,0", true, onAtCommandCompleted);
-    this->steps[5] = new SetApnHologramSkywireCommand(skywire, debug_mode, onSetApnCommandCompleted);
-    this->steps[6] = new NetworkConnectSkywireCommand(skywire, debug_mode, onNetworkConnectCommandCompleted);
-    this->steps[7] = new EnablePacketDataSkywireCommand(skywire, debug_mode, onEnablePacketDataCommandCompleted);
-    this->steps[8] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
+    this->steps[0] = &at_command;
+    this->steps[1] = &cmee_command;
+    this->steps[2] = &disable_echo_command;
+    this->steps[3] = &flow_control_command;
+    this->steps[4] = &interface_control_command;
+    this->steps[5] = &set_apn_command;
+    this->steps[6] = &network_connect_command;
+    this->steps[7] = &enable_packet_data_command;
+    this->steps[8] = &enable_gps_command;
 }
 
 void SkywireCommandStartupWorker::onAtCommandCompleted(char *result_content)
@@ -71,8 +80,19 @@ bool SkywireCommandStartupWorker::run()
 
         if (sent_timestamp != 0 && millis() - sent_timestamp > timeout_milliseconds)
         {
-            Serial.println("Skywire command step: " + String(step->command) + ", after " + timeout_milliseconds + "ms, restarting startup sequence." + " Sent timestamp: " + sent_timestamp + ", current timestamp: " + millis());
-            Serial.println("rx_buffer at timeout: [" + String(rx_buffer) + "], previous step rx_buffer: [" + (step_cursor_index > 0 ? String(steps[step_cursor_index - 1]->getRxBuffer()) : "N/A") + "]");
+            Serial.print(F("Skywire command step: "));
+            Serial.print(step->command);
+            Serial.print(F(", after "));
+            Serial.print(timeout_milliseconds);
+            Serial.print(F("ms, restarting startup sequence. Sent timestamp: "));
+            Serial.print(sent_timestamp);
+            Serial.print(F(", current timestamp: "));
+            Serial.println(millis());
+            Serial.print(F("rx_buffer at timeout: ["));
+            Serial.print(rx_buffer);
+            Serial.print(F("], previous step rx_buffer: ["));
+            Serial.print(step_cursor_index > 0 ? steps[step_cursor_index - 1]->getRxBuffer() : "N/A");
+            Serial.println(F("]"));
 
             reset();
 

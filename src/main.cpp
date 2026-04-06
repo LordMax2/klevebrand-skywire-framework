@@ -30,8 +30,8 @@ void setup() {
     Serial.println("Startup completed!");
 
     while (true) {
-        String payload_to_send = "1;1337;true;1;2;3;99;120.5;59.8586;17.6389;42.5;1013.2;2;7";
-        tcpGpsWorker.setPayloadToSend(payload_to_send.c_str());
+        const char payload_to_send[] = "1;1337;true;1;2;3;99;120.5;59.8586;17.6389;42.5;1013.2;2;7";
+        tcpGpsWorker.setPayloadToSend(payload_to_send);
         tcpGpsWorker.run();
     }
 }

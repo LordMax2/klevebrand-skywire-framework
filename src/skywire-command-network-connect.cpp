@@ -18,12 +18,13 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     if (!isSent())
     {
-        if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        if (millis() - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {
             if (debug_mode)
             {
-                Serial.println("NETWORK CONNECT Sending command: AT+CEREG?\r");
+                Serial.println(F("NETWORK CONNECT Sending command: AT+CEREG?\r"));
             }
+            resetRxBuffer();
             skywire->print("AT+CEREG?\r");
 
             setSent(true);
@@ -39,9 +40,9 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
     const bool has_ok = okReceived();
     if (debug_mode && has_ok)
     {
-        Serial.println("STEPPER CLIENT RECEIVED CEREG");
+        Serial.println(F("STEPPER CLIENT RECEIVED CEREG"));
         Serial.println(rx_buffer);
-        Serial.println("--- END OF RX BUFFER ---");
+        Serial.println(F("--- END OF RX BUFFER ---"));
     }
 
     if (isNetworkConnected())

@@ -42,25 +42,26 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
         return {true, rx_buffer};
     }
 
-    const String payload_to_send = getPayload();
+    const char *payload_to_send = getPayload();
     const unsigned long now = millis();
 
     setFirstProcessCall();
 
     if (!isSent()) {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
+            resetRxBuffer();
             if (debug_mode) {
                 Serial.print(command);
                 Serial.print(path);
                 Serial.print(",");
-                Serial.print(payload_to_send.length());
+                Serial.print(strlen(payload_to_send));
                 Serial.print("\r");
                 Serial.println();
             }
             skywire->print(command);
             skywire->print(path);
             skywire->print(",");
-            skywire->print(payload_to_send.length());
+            skywire->print(strlen(payload_to_send));
             skywire->print("\r");
 
             setSent(true);
@@ -75,7 +76,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
     if (okReceived() && isSent()) {
         if (!ok_received) {
             resetRxBuffer();
-            Serial.println("CLEAR");
+            if (debug_mode) {
+                Serial.println(F("CLEAR"));
+            }
             ok_received = true;
         }
     } else {
@@ -84,14 +87,16 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
 
     if (isSent() && arrowsReceived() && !payload_sent) {
         if (debug_mode) {
-            Serial.println("HTTPSND Sending payload: " + payload_to_send);
+            Serial.print(F("HTTPSND Sending payload: "));
+            Serial.println(payload_to_send);
         }
-        skywire->print(payload_to_send + "\x1A");
+        skywire->print(payload_to_send);
+        skywire->write(0x1A);
 
         payload_sent = true;
 
         if (debug_mode) {
-            Serial.println("HTTPSND payload sent, waiting for final response");
+            Serial.println(F("HTTPSND payload sent, waiting for final response"));
         }
     }
 

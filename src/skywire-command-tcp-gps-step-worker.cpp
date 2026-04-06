@@ -3,37 +3,63 @@
 DroneRequest_t SkywireTcpGpsStepWorker::_latest_drone_request_response = DroneRequest_t::empty();
 GpsLocationInfo_t SkywireTcpGpsStepWorker::_latest_gps_response = GpsLocationInfo_t::empty();
 
-void SkywireTcpGpsStepWorker::setLatestTcpResponse(char response[512])
+namespace
 {
-    String response_copy = response;
+void compactResponse(char *buffer, const char *const *tokens_to_remove, size_t token_count)
+{
+    char *write_cursor = buffer;
+    const char *read_cursor = buffer;
 
-    const int response_start = response_copy.indexOf("\r\n");
-    if (response_start >= 0)
+    while (*read_cursor != '\0')
     {
-        response_copy = response_copy.substring(response_start + 2);
+        bool removed = false;
+        for (size_t i = 0; i < token_count; ++i)
+        {
+            const size_t token_length = strlen(tokens_to_remove[i]);
+            if (token_length > 0 && strncmp(read_cursor, tokens_to_remove[i], token_length) == 0)
+            {
+                read_cursor += token_length;
+                removed = true;
+                break;
+            }
+        }
+
+        if (!removed)
+        {
+            *write_cursor++ = *read_cursor++;
+        }
     }
 
-    const int response_end = response_copy.indexOf("\r\nOK\r\n");
-    if (response_end >= 0)
+    *write_cursor = '\0';
+}
+}
+
+void SkywireTcpGpsStepWorker::setLatestTcpResponse(char *response)
+{
+    char *payload = response;
+
+    char *line_break = strstr(payload, "\r\n");
+    if (line_break != nullptr)
     {
-        response_copy = response_copy.substring(0, response_end);
+        payload = line_break + 2;
     }
 
-    const int data_start = response_copy.indexOf("\r\n");
-    if (data_start >= 0)
+    char *ok_marker = strstr(payload, "\r\nOK\r\n");
+    if (ok_marker != nullptr)
     {
-        response_copy = response_copy.substring(data_start + 2);
+        *ok_marker = '\0';
     }
 
-    response_copy.replace("#SRECV: 1,", "");
-    response_copy.replace("OK", "");
-    response_copy.replace("<<<", "");
-    response_copy.replace("ERROR", "");
-    response_copy.replace("+CME", "");
-    response_copy.replace("\r", "");
-    response_copy.replace("\n", "");
+    line_break = strstr(payload, "\r\n");
+    if (line_break != nullptr)
+    {
+        payload = line_break + 2;
+    }
 
-    _latest_drone_request_response = DroneRequest_t::parseFromCsvString(response_copy);
+    static const char *tokens_to_remove[] = {"#SRECV: 1,", "OK", "<<<", "ERROR", "+CME", "\r", "\n"};
+    compactResponse(payload, tokens_to_remove, sizeof(tokens_to_remove) / sizeof(tokens_to_remove[0]));
+
+    _latest_drone_request_response = DroneRequest_t::parseFromCsvString(payload);
 }
 
 DroneRequest_t SkywireTcpGpsStepWorker::getLatestDroneRequest()
@@ -41,20 +67,12 @@ DroneRequest_t SkywireTcpGpsStepWorker::getLatestDroneRequest()
     return _latest_drone_request_response;
 }
 
-void SkywireTcpGpsStepWorker::setLatestGpsResponse(char response[512])
+void SkywireTcpGpsStepWorker::setLatestGpsResponse(char *response)
 {
-    String response_copy = response;
+    static const char *tokens_to_remove[] = {"OK", "$GPSACP: ", "\r", "\n", ":", " ", "wrong", "state"};
+    compactResponse(response, tokens_to_remove, sizeof(tokens_to_remove) / sizeof(tokens_to_remove[0]));
 
-    response_copy.replace("OK", "");
-    response_copy.replace("$GPSACP: ", "");
-    response_copy.replace("\r", "");
-    response_copy.replace("\n", "");
-    response_copy.replace(":", "");
-    response_copy.replace(" ", "");
-    response_copy.replace("wrong", "");
-    response_copy.replace("state", "");
-
-    _latest_gps_response = GpsLocationInfo_t::parseFromGpsAcpString(response_copy);
+    _latest_gps_response = GpsLocationInfo_t::parseFromGpsAcpString(response);
 }
 
 GpsLocationInfo_t SkywireTcpGpsStepWorker::getLatestGpsResponse() {
