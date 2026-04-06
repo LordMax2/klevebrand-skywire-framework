@@ -11,7 +11,7 @@
 #include "skywire-command-enable-packet-data.h"
 #include "skywire-command-enable-gps.h"
 #include "skywire-command.h"
-#include "skywire-http-gps-step-worker.h"
+#include "skywire-tcp-gps-step-worker.h"
 
 void setup() {
     Serial.begin(115200);
@@ -19,8 +19,7 @@ void setup() {
     Serial.println("Starting Skywire modem...");
 
     SkywireCommandStartupWorker startupWorker(&Serial3, false);
-    SkywireHttpGpsStepWorker httpGpsWorker(&Serial3, "flightcontroltower.klevebrand.se", 80, "api/v1/dronerequest/1337",
-                                           "api/v1/drone/1337/setstate", 20000, false);
+    SkywireTcpGpsStepWorker tcpGpsWorker(&Serial3, "flightcontroltower.klevebrand.se", 13000, 20000, true);
 
     Serial3.begin(true);
 
@@ -32,9 +31,8 @@ void setup() {
 
     while (true) {
         String payload_to_send = "1;1337;true;1;2;3;99;120.5;59.8586;17.6389;42.5;1013.2;2;7";
-        httpGpsWorker.setPayloadToSend(payload_to_send.c_str());
-
-        httpGpsWorker.run();
+        tcpGpsWorker.setPayloadToSend(payload_to_send.c_str());
+        tcpGpsWorker.run();
     }
 }
 

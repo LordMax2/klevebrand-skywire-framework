@@ -14,7 +14,7 @@ bool HttpSndSkywireCommand::arrowsReceived() const {
     return strstr(rx_buffer, ">") != nullptr;
 }
 
-void HttpSndSkywireCommand::setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]) {
+void HttpSndSkywireCommand::setPayload(const char *payload_to_send) {
     strncpy(this->payload, payload_to_send, sizeof(this->payload) - 1);
     this->payload[sizeof(this->payload) - 1] = '\0';
 }
@@ -32,7 +32,7 @@ void HttpSndSkywireCommand::reset() {
 bool HttpSndSkywireCommand::okReceived() {
     auto rx_buffer = getRxBuffer();
 
-    return ok_received || (rx_buffer, "\r\nOK\r\n") != nullptr;
+    return ok_received || strstr(rx_buffer, "\r\nOK\r\n") != nullptr;
 }
 
 SkywireResponseResult_t HttpSndSkywireCommand::process() {

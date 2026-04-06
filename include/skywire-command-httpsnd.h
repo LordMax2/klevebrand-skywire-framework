@@ -16,7 +16,7 @@ public:
     bool okReceived() override;
 
     bool arrowsReceived() const;
-    void setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]);
+    void setPayload(const char *payload_to_send);
     char* getPayload();
     void reset() override;
 

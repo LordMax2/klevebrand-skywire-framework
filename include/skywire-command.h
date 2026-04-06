@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include "skywire-response-result.h"
 
-#define COMMAND_SIZE 64
+#define COMMAND_SIZE 128
 
 typedef void (*OnCompletedFunction)(char result_content[128]);
 
