@@ -1,15 +1,17 @@
 #include "skywire-command-startup-worker.h"
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
-    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, 7)
+    : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT)
 {
     this->steps[0] = new AtSkywireCommand(skywire, debug_mode, onAtCommandCompleted);
     this->steps[1] = new SkywireCommand(skywire, "AT+CMEE=2", debug_mode, onAtCommandCompleted);
     this->steps[2] = new DisableEchoSkywireCommand(skywire, debug_mode, onDisableEchoCommandCompleted);
-    this->steps[3] = new SetApnHologramSkywireCommand(skywire, debug_mode, onSetApnCommandCompleted);
-    this->steps[4] = new NetworkConnectSkywireCommand(skywire, debug_mode, onNetworkConnectCommandCompleted);
-    this->steps[5] = new EnablePacketDataSkywireCommand(skywire, debug_mode, onEnablePacketDataCommandCompleted);
-    this->steps[6] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
+    this->steps[3] = new SkywireCommand(skywire, "AT&K0", true, onAtCommandCompleted);
+    this->steps[4] = new SkywireCommand(skywire, "AT+IFC=0,0", true, onAtCommandCompleted);
+    this->steps[5] = new SetApnHologramSkywireCommand(skywire, debug_mode, onSetApnCommandCompleted);
+    this->steps[6] = new NetworkConnectSkywireCommand(skywire, debug_mode, onNetworkConnectCommandCompleted);
+    this->steps[7] = new EnablePacketDataSkywireCommand(skywire, debug_mode, onEnablePacketDataCommandCompleted);
+    this->steps[8] = new EnableGpsSkywireCommand(skywire, debug_mode, onEnableGpsCommandCompleted);
 }
 
 void SkywireCommandStartupWorker::onAtCommandCompleted(char *result_content)

@@ -28,12 +28,12 @@ SkywireResponseResult_t HttpRingSkywireCommand::process() {
 
     const bool is_complete = completed();
     if (is_complete) {
-        setCompleted(true);
-
         if (on_completed_function != nullptr && !isOnCompletedCalled()) {
             on_completed_function(rx_buffer);
             setOnCompletedCalled(true);
         }
+
+        setCompleted(true);
     }
 
     return {false, ""};

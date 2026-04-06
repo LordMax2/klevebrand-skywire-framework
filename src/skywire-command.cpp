@@ -34,6 +34,39 @@ void SkywireCommand::serialReadToRxBuffer()
     {
         const char c = skywire->read();
         appendToRxBuffer(c);
+
+        if (debug_mode)
+        {
+            const uint8_t byte_value = static_cast<uint8_t>(c);
+            Serial.print("RX BYTE 0x");
+            if (byte_value < 0x10)
+            {
+                Serial.print("0");
+            }
+            Serial.print(byte_value, HEX);
+            Serial.print(" '");
+            if (byte_value == '\r')
+            {
+                Serial.print("CR");
+            }
+            else if (byte_value == '\n')
+            {
+                Serial.print("LF");
+            }
+            else if (byte_value == '\t')
+            {
+                Serial.print("TAB");
+            }
+            else if (byte_value >= 32 && byte_value <= 126)
+            {
+                Serial.print(static_cast<char>(byte_value));
+            }
+            else
+            {
+                Serial.print(".");
+            }
+            Serial.println("'");
+        }
     }
 }
 
@@ -85,13 +118,13 @@ SkywireResponseResult_t SkywireCommand::process()
         const bool is_complete = completed();
         if (is_complete)
         {
-            setCompleted(true);
-
             if(on_completed_function != nullptr && !isOnCompletedCalled())
             {
                 on_completed_function(rx_buffer);
                 setOnCompletedCalled(true);
             }
+
+            setCompleted(true);
         }
 
         return {true, rx_buffer};
@@ -180,5 +213,8 @@ void SkywireCommand::setCompleted(const bool completed)
 {
     _is_completed = completed;
 
-    resetRxBuffer();
+    if (completed)
+    {
+        resetRxBuffer();
+    }
 }

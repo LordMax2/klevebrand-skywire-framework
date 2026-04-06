@@ -18,11 +18,11 @@ void setup() {
 
     Serial.println("Starting Skywire modem...");
 
-    SkywireCommandStartupWorker startupWorker(&Serial3, true);
+    SkywireCommandStartupWorker startupWorker(&Serial3, false);
     SkywireHttpGpsStepWorker httpGpsWorker(&Serial3, "flightcontroltower.klevebrand.se", 80, "api/v1/dronerequest/1337",
-                                           "api/v1/drone/1337/setstate", 20000, true);
+                                           "api/v1/drone/1337/setstate", 20000, false);
 
-    Serial3.begin(115200);
+    Serial3.begin(true);
 
     while (!startupWorker.run()) {
         // Do nothing until startup is completed.

@@ -17,7 +17,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
     setFirstProcessCall();
 
     if (!isSent()) {
-        if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
+        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
             if (debug_mode) {
                 Serial.println("HTTPRCV Sending command: AT#HTTPRCV=0,64\r");
             }
@@ -50,12 +50,12 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
 
     const bool is_complete = completed();
     if (is_complete) {
-        setCompleted(true);
-
         if (on_completed_function != nullptr && !isOnCompletedCalled()) {
             on_completed_function(rx_buffer);
             setOnCompletedCalled(true);
         }
+
+        setCompleted(true);
     }
 
     return {false, ""};

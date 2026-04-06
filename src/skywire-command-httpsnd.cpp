@@ -35,11 +35,12 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
     }
 
     const String payload_to_send = getPayload();
+    const unsigned long now = millis();
 
     setFirstProcessCall();
 
     if (!isSent()) {
-        if (getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
+        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
             if (debug_mode) {
                 Serial.print(command);
                 Serial.print(path);
@@ -59,9 +60,8 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
         return {false, ""};
     }
 
-    if (!payload_sent) {
-        serialReadToRxBuffer();
-    }
+    serialReadToRxBuffer();
+    rx_buffer = getRxBuffer();
 
     if (isSent() && arrowsReceived() && !payload_sent) {
         if (debug_mode) {
@@ -71,27 +71,24 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
 
         payload_sent = true;
 
-        setCompleted(true);
-
         if (debug_mode) {
-            Serial.println("HTTPSND is completed: " + String(completed() ? "true" : "false"));
-            Serial.println(rx_buffer);
+            Serial.println("HTTPSND payload sent, waiting for final response");
         }
     }
 
     const bool is_complete = completed();
     if (is_complete) {
-        setCompleted(true);
-
         if (on_completed_function != nullptr && !isOnCompletedCalled()) {
             on_completed_function(rx_buffer);
             setOnCompletedCalled(true);
         }
+
+        setCompleted(true);
     }
 
-    return {false, ""};
+    return {is_complete, rx_buffer};
 }
 
 bool HttpSndSkywireCommand::completed() {
-    return _is_completed || ((isSent() && okReceived() && arrowsReceived() && payload_sent) || getPayload()[0] == '\0');
+    return _is_completed || (getPayload()[0] == '\0') || (isSent() && payload_sent && okReceived());
 }
