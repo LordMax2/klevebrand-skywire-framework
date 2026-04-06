@@ -71,7 +71,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
 
         rx_buffer = getRxBuffer();
 
-        const bool has_hologram_ok = (strstr(rx_buffer, "hologram") != nullptr && strstr(rx_buffer, "OK") != nullptr);
+        const bool has_hologram_ok = (strstr(rx_buffer, "hologram") != nullptr);
         const bool already_active = (strstr(rx_buffer, "context already activated") != nullptr);
 
         if (has_hologram_ok || already_active)
