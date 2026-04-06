@@ -1,6 +1,7 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[HTTP_SND_PATH_SIZE],
+HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode,
+                                             const char path[HTTP_SND_PATH_SIZE],
                                              const OnCompletedFunction on_completed_function)
     : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function) {
     strncpy(this->path, path, sizeof(this->path) - 1);
@@ -10,7 +11,7 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug
 bool HttpSndSkywireCommand::arrowsReceived() const {
     const auto rx_buffer = getRxBuffer();
 
-    return strstr(rx_buffer, ">>>") != nullptr;
+    return strstr(rx_buffer, ">") != nullptr;
 }
 
 void HttpSndSkywireCommand::setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]) {
@@ -25,6 +26,13 @@ char *HttpSndSkywireCommand::getPayload() {
 void HttpSndSkywireCommand::reset() {
     SkywireCommand::reset();
     payload_sent = false;
+    ok_received = false;
+}
+
+bool HttpSndSkywireCommand::okReceived() {
+    auto rx_buffer = getRxBuffer();
+
+    return ok_received || (rx_buffer, "\r\nOK\r\n") != nullptr;
 }
 
 SkywireResponseResult_t HttpSndSkywireCommand::process() {
@@ -47,6 +55,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
                 Serial.print(",");
                 Serial.print(payload_to_send.length());
                 Serial.print("\r");
+                Serial.println();
             }
             skywire->print(command);
             skywire->print(path);
@@ -62,6 +71,16 @@ SkywireResponseResult_t HttpSndSkywireCommand::process() {
 
     serialReadToRxBuffer();
     rx_buffer = getRxBuffer();
+
+    if (okReceived() && isSent()) {
+        if (!ok_received) {
+            resetRxBuffer();
+            Serial.println("CLEAR");
+            ok_received = true;
+        }
+    } else {
+        return {false, ""};
+    }
 
     if (isSent() && arrowsReceived() && !payload_sent) {
         if (debug_mode) {

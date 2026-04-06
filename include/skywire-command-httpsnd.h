@@ -13,6 +13,7 @@ public:
 
     SkywireResponseResult_t process() override;
     bool completed() override;
+    bool okReceived() override;
 
     bool arrowsReceived() const;
     void setPayload(char payload_to_send[HTTP_SND_PAYLOAD_TO_SEND_SIZE]);
@@ -23,6 +24,7 @@ private:
     char payload[HTTP_SND_PAYLOAD_TO_SEND_SIZE]{};
     char path[HTTP_SND_PATH_SIZE]{};
     bool payload_sent = false;
+    bool ok_received = false;
 };
 
 #endif

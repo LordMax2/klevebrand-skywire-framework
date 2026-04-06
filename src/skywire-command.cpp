@@ -141,7 +141,7 @@ void SkywireCommand::resetRxBuffer()
 
 bool SkywireCommand::okReceived()
 {
-    return strstr(_rx_buffer, "OK") != nullptr;
+    return strstr(_rx_buffer, "\r\nOK\r\n") != nullptr;
 }
 
 void SkywireCommand::reset()
