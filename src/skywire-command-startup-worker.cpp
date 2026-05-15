@@ -3,10 +3,10 @@
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, bool debug_mode)
     : SkywireCommandWorker(skywire_serial, debug_mode, 5000, STARTUP_STEP_COUNT),
       at_command(skywire_serial, debug_mode, nullptr),
-      cmee_command(skywire_serial, "AT+CMEE=2", debug_mode, nullptr),
+      cmee_command(skywire_serial, F("AT+CMEE=2"), debug_mode, nullptr),
       disable_echo_command(skywire_serial, debug_mode, nullptr),
-      flow_control_command(skywire_serial, "AT&K0", debug_mode, nullptr),
-      interface_control_command(skywire_serial, "AT+IFC=0,0", debug_mode, nullptr),
+      flow_control_command(skywire_serial, F("AT&K0"), debug_mode, nullptr),
+      interface_control_command(skywire_serial, F("AT+IFC=0,0"), debug_mode, nullptr),
       set_apn_command(skywire_serial, debug_mode, nullptr),
       network_connect_command(skywire_serial, debug_mode, nullptr),
       enable_packet_data_command(skywire_serial, debug_mode, nullptr),

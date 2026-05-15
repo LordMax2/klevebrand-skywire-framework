@@ -2,7 +2,7 @@
 
 HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, const bool debug_mode,
                                                const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "HTTPRING", debug_mode, on_completed_function) {
+    : SkywireCommand(skywire, F("HTTPRING"), debug_mode, on_completed_function) {
 }
 
 SkywireResponseResult_t HttpRingSkywireCommand::process() {

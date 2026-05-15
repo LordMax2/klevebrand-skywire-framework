@@ -1,7 +1,7 @@
 #include "skywire-command-network-connect.h"
 
 NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "", debug_mode, on_completed_function)
+    : SkywireCommand(skywire, F("AT+CEREG?"), debug_mode, on_completed_function)
 {
 }
 
@@ -25,7 +25,7 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
                 Serial.println(F("NETWORK CONNECT Sending command: AT+CEREG?\r"));
             }
             resetRxBuffer();
-            skywire->print("AT+CEREG?\r");
+            writeCommandToModem();
 
             setSent(true);
         }

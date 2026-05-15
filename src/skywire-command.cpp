@@ -2,11 +2,9 @@
 
 char SkywireCommand::_rx_buffer[SKYWIRE_RX_BUFFER_SIZE] = {0};
 
-SkywireCommand::SkywireCommand(HardwareSerial *skywire, const char command[COMMAND_SIZE], const bool debug_mode,
+SkywireCommand::SkywireCommand(HardwareSerial *skywire, const __FlashStringHelper *command, const bool debug_mode,
                                const OnCompletedFunction on_completed_function)
-    : skywire(skywire), debug_mode(debug_mode), on_completed_function(on_completed_function) {
-    strncpy(this->command, command, sizeof(this->command) - 1);
-    this->command[sizeof(this->command) - 1] = '\0';
+    : skywire(skywire), command(command), debug_mode(debug_mode), on_completed_function(on_completed_function) {
 }
 
 char *SkywireCommand::getRxBuffer() {
@@ -17,12 +15,11 @@ void SkywireCommand::appendToRxBuffer(char c) {
     if (_rx_buffer_cursor_index < sizeof(_rx_buffer) - 1) {
         _rx_buffer[_rx_buffer_cursor_index++] = c;
         _rx_buffer[_rx_buffer_cursor_index] = '\0';
-    } else if (debug_mode)
-        if (debug_mode) {
-            Serial.println(F("RX buffer overflow. Character not appended."));
-            Serial.print(F("Size: "));
-            Serial.println(sizeof(_rx_buffer) - 1);
-        }
+    } else if (debug_mode) {
+        Serial.println(F("RX buffer overflow. Character not appended."));
+        Serial.print(F("Size: "));
+        Serial.println(sizeof(_rx_buffer) - 1);
+    }
 }
 
 void SkywireCommand::serialReadToRxBuffer() {
@@ -32,25 +29,34 @@ void SkywireCommand::serialReadToRxBuffer() {
 
         if (debug_mode) {
             const uint8_t byte_value = static_cast<uint8_t>(c);
-            Serial.print("RX BYTE 0x");
+            Serial.print(F("RX BYTE 0x"));
             if (byte_value < 0x10) {
-                Serial.print("0");
+                Serial.print(F("0"));
             }
             Serial.print(byte_value, HEX);
-            Serial.print(" '");
+            Serial.print(F(" '"));
             if (byte_value == '\r') {
-                Serial.print("CR");
+                Serial.print(F("CR"));
             } else if (byte_value == '\n') {
-                Serial.print("LF");
+                Serial.print(F("LF"));
             } else if (byte_value == '\t') {
-                Serial.print("TAB");
+                Serial.print(F("TAB"));
             } else if (byte_value >= 32 && byte_value <= 126) {
                 Serial.print(static_cast<char>(byte_value));
             } else {
-                Serial.print(".");
+                Serial.print(F("."));
             }
-            Serial.println("'");
+            Serial.println(F("'"));
         }
+    }
+}
+
+void SkywireCommand::writeCommandToModem() {
+    skywire->print(command);
+    skywire->print('\r');
+
+    if (debug_mode) {
+        Serial.println(command);
     }
 }
 
@@ -68,12 +74,7 @@ SkywireResponseResult_t SkywireCommand::process() {
     if (!isSent()) {
         if ((now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)) {
             resetRxBuffer();
-            skywire->print(command);
-            skywire->print("\r");
-
-            if (debug_mode) {
-                Serial.println(command);
-            }
+            writeCommandToModem();
 
             setSent(true);
         }

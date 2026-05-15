@@ -5,7 +5,7 @@ SocketSendSkywireCommand::SocketSendSkywireCommand(HardwareSerial *skywire,
                                                    const char *message,
                                                    const bool read_response,
                                                    const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "AT#SSEND=1", debug_mode, on_completed_function),
+    : SkywireCommand(skywire, F("AT#SSEND=1"), debug_mode, on_completed_function),
       read_response(read_response) {
     setMessage(message);
 }
@@ -28,8 +28,16 @@ bool SocketSendSkywireCommand::responseReceived() const {
     return strstr(rx_buffer, "#SRECV:") != nullptr && strstr(rx_buffer, "\r\nOK\r\n") != nullptr;
 }
 
+bool SocketSendSkywireCommand::responseRetrySuggested() const {
+    const auto rx_buffer = getRxBuffer();
+
+    return strstr(rx_buffer, "SRING") != nullptr ||
+           strstr(rx_buffer, "+CME ERROR: operation not supported") != nullptr;
+}
+
 void SocketSendSkywireCommand::readSocketResponse() {
-    skywire->print("AT#SRECV=1,255\r");
+    skywire->print(F("AT#SRECV=1,255\r"));
+    setSent(true);
     last_read_timestamp = millis();
     response_requested = true;
 
@@ -51,12 +59,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process() {
     if (!isSent()) {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
             resetRxBuffer();
-            skywire->print(command);
-            skywire->print("\r");
-
-            if (debug_mode) {
-                Serial.println("AT#SSEND=1");
-            }
+            writeCommandToModem();
 
             setSent(true);
         }
@@ -96,8 +99,11 @@ SkywireResponseResult_t SocketSendSkywireCommand::process() {
             return {false, ""};
         }
 
-        if (response_requested && !response_received && now - last_read_timestamp > 200 && !skywire->available()) {
+        if (response_requested && !response_received && now - last_read_timestamp > 200 &&
+            (responseRetrySuggested() || !skywire->available())) {
+            resetRxBuffer();
             readSocketResponse();
+            return {false, ""};
         }
 
         if (!responseReceived()) {

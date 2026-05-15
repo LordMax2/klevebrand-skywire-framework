@@ -24,6 +24,7 @@ public:
 private:
     bool promptReceived() const;
     bool responseReceived() const;
+    bool responseRetrySuggested() const;
     void readSocketResponse();
 
     char message[SOCKET_SEND_MESSAGE_SIZE]{};

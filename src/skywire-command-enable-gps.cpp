@@ -1,7 +1,7 @@
 #include "skywire-command-enable-gps.h"
 
 EnableGpsSkywireCommand::EnableGpsSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "AT$GPSP=1", debug_mode, on_completed_function)
+    : SkywireCommand(skywire, F("AT$GPSP=1"), debug_mode, on_completed_function)
 {
 }
 

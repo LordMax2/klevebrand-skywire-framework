@@ -3,7 +3,7 @@
 HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode,
                                              const char path[HTTP_SND_PATH_SIZE],
                                              const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "AT#HTTPSND=0,0,", debug_mode, on_completed_function) {
+    : SkywireCommand(skywire, F("AT#HTTPSND=0,0,"), debug_mode, on_completed_function) {
     strncpy(this->path, path, sizeof(this->path) - 1);
     this->path[sizeof(this->path) - 1] = '\0';
 }

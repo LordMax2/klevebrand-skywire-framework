@@ -1,7 +1,7 @@
 #include "skywire-command-set-hologram-apn.h"
 
 SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "AT+CGDCONT=1,\"IPV4V6\",\"hologram\"", debug_mode, on_completed_function),
+    : SkywireCommand(skywire, F("AT+CGDCONT=1,\"IPV4V6\",\"hologram\""), debug_mode, on_completed_function),
       state(State::SEND_SET)
 {
 }
@@ -25,14 +25,9 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         {
             resetRxBuffer();
 
-            skywire->print(command);
-            skywire->print('\r');
+            writeCommandToModem();
 
             setSent(true);
-
-            if (debug_mode) {
-                Serial.println(command);
-            }
 
             state = State::WAIT_SET;
         }
@@ -55,10 +50,10 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         if (!isSent())
         {
             resetRxBuffer();
-            skywire->print("AT+CGDCONT?\r");
+            skywire->print(F("AT+CGDCONT?\r"));
 
             if (debug_mode) {
-                Serial.println("AT+CGDCONT?");
+                Serial.println(F("AT+CGDCONT?"));
             }
 
             setSent(true);
@@ -107,20 +102,15 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     {
         if (state == State::WAIT_SET)
         {
-            skywire->print(command);
-            skywire->print('\r');
-
-            if (debug_mode) {
-                Serial.println(command);
-            }
+            writeCommandToModem();
         }
         else if (state == State::WAIT_QUERY)
         {
             resetRxBuffer();
-            skywire->print("AT+CGDCONT?\r");
+            skywire->print(F("AT+CGDCONT?\r"));
 
             if (debug_mode) {
-                Serial.println("AT+CGDCONT?");
+                Serial.println(F("AT+CGDCONT?"));
             }
         }
 

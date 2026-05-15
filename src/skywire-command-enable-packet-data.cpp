@@ -1,7 +1,7 @@
 #include "skywire-command-enable-packet-data.h"
 
 EnablePacketDataSkywireCommand::EnablePacketDataSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "AT#SGACT=1,1", debug_mode, on_completed_function)
+    : SkywireCommand(skywire, F("AT#SGACT=1,1"), debug_mode, on_completed_function)
 {
 }
 

@@ -60,6 +60,8 @@ void SkywireTcpGpsStepWorker::setLatestTcpResponse(char *response)
     compactResponse(payload, tokens_to_remove, sizeof(tokens_to_remove) / sizeof(tokens_to_remove[0]));
 
     _latest_drone_request_response = DroneRequest_t::parseFromCsvString(payload);
+
+    Serial.println(payload);
 }
 
 DroneRequest_t SkywireTcpGpsStepWorker::getLatestDroneRequest()

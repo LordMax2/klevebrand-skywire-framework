@@ -2,7 +2,7 @@
 
 HttpRcvSkywireCommand::HttpRcvSkywireCommand(HardwareSerial *skywire, const bool debug_mode,
                                              const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, "HTTPRCV", debug_mode, on_completed_function) {
+    : SkywireCommand(skywire, F("HTTPRCV"), debug_mode, on_completed_function) {
 }
 
 SkywireResponseResult_t HttpRcvSkywireCommand::process() {
@@ -22,7 +22,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
             if (debug_mode) {
                 Serial.println(F("HTTPRCV Sending command: AT#HTTPRCV=0,64\r"));
             }
-            skywire->print("AT#HTTPRCV=0,64\r");
+            skywire->print(F("AT#HTTPRCV=0,64\r"));
 
             setSent(true);
         }
@@ -34,7 +34,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process() {
         timestamp_milliseconds = now;
 
         resetRxBuffer();
-        skywire->print("AT#HTTPRCV=0,64\r");
+        skywire->print(F("AT#HTTPRCV=0,64\r"));
 
         if (debug_mode) {
             Serial.println(F("HTTPRCV Sending command: AT#HTTPRCV=0,64\r"));
