@@ -10,9 +10,11 @@ public:
     NetworkConnectSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process() override;
+    void reset() override;
 
 private:
     static bool isNetworkConnected();
+    unsigned long last_poll_timestamp = 0;
 };
 
 #endif

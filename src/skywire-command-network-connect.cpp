@@ -8,6 +8,7 @@ NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywi
 SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 {
     auto rx_buffer = getRxBuffer();
+    const unsigned long now = millis();
 
     if (completed())
     {
@@ -18,7 +19,8 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     if (!isSent())
     {
-        if (millis() - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0 &&
+            (last_poll_timestamp == 0 || now - last_poll_timestamp >= 1000))
         {
             if (debug_mode)
             {
@@ -28,6 +30,7 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
             writeCommandToModem();
 
             setSent(true);
+            last_poll_timestamp = now;
         }
 
         return {false, ""};
@@ -58,7 +61,19 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
         return {true, rx_buffer};
     }
 
+    if (has_ok)
+    {
+        resetRxBuffer();
+        setSent(false);
+    }
+
     return {false, ""};
+}
+
+void NetworkConnectSkywireCommand::reset()
+{
+    SkywireCommand::reset();
+    last_poll_timestamp = 0;
 }
 
 bool NetworkConnectSkywireCommand::isNetworkConnected()
