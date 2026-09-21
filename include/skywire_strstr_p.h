@@ -4,6 +4,7 @@
 #define SKYWIRE_STRSTR_P_H
 
 #include "Arduino.h"
+#include <avr/pgmspace.h>
 
 inline char *skywireStrstrP(char *haystack, const char *needle_progmem)
 {
