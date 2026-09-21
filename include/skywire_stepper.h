@@ -9,10 +9,9 @@
 
 enum class SkywireStepResult
 {
-    Processed,
-    Advanced,
-    Finished,
-    TimedOut
+    SequenceStillRunning,
+    SequenceCompleted,
+    StepTimedOut
 };
 
 template<uint8_t StepCount>
@@ -21,7 +20,7 @@ class SkywireStepper
 public:
     explicit SkywireStepper(unsigned long timeout_milliseconds);
 
-    bool isFinished() const;
+    bool hasCompletedAllCommands() const;
 
     template<SkywireCommandConcept... Commands>
     SkywireStepResult stepCurrent(Commands &...commands);
@@ -31,10 +30,7 @@ public:
 
 private:
     template<SkywireCommandConcept Command>
-    SkywireStepResult step(Command &command);
-
-    template<SkywireCommandConcept First, SkywireCommandConcept... Rest>
-    SkywireStepResult stepCurrentFrom(uint8_t current, First &first, Rest &...rest);
+    SkywireStepResult stepCommand(Command &command);
 
     unsigned long _timeout_milliseconds;
     uint8_t _step_cursor_index;
@@ -48,14 +44,14 @@ inline SkywireStepper<StepCount>::SkywireStepper(const unsigned long timeout_mil
 }
 
 template<uint8_t StepCount>
-inline bool SkywireStepper<StepCount>::isFinished() const
+inline bool SkywireStepper<StepCount>::hasCompletedAllCommands() const
 {
     return _step_cursor_index >= StepCount;
 }
 
 template<uint8_t StepCount>
 template<SkywireCommandConcept Command>
-SkywireStepResult SkywireStepper<StepCount>::step(Command &command)
+SkywireStepResult SkywireStepper<StepCount>::stepCommand(Command &command)
 {
     if (command.completed())
     {
@@ -63,10 +59,10 @@ SkywireStepResult SkywireStepper<StepCount>::step(Command &command)
 
         if (_step_cursor_index >= StepCount)
         {
-            return SkywireStepResult::Finished;
+            return SkywireStepResult::SequenceCompleted;
         }
 
-        return SkywireStepResult::Advanced;
+        return SkywireStepResult::SequenceStillRunning;
     }
 
     const unsigned long sent_timestamp = command.getSentTimestamp();
@@ -78,29 +74,12 @@ SkywireStepResult SkywireStepper<StepCount>::step(Command &command)
             SkywireAtEngine::logStepTimeout(command.command(), _timeout_milliseconds, sent_timestamp);
         }
 
-        return SkywireStepResult::TimedOut;
+        return SkywireStepResult::StepTimedOut;
     }
 
     command.process();
 
-    return SkywireStepResult::Processed;
-}
-
-template<uint8_t StepCount>
-template<SkywireCommandConcept First, SkywireCommandConcept... Rest>
-SkywireStepResult SkywireStepper<StepCount>::stepCurrentFrom(const uint8_t current, First &first, Rest &...rest)
-{
-    if (_step_cursor_index == current)
-    {
-        return step(first);
-    }
-
-    if constexpr (sizeof...(Rest) > 0)
-    {
-        return stepCurrentFrom(static_cast<uint8_t>(current + 1), rest...);
-    }
-
-    return SkywireStepResult::Finished;
+    return SkywireStepResult::SequenceStillRunning;
 }
 
 template<uint8_t StepCount>
@@ -109,7 +88,26 @@ SkywireStepResult SkywireStepper<StepCount>::stepCurrent(Commands &...commands)
 {
     static_assert(sizeof...(Commands) == StepCount, "command list size must match step count");
 
-    return stepCurrentFrom(0, commands...);
+    SkywireStepResult result = SkywireStepResult::SequenceCompleted;
+    uint8_t command_index = 0;
+
+    const auto step_matching_command = [&](auto &command) -> bool
+    {
+        if (command_index == _step_cursor_index)
+        {
+            result = stepCommand(command);
+
+            return true;
+        }
+
+        command_index++;
+
+        return false;
+    };
+
+    (step_matching_command(commands) || ...);
+
+    return result;
 }
 
 template<uint8_t StepCount>

@@ -41,5 +41,5 @@ SkywireResponseResult_t EnableGpsSkywireCommand::process()
 
 bool EnableGpsSkywireCommand::completed() const
 {
-    return _at.isCompletedFlag() || (_at.isSent() && okReceived());
+    return _at.hasMarkedCompleted() || (_at.hasSent() && okReceived());
 }

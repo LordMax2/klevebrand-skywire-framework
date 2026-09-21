@@ -27,7 +27,7 @@ private:
     };
 
     bool socketSetupFailed() const;
-    bool socketCloseFinished() const;
+    bool hasReceivedSocketCloseResponse() const;
 
     SkywireAtEngine _at;
     State _state;

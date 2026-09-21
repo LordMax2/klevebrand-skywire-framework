@@ -32,14 +32,14 @@ public:
     void resetRxBuffer();
     static char *getRxBuffer();
 
-    void setFirstProcessCall();
+    void recordFirstProcessCall();
     unsigned long getFirstProcessCallTimestamp() const;
-    bool isSent() const;
-    void setSent(bool sent);
-    void setCompleted(bool completed);
-    bool isCompletedFlag() const;
-    bool isOnCompletedCalled() const;
-    void setOnCompletedCalled(bool on_completed_called);
+    bool hasSent() const;
+    void setSent(bool has_sent);
+    void setCompleted(bool is_completed);
+    bool hasMarkedCompleted() const;
+    bool hasCalledOnCompleted() const;
+    void setHasCalledOnCompleted(bool has_called_on_completed);
     void notifyCompletedIfNeeded();
 
     void printToModem(const __FlashStringHelper *value);
@@ -66,10 +66,10 @@ private:
     OnCompletedFunction _on_completed_function;
     unsigned long _sent_timestamp;
     unsigned long _first_process_call_timestamp;
-    bool _sent;
-    bool _on_completed_called;
-    bool _first_process_called;
-    bool _completed;
+    bool _has_sent;
+    bool _has_called_on_completed;
+    bool _has_recorded_first_process_call;
+    bool _has_marked_completed;
 };
 
 static_assert(SkywireCommandConcept<SkywireAtEngine>, "SkywireAtEngine doesnt implement the concept");

@@ -40,7 +40,7 @@ void SkywireTcpGpsStepWorker::setPayloadToSend(const char *payload)
 
 bool SkywireTcpGpsStepWorker::run()
 {
-    if (_stepper.isFinished())
+    if (_stepper.hasCompletedAllCommands())
     {
         reset();
 
@@ -55,12 +55,12 @@ bool SkywireTcpGpsStepWorker::run()
         _send_state_command,
         _socket_close_command);
 
-    if (result == SkywireStepResult::TimedOut)
+    if (result == SkywireStepResult::StepTimedOut)
     {
         reset();
         SkywireAtEngine::rebeginModem();
     }
-    else if (result == SkywireStepResult::Finished)
+    else if (result == SkywireStepResult::SequenceCompleted)
     {
         reset();
 

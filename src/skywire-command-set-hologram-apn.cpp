@@ -24,9 +24,9 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
     switch (_state)
     {
     case State::SendSet:
-        _at.setFirstProcessCall();
+        _at.recordFirstProcessCall();
 
-        if (!_at.isSent() &&
+        if (!_at.hasSent() &&
             millis() - _at.getFirstProcessCallTimestamp() > 200 &&
             _at.getFirstProcessCallTimestamp() != 0)
         {
@@ -50,7 +50,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         break;
 
     case State::SendQuery:
-        if (!_at.isSent())
+        if (!_at.hasSent())
         {
             _at.resetRxBuffer();
             _at.printToModem(F("AT+CGDCONT?\r"));
@@ -95,7 +95,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    if (_at.isSent() && now - _at.getSentTimestamp() >= 1000)
+    if (_at.hasSent() && now - _at.getSentTimestamp() >= 1000)
     {
         if (_state == State::WaitSet)
         {

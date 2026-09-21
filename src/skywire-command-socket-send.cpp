@@ -5,16 +5,16 @@ SocketSendSkywireCommand::SocketSendSkywireCommand(
     HardwareSerial *skywire,
     const bool debug_mode,
     const __FlashStringHelper *flash_message,
-    const bool read_response,
+    const bool should_read_response,
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT#SSEND=1"), debug_mode, on_completed_function),
       _flash_message(flash_message),
       _message(nullptr),
-      _last_read_timestamp(0),
-      _read_response(read_response),
-      _payload_sent(false),
-      _response_requested(false),
-      _response_received(false)
+      _last_response_request_timestamp(0),
+      _should_read_response(should_read_response),
+      _has_sent_payload(false),
+      _has_requested_response(false),
+      _has_received_response(false)
 {
 }
 
@@ -22,16 +22,16 @@ SocketSendSkywireCommand::SocketSendSkywireCommand(
     HardwareSerial *skywire,
     const bool debug_mode,
     char *message,
-    const bool read_response,
+    const bool should_read_response,
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT#SSEND=1"), debug_mode, on_completed_function),
       _flash_message(nullptr),
       _message(message),
-      _last_read_timestamp(0),
-      _read_response(read_response),
-      _payload_sent(false),
-      _response_requested(false),
-      _response_received(false)
+      _last_response_request_timestamp(0),
+      _should_read_response(should_read_response),
+      _has_sent_payload(false),
+      _has_requested_response(false),
+      _has_received_response(false)
 {
 }
 
@@ -86,8 +86,8 @@ void SocketSendSkywireCommand::readSocketResponse()
     _at.printToModem(static_cast<int>(SKYWIRE_SRECV_SIZE));
     _at.printToModem('\r');
     _at.setSent(true);
-    _last_read_timestamp = millis();
-    _response_requested = true;
+    _last_response_request_timestamp = millis();
+    _has_requested_response = true;
 
     if (SkywireAtEngine::debugMode())
     {
@@ -105,10 +105,10 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
     const unsigned long now = millis();
 
-    if (!_at.isSent())
+    if (!_at.hasSent())
     {
         if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
         {
@@ -123,7 +123,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
     _at.serialReadToRxBuffer();
     rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    if (!_payload_sent)
+    if (!_has_sent_payload)
     {
         if (!promptReceived())
         {
@@ -131,7 +131,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
         }
 
         writePayloadToModem();
-        _payload_sent = true;
+        _has_sent_payload = true;
 
         if (SkywireAtEngine::debugMode())
         {
@@ -151,7 +151,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
         return {false, rx_buffer};
     }
 
-    if (!_read_response)
+    if (!_should_read_response)
     {
         if (!_at.okReceived())
         {
@@ -160,7 +160,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
     }
     else
     {
-        if (!_response_requested && _at.okReceived())
+        if (!_has_requested_response && _at.okReceived())
         {
             _at.resetRxBuffer();
             readSocketResponse();
@@ -168,9 +168,9 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
             return {false, rx_buffer};
         }
 
-        if (_response_requested &&
-            !_response_received &&
-            now - _last_read_timestamp > 200 &&
+        if (_has_requested_response &&
+            !_has_received_response &&
+            now - _last_response_request_timestamp > 200 &&
             (responseRetrySuggested() || !_at.modemAvailable()))
         {
             _at.resetRxBuffer();
@@ -184,7 +184,7 @@ SkywireResponseResult_t SocketSendSkywireCommand::process()
             return {false, rx_buffer};
         }
 
-        _response_received = true;
+        _has_received_response = true;
     }
 
     _at.notifyCompletedIfNeeded();
@@ -200,19 +200,19 @@ bool SocketSendSkywireCommand::completed() const
         return true;
     }
 
-    if (_read_response)
+    if (_should_read_response)
     {
-        return _at.isCompletedFlag() || _response_received;
+        return _at.hasMarkedCompleted() || _has_received_response;
     }
 
-    return _at.isCompletedFlag() || (_payload_sent && _at.okReceived());
+    return _at.hasMarkedCompleted() || (_has_sent_payload && _at.okReceived());
 }
 
 void SocketSendSkywireCommand::reset()
 {
     _at.reset();
-    _last_read_timestamp = 0;
-    _payload_sent = false;
-    _response_requested = false;
-    _response_received = false;
+    _last_response_request_timestamp = 0;
+    _has_sent_payload = false;
+    _has_requested_response = false;
+    _has_received_response = false;
 }

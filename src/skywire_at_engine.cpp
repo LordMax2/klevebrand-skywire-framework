@@ -15,10 +15,10 @@ SkywireAtEngine::SkywireAtEngine(
       _on_completed_function(on_completed_function),
       _sent_timestamp(0),
       _first_process_call_timestamp(0),
-      _sent(false),
-      _on_completed_called(false),
-      _first_process_called(false),
-      _completed(false)
+      _has_sent(false),
+      _has_called_on_completed(false),
+      _has_recorded_first_process_call(false),
+      _has_marked_completed(false)
 {
     _skywire = skywire;
     _debug_mode = debug_mode;
@@ -174,12 +174,12 @@ bool SkywireAtEngine::okReceived() const
            skywireContainsP(_rx_buffer, PSTR("+CME ERROR: context already activated"));
 }
 
-void SkywireAtEngine::setFirstProcessCall()
+void SkywireAtEngine::recordFirstProcessCall()
 {
-    if (!_first_process_called)
+    if (!_has_recorded_first_process_call)
     {
         _first_process_call_timestamp = millis();
-        _first_process_called = true;
+        _has_recorded_first_process_call = true;
     }
 }
 
@@ -188,18 +188,19 @@ unsigned long SkywireAtEngine::getFirstProcessCallTimestamp() const
     return _first_process_call_timestamp;
 }
 
-void SkywireAtEngine::setSent(const bool sent)
+void SkywireAtEngine::setSent(const bool has_sent)
 {
-    _sent = sent;
-    if (sent)
+    _has_sent = has_sent;
+
+    if (has_sent)
     {
         _sent_timestamp = millis();
     }
 }
 
-bool SkywireAtEngine::isSent() const
+bool SkywireAtEngine::hasSent() const
 {
-    return _sent;
+    return _has_sent;
 }
 
 unsigned long SkywireAtEngine::getSentTimestamp() const
@@ -207,48 +208,48 @@ unsigned long SkywireAtEngine::getSentTimestamp() const
     return _sent_timestamp;
 }
 
-void SkywireAtEngine::setCompleted(const bool completed)
+void SkywireAtEngine::setCompleted(const bool is_completed)
 {
-    _completed = completed;
+    _has_marked_completed = is_completed;
 }
 
-bool SkywireAtEngine::isCompletedFlag() const
+bool SkywireAtEngine::hasMarkedCompleted() const
 {
-    return _completed;
+    return _has_marked_completed;
 }
 
-bool SkywireAtEngine::isOnCompletedCalled() const
+bool SkywireAtEngine::hasCalledOnCompleted() const
 {
-    return _on_completed_called;
+    return _has_called_on_completed;
 }
 
-void SkywireAtEngine::setOnCompletedCalled(const bool on_completed_called)
+void SkywireAtEngine::setHasCalledOnCompleted(const bool has_called_on_completed)
 {
-    _on_completed_called = on_completed_called;
+    _has_called_on_completed = has_called_on_completed;
 }
 
 void SkywireAtEngine::notifyCompletedIfNeeded()
 {
-    if (_on_completed_function != nullptr && !isOnCompletedCalled())
+    if (_on_completed_function != nullptr && !hasCalledOnCompleted())
     {
         _on_completed_function(getRxBuffer());
-        setOnCompletedCalled(true);
+        setHasCalledOnCompleted(true);
     }
 }
 
 bool SkywireAtEngine::completed() const
 {
-    return isCompletedFlag() || (isSent() && okReceived());
+    return hasMarkedCompleted() || (hasSent() && okReceived());
 }
 
 void SkywireAtEngine::reset()
 {
     _sent_timestamp = 0;
     _first_process_call_timestamp = 0;
-    _sent = false;
-    _on_completed_called = false;
-    _first_process_called = false;
-    _completed = false;
+    _has_sent = false;
+    _has_called_on_completed = false;
+    _has_recorded_first_process_call = false;
+    _has_marked_completed = false;
     resetRxBuffer();
 }
 
@@ -256,9 +257,9 @@ bool SkywireAtEngine::waitForSendThenRead()
 {
     const unsigned long now = millis();
 
-    setFirstProcessCall();
+    recordFirstProcessCall();
 
-    if (!isSent())
+    if (!hasSent())
     {
         if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
         {

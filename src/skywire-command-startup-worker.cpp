@@ -30,7 +30,7 @@ void SkywireCommandStartupWorker::reset()
 
 bool SkywireCommandStartupWorker::run()
 {
-    if (_stepper.isFinished())
+    if (_stepper.hasCompletedAllCommands())
     {
         return true;
     }
@@ -46,7 +46,7 @@ bool SkywireCommandStartupWorker::run()
         _enable_packet_data_command,
         _enable_gps_command);
 
-    if (result == SkywireStepResult::TimedOut)
+    if (result == SkywireStepResult::StepTimedOut)
     {
         reset();
         SkywireAtEngine::rebeginModem();

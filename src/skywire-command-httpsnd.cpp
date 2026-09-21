@@ -10,8 +10,8 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(
     const char path[HTTP_SND_PATH_SIZE],
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT#HTTPSND=0,0,"), debug_mode, on_completed_function),
-      _payload_sent(false),
-      _ok_received(false)
+      _has_sent_payload(false),
+      _has_received_ok(false)
 {
     strncpy(_path, path != nullptr ? path : "", sizeof(_path) - 1);
     _path[sizeof(_path) - 1] = '\0';
@@ -32,13 +32,13 @@ void HttpSndSkywireCommand::setPayload(const char *payload_to_send)
 void HttpSndSkywireCommand::reset()
 {
     _at.reset();
-    _payload_sent = false;
-    _ok_received = false;
+    _has_sent_payload = false;
+    _has_received_ok = false;
 }
 
 bool HttpSndSkywireCommand::okReceived() const
 {
-    return _ok_received || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("\r\nOK\r\n"));
+    return _has_received_ok || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("\r\nOK\r\n"));
 }
 
 SkywireResponseResult_t HttpSndSkywireCommand::process()
@@ -52,9 +52,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
     const unsigned long now = millis();
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
 
-    if (!_at.isSent())
+    if (!_at.hasSent())
     {
         if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
         {
@@ -84,9 +84,9 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
     _at.serialReadToRxBuffer();
     rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    if (okReceived() && _at.isSent())
+    if (okReceived() && _at.hasSent())
     {
-        if (!_ok_received)
+        if (!_has_received_ok)
         {
             _at.resetRxBuffer();
             if (SkywireAtEngine::debugMode())
@@ -94,7 +94,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
                 Serial.println(F("CLEAR"));
             }
 
-            _ok_received = true;
+            _has_received_ok = true;
         }
     }
     else
@@ -102,7 +102,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
         return {false, rx_buffer};
     }
 
-    if (_at.isSent() && arrowsReceived() && !_payload_sent)
+    if (_at.hasSent() && arrowsReceived() && !_has_sent_payload)
     {
         if (SkywireAtEngine::debugMode())
         {
@@ -112,7 +112,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
         _at.printToModem(_payload);
         _at.writeToModem(0x1A);
-        _payload_sent = true;
+        _has_sent_payload = true;
 
         if (SkywireAtEngine::debugMode())
         {
@@ -132,7 +132,7 @@ SkywireResponseResult_t HttpSndSkywireCommand::process()
 
 bool HttpSndSkywireCommand::completed() const
 {
-    return _at.isCompletedFlag() || (_payload[0] == '\0') || (_at.isSent() && _payload_sent && okReceived());
+    return _at.hasMarkedCompleted() || (_payload[0] == '\0') || (_at.hasSent() && _has_sent_payload && okReceived());
 }
 
 #endif

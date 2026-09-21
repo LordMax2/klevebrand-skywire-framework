@@ -14,14 +14,14 @@ public:
         HardwareSerial *skywire,
         bool debug_mode,
         const __FlashStringHelper *flash_message,
-        bool read_response,
+        bool should_read_response,
         OnCompletedFunction on_completed_function);
 
     SocketSendSkywireCommand(
         HardwareSerial *skywire,
         bool debug_mode,
         char *message,
-        bool read_response,
+        bool should_read_response,
         OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process();
@@ -41,11 +41,11 @@ private:
     SkywireAtEngine _at;
     const __FlashStringHelper *_flash_message;
     char *_message;
-    unsigned long _last_read_timestamp;
-    bool _read_response;
-    bool _payload_sent;
-    bool _response_requested;
-    bool _response_received;
+    unsigned long _last_response_request_timestamp;
+    bool _should_read_response;
+    bool _has_sent_payload;
+    bool _has_requested_response;
+    bool _has_received_response;
 };
 
 static_assert(SkywireCommandConcept<SocketSendSkywireCommand>, "SocketSendSkywireCommand doesnt implement the concept");

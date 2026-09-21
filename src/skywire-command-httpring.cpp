@@ -21,9 +21,9 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
 
-    if (!_at.isSent())
+    if (!_at.hasSent())
     {
         _at.resetRxBuffer();
         _at.setSent(true);
@@ -61,8 +61,8 @@ bool HttpRingSkywireCommand::okReceived() const
 
 bool HttpRingSkywireCommand::completed() const
 {
-    return _at.isCompletedFlag() ||
-           (_at.isSent() && okReceived() && millis() - _at.getSentTimestamp() > 500);
+    return _at.hasMarkedCompleted() ||
+           (_at.hasSent() && okReceived() && millis() - _at.getSentTimestamp() > 500);
 }
 
 #endif

@@ -16,7 +16,7 @@ bool SocketConfigureSkywireCommand::socketSetupFailed() const
     return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("+CME ERROR: can not setup socket"));
 }
 
-bool SocketConfigureSkywireCommand::socketCloseFinished() const
+bool SocketConfigureSkywireCommand::hasReceivedSocketCloseResponse() const
 {
     char *const rx_buffer = SkywireAtEngine::getRxBuffer();
 
@@ -35,12 +35,12 @@ SkywireResponseResult_t SocketConfigureSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
 
     switch (_state)
     {
     case State::SendConfigure:
-        if (!_at.isSent() &&
+        if (!_at.hasSent() &&
             now - _at.getFirstProcessCallTimestamp() > 200 &&
             _at.getFirstProcessCallTimestamp() != 0)
         {
@@ -82,7 +82,7 @@ SkywireResponseResult_t SocketConfigureSkywireCommand::process()
         return {true, rx_buffer};
 
     case State::SendClose:
-        if (!_at.isSent())
+        if (!_at.hasSent())
         {
             _at.printToModem(F("AT#SH=1\r"));
 
@@ -100,7 +100,7 @@ SkywireResponseResult_t SocketConfigureSkywireCommand::process()
     case State::WaitClose:
         _at.serialReadToRxBuffer();
 
-        if (!socketCloseFinished())
+        if (!hasReceivedSocketCloseResponse())
         {
             if (_recovery_started_timestamp != 0 && now - _recovery_started_timestamp > 1000)
             {

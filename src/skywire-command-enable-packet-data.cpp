@@ -45,5 +45,5 @@ SkywireResponseResult_t EnablePacketDataSkywireCommand::process()
 
 bool EnablePacketDataSkywireCommand::completed() const
 {
-    return _at.isCompletedFlag() || (_at.isSent() && okReceived());
+    return _at.hasMarkedCompleted() || (_at.hasSent() && okReceived());
 }

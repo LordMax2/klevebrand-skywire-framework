@@ -39,9 +39,9 @@ SkywireResponseResult_t SocketConnectSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
 
-    if (!_at.isSent())
+    if (!_at.hasSent())
     {
         if (millis() - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
         {

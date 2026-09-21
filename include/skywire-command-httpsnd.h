@@ -34,8 +34,8 @@ private:
     SkywireAtEngine _at;
     char _payload[HTTP_SND_PAYLOAD_TO_SEND_SIZE];
     char _path[HTTP_SND_PATH_SIZE];
-    bool _payload_sent;
-    bool _ok_received;
+    bool _has_sent_payload;
+    bool _has_received_ok;
 };
 
 static_assert(SkywireCommandConcept<HttpSndSkywireCommand>, "HttpSndSkywireCommand doesnt implement the concept");

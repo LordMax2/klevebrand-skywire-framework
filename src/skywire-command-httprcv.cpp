@@ -24,9 +24,9 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
 
     const unsigned long now = millis();
 
-    _at.setFirstProcessCall();
+    _at.recordFirstProcessCall();
 
-    if (!_at.isSent())
+    if (!_at.hasSent())
     {
         if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
         {
@@ -88,7 +88,7 @@ void HttpRcvSkywireCommand::reset()
 
 bool HttpRcvSkywireCommand::completed() const
 {
-    return _at.isCompletedFlag() || (_at.isSent() && okReceived());
+    return _at.hasMarkedCompleted() || (_at.hasSent() && okReceived());
 }
 
 #endif
