@@ -1,30 +1,45 @@
-#ifndef SKYWIRE_STEP_HTTPSND_H
-#define SKYWIRE_STEP_HTTPSND_H
+#pragma once
 
-#include "skywire-command.h"
+#ifndef SKYWIRE_COMMAND_HTTPSND_H
+#define SKYWIRE_COMMAND_HTTPSND_H
 
-#define HTTP_SND_PATH_SIZE 64
-#define HTTP_SND_PAYLOAD_TO_SEND_SIZE 128
+#include "skywire_config.h"
 
-class HttpSndSkywireCommand : public SkywireCommand
+#if SKYWIRE_ENABLE_HTTP
+
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
+
+class HttpSndSkywireCommand
 {
 public:
-    HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode, const char path[HTTP_SND_PATH_SIZE], OnCompletedFunction on_completed_function);
+    HttpSndSkywireCommand(
+        HardwareSerial *skywire,
+        bool debug_mode,
+        const char path[HTTP_SND_PATH_SIZE],
+        OnCompletedFunction on_completed_function);
 
-    SkywireResponseResult_t process() override;
-    bool completed() override;
-    bool okReceived() override;
+    SkywireResponseResult_t process();
+    bool completed() const;
+    void reset();
+    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+    const __FlashStringHelper *command() const { return _at.command(); }
 
-    bool arrowsReceived() const;
     void setPayload(const char *payload_to_send);
-    char* getPayload();
-    void reset() override;
 
 private:
-    char payload[HTTP_SND_PAYLOAD_TO_SEND_SIZE]{};
-    char path[HTTP_SND_PATH_SIZE]{};
-    bool payload_sent = false;
-    bool ok_received = false;
+    bool arrowsReceived() const;
+    bool okReceived() const;
+
+    SkywireAtEngine _at;
+    char _payload[HTTP_SND_PAYLOAD_TO_SEND_SIZE];
+    char _path[HTTP_SND_PATH_SIZE];
+    bool _payload_sent;
+    bool _ok_received;
 };
+
+static_assert(SkywireCommandConcept<HttpSndSkywireCommand>, "HttpSndSkywireCommand doesnt implement the concept");
+
+#endif
 
 #endif

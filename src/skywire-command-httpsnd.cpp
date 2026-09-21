@@ -1,118 +1,138 @@
 #include "skywire-command-httpsnd.h"
 
-HttpSndSkywireCommand::HttpSndSkywireCommand(HardwareSerial *skywire, bool debug_mode,
-                                             const char path[HTTP_SND_PATH_SIZE],
-                                             const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("AT#HTTPSND=0,0,"), debug_mode, on_completed_function) {
-    strncpy(this->path, path, sizeof(this->path) - 1);
-    this->path[sizeof(this->path) - 1] = '\0';
+#if SKYWIRE_ENABLE_HTTP
+
+#include "skywire_strstr_p.h"
+
+HttpSndSkywireCommand::HttpSndSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const char path[HTTP_SND_PATH_SIZE],
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT#HTTPSND=0,0,"), debug_mode, on_completed_function),
+      _payload_sent(false),
+      _ok_received(false)
+{
+    strncpy(_path, path != nullptr ? path : "", sizeof(_path) - 1);
+    _path[sizeof(_path) - 1] = '\0';
+    _payload[0] = '\0';
 }
 
-bool HttpSndSkywireCommand::arrowsReceived() const {
-    const auto rx_buffer = getRxBuffer();
-
-    return strstr(rx_buffer, ">") != nullptr;
+bool HttpSndSkywireCommand::arrowsReceived() const
+{
+    return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR(">"));
 }
 
-void HttpSndSkywireCommand::setPayload(const char *payload_to_send) {
-    strncpy(this->payload, payload_to_send, sizeof(this->payload) - 1);
-    this->payload[sizeof(this->payload) - 1] = '\0';
+void HttpSndSkywireCommand::setPayload(const char *payload_to_send)
+{
+    strncpy(_payload, payload_to_send != nullptr ? payload_to_send : "", sizeof(_payload) - 1);
+    _payload[sizeof(_payload) - 1] = '\0';
 }
 
-char *HttpSndSkywireCommand::getPayload() {
-    return payload;
+void HttpSndSkywireCommand::reset()
+{
+    _at.reset();
+    _payload_sent = false;
+    _ok_received = false;
 }
 
-void HttpSndSkywireCommand::reset() {
-    SkywireCommand::reset();
-    payload_sent = false;
-    ok_received = false;
+bool HttpSndSkywireCommand::okReceived() const
+{
+    return _ok_received || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("\r\nOK\r\n"));
 }
 
-bool HttpSndSkywireCommand::okReceived() {
-    auto rx_buffer = getRxBuffer();
+SkywireResponseResult_t HttpSndSkywireCommand::process()
+{
+    char *rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    return ok_received || strstr(rx_buffer, "\r\nOK\r\n") != nullptr;
-}
-
-SkywireResponseResult_t HttpSndSkywireCommand::process() {
-    auto rx_buffer = getRxBuffer();
-
-    if (completed()) {
+    if (completed())
+    {
         return {true, rx_buffer};
     }
 
-    const char *payload_to_send = getPayload();
     const unsigned long now = millis();
 
-    setFirstProcessCall();
+    _at.setFirstProcessCall();
 
-    if (!isSent()) {
-        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
-            resetRxBuffer();
-            if (debug_mode) {
-                Serial.print(command);
-                Serial.print(path);
-                Serial.print(",");
-                Serial.print(strlen(payload_to_send));
-                Serial.print("\r");
+    if (!_at.isSent())
+    {
+        if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
+        {
+            _at.resetRxBuffer();
+
+            if (SkywireAtEngine::debugMode())
+            {
+                Serial.print(_at.command());
+                Serial.print(_path);
+                Serial.print(F(","));
+                Serial.print(strlen(_payload));
+                Serial.print(F("\r"));
                 Serial.println();
             }
-            skywire->print(command);
-            skywire->print(path);
-            skywire->print(",");
-            skywire->print(strlen(payload_to_send));
-            skywire->print("\r");
 
-            setSent(true);
+            _at.printToModem(_at.command());
+            _at.printToModem(_path);
+            _at.printToModem(F(","));
+            _at.printToModem(static_cast<int>(strlen(_payload)));
+            _at.printToModem('\r');
+            _at.setSent(true);
         }
 
-        return {false, ""};
+        return {false, rx_buffer};
     }
 
-    serialReadToRxBuffer();
-    rx_buffer = getRxBuffer();
+    _at.serialReadToRxBuffer();
+    rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    if (okReceived() && isSent()) {
-        if (!ok_received) {
-            resetRxBuffer();
-            if (debug_mode) {
+    if (okReceived() && _at.isSent())
+    {
+        if (!_ok_received)
+        {
+            _at.resetRxBuffer();
+            if (SkywireAtEngine::debugMode())
+            {
                 Serial.println(F("CLEAR"));
             }
-            ok_received = true;
+
+            _ok_received = true;
         }
-    } else {
-        return {false, ""};
+    }
+    else
+    {
+        return {false, rx_buffer};
     }
 
-    if (isSent() && arrowsReceived() && !payload_sent) {
-        if (debug_mode) {
+    if (_at.isSent() && arrowsReceived() && !_payload_sent)
+    {
+        if (SkywireAtEngine::debugMode())
+        {
             Serial.print(F("HTTPSND Sending payload: "));
-            Serial.println(payload_to_send);
+            Serial.println(_payload);
         }
-        skywire->print(payload_to_send);
-        skywire->write(0x1A);
 
-        payload_sent = true;
+        _at.printToModem(_payload);
+        _at.writeToModem(0x1A);
+        _payload_sent = true;
 
-        if (debug_mode) {
+        if (SkywireAtEngine::debugMode())
+        {
             Serial.println(F("HTTPSND payload sent, waiting for final response"));
         }
     }
 
     const bool is_complete = completed();
-    if (is_complete) {
-        if (on_completed_function != nullptr && !isOnCompletedCalled()) {
-            on_completed_function(rx_buffer);
-            setOnCompletedCalled(true);
-        }
-
-        setCompleted(true);
+    if (is_complete)
+    {
+        _at.notifyCompletedIfNeeded();
+        _at.setCompleted(true);
     }
 
     return {is_complete, rx_buffer};
 }
 
-bool HttpSndSkywireCommand::completed() {
-    return _is_completed || (getPayload()[0] == '\0') || (isSent() && payload_sent && okReceived());
+bool HttpSndSkywireCommand::completed() const
+{
+    return _at.isCompletedFlag() || (_payload[0] == '\0') || (_at.isSent() && _payload_sent && okReceived());
 }
+
+#endif

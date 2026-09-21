@@ -1,18 +1,45 @@
 #include "skywire-command-enable-gps.h"
+#include "skywire_strstr_p.h"
 
-EnableGpsSkywireCommand::EnableGpsSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("AT$GPSP=1"), debug_mode, on_completed_function)
+EnableGpsSkywireCommand::EnableGpsSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT$GPSP=1"), debug_mode, on_completed_function)
 {
 }
 
-bool EnableGpsSkywireCommand::okReceived()
+bool EnableGpsSkywireCommand::okReceived() const
 {
-    const auto rx_buffer = getRxBuffer();
+    return _at.okReceived() || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("ERROR"));
+}
 
-    if (SkywireCommand::okReceived() || strstr(rx_buffer, "ERROR") != nullptr)
+SkywireResponseResult_t EnableGpsSkywireCommand::process()
+{
+    char *const rx_buffer = SkywireAtEngine::getRxBuffer();
+
+    if (completed())
     {
-        return true;
+        return {true, rx_buffer};
     }
 
-    return false;
+    if (!_at.waitForSendThenRead())
+    {
+        return {false, rx_buffer};
+    }
+
+    if (!okReceived())
+    {
+        return {false, rx_buffer};
+    }
+
+    _at.notifyCompletedIfNeeded();
+    _at.setCompleted(true);
+
+    return {true, rx_buffer};
+}
+
+bool EnableGpsSkywireCommand::completed() const
+{
+    return _at.isCompletedFlag() || (_at.isSent() && okReceived());
 }

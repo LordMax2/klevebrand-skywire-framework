@@ -1,109 +1,132 @@
 #include "skywire-command-socket-configure.h"
+#include "skywire_strstr_p.h"
 
-SocketConfigureSkywireCommand::SocketConfigureSkywireCommand(HardwareSerial *skywire,
-                                                             const bool debug_mode,
-                                                             const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("AT#SCFG=1,1,300,90,600,50"), debug_mode, on_completed_function) {
+SocketConfigureSkywireCommand::SocketConfigureSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT#SCFG=1,1,300,90,600,50"), debug_mode, on_completed_function),
+      _state(State::SendConfigure),
+      _recovery_started_timestamp(0)
+{
 }
 
-bool SocketConfigureSkywireCommand::socketSetupFailed() const {
-    return strstr(getRxBuffer(), "+CME ERROR: can not setup socket") != nullptr;
+bool SocketConfigureSkywireCommand::socketSetupFailed() const
+{
+    return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("+CME ERROR: can not setup socket"));
 }
 
-bool SocketConfigureSkywireCommand::socketCloseFinished() const {
-    const auto rx_buffer = getRxBuffer();
-    return strstr(rx_buffer, "\r\nOK\r\n") != nullptr ||
-           strstr(rx_buffer, "ERROR") != nullptr ||
-           strstr(rx_buffer, "+CME ERROR") != nullptr;
+bool SocketConfigureSkywireCommand::socketCloseFinished() const
+{
+    char *const rx_buffer = SkywireAtEngine::getRxBuffer();
+
+    return skywireContainsP(rx_buffer, PSTR("\r\nOK\r\n")) ||
+           skywireContainsP(rx_buffer, PSTR("ERROR")) ||
+           skywireContainsP(rx_buffer, PSTR("+CME ERROR"));
 }
 
-SkywireResponseResult_t SocketConfigureSkywireCommand::process() {
-    auto rx_buffer = getRxBuffer();
+SkywireResponseResult_t SocketConfigureSkywireCommand::process()
+{
+    char *rx_buffer = SkywireAtEngine::getRxBuffer();
+    const unsigned long now = millis();
 
-    if (completed()) {
+    if (_at.completed())
+    {
         return {true, rx_buffer};
     }
 
-    const unsigned long now = millis();
-    setFirstProcessCall();
+    _at.setFirstProcessCall();
 
-    switch (state) {
-        case State::SEND_CONFIGURE:
-            if (!isSent() && now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0) {
-                resetRxBuffer();
-                writeCommandToModem();
-                setSent(true);
-                state = State::WAIT_CONFIGURE;
-            }
-            return {false, ""};
+    switch (_state)
+    {
+    case State::SendConfigure:
+        if (!_at.isSent() &&
+            now - _at.getFirstProcessCallTimestamp() > 200 &&
+            _at.getFirstProcessCallTimestamp() != 0)
+        {
+            _at.resetRxBuffer();
+            _at.writeCommandToModem();
+            _at.setSent(true);
+            _state = State::WaitConfigure;
+        }
 
-        case State::WAIT_CONFIGURE:
-            serialReadToRxBuffer();
-            rx_buffer = getRxBuffer();
+        return {false, rx_buffer};
 
-            if (socketSetupFailed()) {
-                if (debug_mode) {
-                    Serial.println(F("Socket configure failed, closing socket before retry."));
-                }
+    case State::WaitConfigure:
+        _at.serialReadToRxBuffer();
+        rx_buffer = SkywireAtEngine::getRxBuffer();
 
-                resetRxBuffer();
-                setSent(false);
-                recovery_started_timestamp = now;
-                state = State::SEND_CLOSE;
-                return {false, ""};
-            }
-
-            if (!okReceived()) {
-                return {false, ""};
+        if (socketSetupFailed())
+        {
+            if (SkywireAtEngine::debugMode())
+            {
+                Serial.println(F("Socket configure failed, closing socket before retry."));
             }
 
-            if (on_completed_function != nullptr && !isOnCompletedCalled()) {
-                on_completed_function(rx_buffer);
-                setOnCompletedCalled(true);
+            _at.resetRxBuffer();
+            _at.setSent(false);
+            _recovery_started_timestamp = now;
+            _state = State::SendClose;
+
+            return {false, rx_buffer};
+        }
+
+        if (!_at.okReceived())
+        {
+            return {false, rx_buffer};
+        }
+
+        _at.notifyCompletedIfNeeded();
+        _at.setCompleted(true);
+
+        return {true, rx_buffer};
+
+    case State::SendClose:
+        if (!_at.isSent())
+        {
+            _at.printToModem(F("AT#SH=1\r"));
+
+            if (SkywireAtEngine::debugMode())
+            {
+                Serial.println(F("AT#SH=1"));
             }
 
-            setCompleted(true);
-            return {true, rx_buffer};
+            _at.setSent(true);
+            _state = State::WaitClose;
+        }
 
-        case State::SEND_CLOSE:
-            if (!isSent()) {
-                skywire->print(F("AT#SH=1\r"));
+        return {false, rx_buffer};
 
-                if (debug_mode) {
-                    Serial.println(F("AT#SH=1"));
-                }
+    case State::WaitClose:
+        _at.serialReadToRxBuffer();
 
-                setSent(true);
-                state = State::WAIT_CLOSE;
-            }
-            return {false, ""};
-
-        case State::WAIT_CLOSE:
-            serialReadToRxBuffer();
-
-            if (!socketCloseFinished()) {
-                if (recovery_started_timestamp != 0 && now - recovery_started_timestamp > 1000) {
-                    resetRxBuffer();
-                    setSent(false);
-                    recovery_started_timestamp = now;
-                    state = State::SEND_CLOSE;
-                }
-
-                return {false, ""};
+        if (!socketCloseFinished())
+        {
+            if (_recovery_started_timestamp != 0 && now - _recovery_started_timestamp > 1000)
+            {
+                _at.resetRxBuffer();
+                _at.setSent(false);
+                _recovery_started_timestamp = now;
+                _state = State::SendClose;
             }
 
-            resetRxBuffer();
-            setSent(false);
-            recovery_started_timestamp = 0;
-            state = State::SEND_CONFIGURE;
-            return {false, ""};
+            return {false, rx_buffer};
+        }
+
+        _at.resetRxBuffer();
+        _at.setSent(false);
+        _recovery_started_timestamp = 0;
+        _state = State::SendConfigure;
+
+        return {false, rx_buffer};
     }
 
-    return {false, ""};
+    return {false, rx_buffer};
 }
 
-void SocketConfigureSkywireCommand::reset() {
-    SkywireCommand::reset();
-    state = State::SEND_CONFIGURE;
-    recovery_started_timestamp = 0;
+void SocketConfigureSkywireCommand::reset()
+{
+    _at.reset();
+    _state = State::SendConfigure;
+    _recovery_started_timestamp = 0;
 }

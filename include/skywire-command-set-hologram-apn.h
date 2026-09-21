@@ -1,26 +1,36 @@
-#ifndef SKYWIRE_STEP_SET_APN_H
-#define SKYWIRE_STEP_SET_APN_H
+#pragma once
 
-#include "skywire-command.h"
+#ifndef SKYWIRE_COMMAND_SET_HOLOGRAM_APN_H
+#define SKYWIRE_COMMAND_SET_HOLOGRAM_APN_H
 
-class SetApnHologramSkywireCommand : public SkywireCommand
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
+
+class SetApnHologramSkywireCommand
 {
 public:
     SetApnHologramSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
-    SkywireResponseResult_t process() override;
-    void reset() override;
+    SkywireResponseResult_t process();
+    void reset();
+    bool completed() const { return _at.completed(); }
+    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+    const __FlashStringHelper *command() const { return _at.command(); }
 
 private:
     enum class State
     {
-        SEND_SET,
-        WAIT_SET,
-        SEND_QUERY,
-        WAIT_QUERY,
-        DONE
+        SendSet,
+        WaitSet,
+        SendQuery,
+        WaitQuery,
+        Done
     };
-    State state;
+
+    SkywireAtEngine _at;
+    State _state;
 };
+
+static_assert(SkywireCommandConcept<SetApnHologramSkywireCommand>, "SetApnHologramSkywireCommand doesnt implement the concept");
 
 #endif

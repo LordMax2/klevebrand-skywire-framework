@@ -1,24 +1,35 @@
+#pragma once
+
 #ifndef SKYWIRE_COMMAND_SOCKET_CONNECT_H
 #define SKYWIRE_COMMAND_SOCKET_CONNECT_H
 
-#include "skywire-command.h"
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
 
-#define SOCKET_CONNECT_COMMAND_SIZE 64
-
-class SocketConnectSkywireCommand : public SkywireCommand
+class SocketConnectSkywireCommand
 {
 public:
-    SocketConnectSkywireCommand(HardwareSerial *skywire,
-                                const char *host,
-                                int port,
-                                bool debug_mode,
-                                OnCompletedFunction on_completed_function);
+    SocketConnectSkywireCommand(
+        HardwareSerial *skywire,
+        const char *host,
+        int port,
+        bool debug_mode,
+        OnCompletedFunction on_completed_function);
 
-protected:
-    void writeCommandToModem() override;
+    SkywireResponseResult_t process();
+    void reset() { _at.reset(); }
+    bool completed() const { return _at.completed(); }
+    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+    const __FlashStringHelper *command() const { return _at.command(); }
 
 private:
-    char command_buffer[SOCKET_CONNECT_COMMAND_SIZE]{};
+    void writeConnectCommandToModem();
+
+    SkywireAtEngine _at;
+    const char *_host;
+    int _port;
 };
+
+static_assert(SkywireCommandConcept<SocketConnectSkywireCommand>, "SocketConnectSkywireCommand doesnt implement the concept");
 
 #endif

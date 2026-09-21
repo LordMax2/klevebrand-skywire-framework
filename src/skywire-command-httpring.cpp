@@ -1,57 +1,68 @@
 #include "skywire-command-httpring.h"
 
-HttpRingSkywireCommand::HttpRingSkywireCommand(HardwareSerial *skywire, const bool debug_mode,
-                                               const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("HTTPRING"), debug_mode, on_completed_function) {
+#if SKYWIRE_ENABLE_HTTP
+
+#include "skywire_strstr_p.h"
+
+HttpRingSkywireCommand::HttpRingSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("HTTPRING"), debug_mode, on_completed_function)
+{
 }
 
-SkywireResponseResult_t HttpRingSkywireCommand::process() {
-    auto rx_buffer = getRxBuffer();
+SkywireResponseResult_t HttpRingSkywireCommand::process()
+{
+    char *const rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    if (completed()) {
+    if (completed())
+    {
         return {true, rx_buffer};
     }
 
-    setFirstProcessCall();
+    _at.setFirstProcessCall();
 
-    if (!isSent())
+    if (!_at.isSent())
     {
-        resetRxBuffer();
-        setSent(true);
+        _at.resetRxBuffer();
+        _at.setSent(true);
     }
 
-    serialReadToRxBuffer();
+    _at.serialReadToRxBuffer();
 
     const bool has_ok = okReceived();
-    if (debug_mode && has_ok) {
+    if (SkywireAtEngine::debugMode() && has_ok)
+    {
         Serial.println(F("STEPPER CLIENT RECEIVED HTTPRING OK: "));
         Serial.println(rx_buffer);
         Serial.println(F("--- END OF RX BUFFER ---"));
     }
 
-    const bool is_complete = completed();
-    if (is_complete) {
-        if (on_completed_function != nullptr && !isOnCompletedCalled()) {
-            on_completed_function(rx_buffer);
-            setOnCompletedCalled(true);
-        }
-
-        setCompleted(true);
+    if (completed())
+    {
+        _at.notifyCompletedIfNeeded();
+        _at.setCompleted(true);
     }
 
-    return {false, ""};
+    return {false, rx_buffer};
 }
 
-bool HttpRingSkywireCommand::okReceived() {
-    const auto rx_buffer = getRxBuffer();
-
-    const char *ring = strstr(rx_buffer, "HTTPRING");
+bool HttpRingSkywireCommand::okReceived() const
+{
+    char *const ring = skywireStrstrP(SkywireAtEngine::getRxBuffer(), PSTR("HTTPRING"));
     if (ring == nullptr)
+    {
         return false;
+    }
 
     return strchr(ring, '\r') != nullptr;
 }
 
-bool HttpRingSkywireCommand::completed() {
-    return _is_completed || (isSent() && okReceived() && millis() - getSentTimestamp() > 500);
+bool HttpRingSkywireCommand::completed() const
+{
+    return _at.isCompletedFlag() ||
+           (_at.isSent() && okReceived() && millis() - _at.getSentTimestamp() > 500);
 }
+
+#endif

@@ -1,47 +1,52 @@
 #include "skywire-command-network-connect.h"
+#include "skywire_strstr_p.h"
 
-NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("AT+CEREG?"), debug_mode, on_completed_function)
+NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT+CEREG?"), debug_mode, on_completed_function),
+      _last_poll_timestamp(0)
 {
 }
 
 SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 {
-    auto rx_buffer = getRxBuffer();
+    char *rx_buffer = SkywireAtEngine::getRxBuffer();
     const unsigned long now = millis();
 
-    if (completed())
+    if (_at.completed())
     {
         return {true, rx_buffer};
     }
 
-    setFirstProcessCall();
+    _at.setFirstProcessCall();
 
-    if (!isSent())
+    if (!_at.isSent())
     {
-        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0 &&
-            (last_poll_timestamp == 0 || now - last_poll_timestamp >= 1000))
+        if (now - _at.getFirstProcessCallTimestamp() > 200 &&
+            _at.getFirstProcessCallTimestamp() != 0 &&
+            (_last_poll_timestamp == 0 || now - _last_poll_timestamp >= 1000))
         {
-            if (debug_mode)
+            if (SkywireAtEngine::debugMode())
             {
                 Serial.println(F("NETWORK CONNECT Sending command: AT+CEREG?\r"));
             }
-            resetRxBuffer();
-            writeCommandToModem();
 
-            setSent(true);
-            last_poll_timestamp = now;
+            _at.resetRxBuffer();
+            _at.writeCommandToModem();
+            _at.setSent(true);
+            _last_poll_timestamp = now;
         }
 
-        return {false, ""};
+        return {false, rx_buffer};
     }
 
-    serialReadToRxBuffer();
+    _at.serialReadToRxBuffer();
+    rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    rx_buffer = getRxBuffer();
-
-    const bool has_ok = okReceived();
-    if (debug_mode && has_ok)
+    const bool has_ok = _at.okReceived();
+    if (SkywireAtEngine::debugMode() && has_ok)
     {
         Serial.println(F("STEPPER CLIENT RECEIVED CEREG"));
         Serial.println(rx_buffer);
@@ -50,54 +55,44 @@ SkywireResponseResult_t NetworkConnectSkywireCommand::process()
 
     if (isNetworkConnected())
     {
-        setCompleted(true);
-
-        if (on_completed_function != nullptr && !isOnCompletedCalled())
-        {
-            on_completed_function(rx_buffer);
-            setOnCompletedCalled(true);
-        }
+        _at.setCompleted(true);
+        _at.notifyCompletedIfNeeded();
 
         return {true, rx_buffer};
     }
 
     if (has_ok)
     {
-        resetRxBuffer();
-        setSent(false);
+        _at.resetRxBuffer();
+        _at.setSent(false);
     }
 
-    return {false, ""};
+    return {false, rx_buffer};
 }
 
 void NetworkConnectSkywireCommand::reset()
 {
-    SkywireCommand::reset();
-    last_poll_timestamp = 0;
+    _at.reset();
+    _last_poll_timestamp = 0;
 }
 
 bool NetworkConnectSkywireCommand::isNetworkConnected()
 {
-    const auto rx_ptr = getRxBuffer();
+    char *const rx_ptr = SkywireAtEngine::getRxBuffer();
+    char *const cereg_pos = skywireStrstrP(rx_ptr, PSTR("+CEREG:"));
 
-    const char *cereg_pos = strstr(rx_ptr, "+CEREG:");
-    if (!cereg_pos)
+    if (cereg_pos == nullptr)
     {
         return false;
     }
 
     const char *first_comma = strchr(cereg_pos, ',');
-    if (!first_comma)
+    if (first_comma == nullptr)
     {
         return false;
     }
 
     const char status_char = *(first_comma + 1);
 
-    if (status_char == '1' || status_char == '5')
-    {
-        return true;
-    }
-
-    return false;
+    return status_char == '1' || status_char == '5';
 }

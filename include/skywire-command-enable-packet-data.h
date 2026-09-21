@@ -1,14 +1,28 @@
-#ifndef SKYWIRE_STEP_ENABLE_PACKET_DATA_H
-#define SKYWIRE_STEP_ENABLE_PACKET_DATA_H
+#pragma once
 
-#include "skywire-command.h"
+#ifndef SKYWIRE_COMMAND_ENABLE_PACKET_DATA_H
+#define SKYWIRE_COMMAND_ENABLE_PACKET_DATA_H
 
-class EnablePacketDataSkywireCommand : public SkywireCommand
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
+
+class EnablePacketDataSkywireCommand
 {
 public:
-    EnablePacketDataSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function) ;
+    EnablePacketDataSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
 
-    bool okReceived() override;
+    SkywireResponseResult_t process();
+    void reset() { _at.reset(); }
+    bool completed() const;
+    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+    const __FlashStringHelper *command() const { return _at.command(); }
+
+private:
+    bool okReceived() const;
+
+    SkywireAtEngine _at;
 };
+
+static_assert(SkywireCommandConcept<EnablePacketDataSkywireCommand>, "EnablePacketDataSkywireCommand doesnt implement the concept");
 
 #endif

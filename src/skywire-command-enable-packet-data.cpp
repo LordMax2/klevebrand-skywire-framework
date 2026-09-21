@@ -1,18 +1,49 @@
 #include "skywire-command-enable-packet-data.h"
+#include "skywire_strstr_p.h"
 
-EnablePacketDataSkywireCommand::EnablePacketDataSkywireCommand(HardwareSerial *skywire, const bool debug_mode, const OnCompletedFunction on_completed_function)
-    : SkywireCommand(skywire, F("AT#SGACT=1,1"), debug_mode, on_completed_function)
+EnablePacketDataSkywireCommand::EnablePacketDataSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT#SGACT=1,1"), debug_mode, on_completed_function)
 {
 }
 
-bool EnablePacketDataSkywireCommand::okReceived()
+bool EnablePacketDataSkywireCommand::okReceived() const
 {
-    const auto rx_buffer = getRxBuffer();
+    char *const rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    if (SkywireCommand::okReceived() || strstr(rx_buffer, "ERROR") != nullptr || strstr(rx_buffer, "+CME ERROR: context already activated") != nullptr)
+    return _at.okReceived() ||
+           skywireContainsP(rx_buffer, PSTR("ERROR")) ||
+           skywireContainsP(rx_buffer, PSTR("+CME ERROR: context already activated"));
+}
+
+SkywireResponseResult_t EnablePacketDataSkywireCommand::process()
+{
+    char *const rx_buffer = SkywireAtEngine::getRxBuffer();
+
+    if (completed())
     {
-        return true;
+        return {true, rx_buffer};
     }
 
-    return false;
+    if (!_at.waitForSendThenRead())
+    {
+        return {false, rx_buffer};
+    }
+
+    if (!okReceived())
+    {
+        return {false, rx_buffer};
+    }
+
+    _at.notifyCompletedIfNeeded();
+    _at.setCompleted(true);
+
+    return {true, rx_buffer};
+}
+
+bool EnablePacketDataSkywireCommand::completed() const
+{
+    return _at.isCompletedFlag() || (_at.isSent() && okReceived());
 }
