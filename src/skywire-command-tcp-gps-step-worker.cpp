@@ -10,7 +10,7 @@ SkywireTcpGpsStepWorker::SkywireTcpGpsStepWorker(
     const int port,
     const unsigned long timeout_milliseconds,
     const bool debug_mode)
-    : _stepper(timeout_milliseconds, TCP_GPS_STEP_COUNT),
+    : _stepper(timeout_milliseconds),
       _gps_command(skywire_serial, debug_mode, setLatestGpsResponse),
       _socket_configure_command(skywire_serial, debug_mode, nullptr),
       _socket_connect_command(skywire_serial, host, port, debug_mode, nullptr),
@@ -23,40 +23,19 @@ SkywireTcpGpsStepWorker::SkywireTcpGpsStepWorker(
 
 void SkywireTcpGpsStepWorker::reset()
 {
-    _gps_command.reset();
-    _socket_configure_command.reset();
-    _socket_connect_command.reset();
-    _request_command.reset();
-    _send_state_command.reset();
-    _socket_close_command.reset();
-    _stepper.resetCursor();
+    _stepper.reset(
+        _gps_command,
+        _socket_configure_command,
+        _socket_connect_command,
+        _request_command,
+        _send_state_command,
+        _socket_close_command);
 }
 
 void SkywireTcpGpsStepWorker::setPayloadToSend(const char *payload)
 {
     strcpy_P(_state_message, PSTR("SetDroneState|1337|"));
     strncat(_state_message, payload != nullptr ? payload : "", sizeof(_state_message) - strlen(_state_message) - 1);
-}
-
-SkywireStepperTickResult SkywireTcpGpsStepWorker::tickCurrentStep()
-{
-    switch (_stepper.stepCursorIndex())
-    {
-    case 0:
-        return _stepper.tick(_gps_command);
-    case 1:
-        return _stepper.tick(_socket_configure_command);
-    case 2:
-        return _stepper.tick(_socket_connect_command);
-    case 3:
-        return _stepper.tick(_request_command);
-    case 4:
-        return _stepper.tick(_send_state_command);
-    case 5:
-        return _stepper.tick(_socket_close_command);
-    default:
-        return SkywireStepperTickResult::Finished;
-    }
 }
 
 bool SkywireTcpGpsStepWorker::run()
@@ -68,14 +47,20 @@ bool SkywireTcpGpsStepWorker::run()
         return true;
     }
 
-    const SkywireStepperTickResult result = tickCurrentStep();
+    const SkywireStepResult result = _stepper.stepCurrent(
+        _gps_command,
+        _socket_configure_command,
+        _socket_connect_command,
+        _request_command,
+        _send_state_command,
+        _socket_close_command);
 
-    if (result == SkywireStepperTickResult::TimedOut)
+    if (result == SkywireStepResult::TimedOut)
     {
         reset();
         SkywireAtEngine::rebeginModem();
     }
-    else if (result == SkywireStepperTickResult::Finished)
+    else if (result == SkywireStepResult::Finished)
     {
         reset();
 

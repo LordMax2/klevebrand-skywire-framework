@@ -57,14 +57,6 @@ public:
         unsigned long sent_timestamp);
 
 private:
-    static constexpr uint8_t kFlagSent = 1 << 0;
-    static constexpr uint8_t kFlagOnCompletedCalled = 1 << 1;
-    static constexpr uint8_t kFlagFirstProcessCalled = 1 << 2;
-    static constexpr uint8_t kFlagCompleted = 1 << 3;
-
-    bool flag(uint8_t mask) const;
-    void setFlag(uint8_t mask, bool value);
-
     static HardwareSerial *_skywire;
     static bool _debug_mode;
     static char _rx_buffer[SKYWIRE_RX_BUFFER_SIZE];
@@ -74,7 +66,10 @@ private:
     OnCompletedFunction _on_completed_function;
     unsigned long _sent_timestamp;
     unsigned long _first_process_call_timestamp;
-    uint8_t _flags;
+    bool _sent;
+    bool _on_completed_called;
+    bool _first_process_called;
+    bool _completed;
 };
 
 static_assert(SkywireCommandConcept<SkywireAtEngine>, "SkywireAtEngine doesnt implement the concept");

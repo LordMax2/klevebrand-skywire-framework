@@ -38,12 +38,10 @@ public:
     static void setLatestGpsResponse(char *response);
 
 private:
-    SkywireStepperTickResult tickCurrentStep();
-
     static GpsLocationInfo_t _latest_gps_response;
     static DroneRequest_t _latest_drone_request_response;
 
-    SkywireStepper _stepper;
+    SkywireStepper<TCP_GPS_STEP_COUNT> _stepper;
     GpsAcpSkywireCommand _gps_command;
     SocketConfigureSkywireCommand _socket_configure_command;
     SocketConnectSkywireCommand _socket_connect_command;

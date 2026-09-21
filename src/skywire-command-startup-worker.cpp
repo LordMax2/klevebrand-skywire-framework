@@ -1,7 +1,7 @@
 #include "skywire-command-startup-worker.h"
 
 SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire_serial, const bool debug_mode)
-    : _stepper(5000, STARTUP_STEP_COUNT),
+    : _stepper(5000),
       _at_command(skywire_serial, debug_mode, nullptr),
       _cmee_command(skywire_serial, F("AT+CMEE=2"), debug_mode, nullptr),
       _disable_echo_command(skywire_serial, debug_mode, nullptr),
@@ -16,43 +16,16 @@ SkywireCommandStartupWorker::SkywireCommandStartupWorker(HardwareSerial *skywire
 
 void SkywireCommandStartupWorker::reset()
 {
-    _at_command.reset();
-    _cmee_command.reset();
-    _disable_echo_command.reset();
-    _flow_control_command.reset();
-    _interface_control_command.reset();
-    _set_apn_command.reset();
-    _network_connect_command.reset();
-    _enable_packet_data_command.reset();
-    _enable_gps_command.reset();
-    _stepper.resetCursor();
-}
-
-SkywireStepperTickResult SkywireCommandStartupWorker::tickCurrentStep()
-{
-    switch (_stepper.stepCursorIndex())
-    {
-    case 0:
-        return _stepper.tick(_at_command);
-    case 1:
-        return _stepper.tick(_cmee_command);
-    case 2:
-        return _stepper.tick(_disable_echo_command);
-    case 3:
-        return _stepper.tick(_flow_control_command);
-    case 4:
-        return _stepper.tick(_interface_control_command);
-    case 5:
-        return _stepper.tick(_set_apn_command);
-    case 6:
-        return _stepper.tick(_network_connect_command);
-    case 7:
-        return _stepper.tick(_enable_packet_data_command);
-    case 8:
-        return _stepper.tick(_enable_gps_command);
-    default:
-        return SkywireStepperTickResult::Finished;
-    }
+    _stepper.reset(
+        _at_command,
+        _cmee_command,
+        _disable_echo_command,
+        _flow_control_command,
+        _interface_control_command,
+        _set_apn_command,
+        _network_connect_command,
+        _enable_packet_data_command,
+        _enable_gps_command);
 }
 
 bool SkywireCommandStartupWorker::run()
@@ -62,9 +35,18 @@ bool SkywireCommandStartupWorker::run()
         return true;
     }
 
-    const SkywireStepperTickResult result = tickCurrentStep();
+    const SkywireStepResult result = _stepper.stepCurrent(
+        _at_command,
+        _cmee_command,
+        _disable_echo_command,
+        _flow_control_command,
+        _interface_control_command,
+        _set_apn_command,
+        _network_connect_command,
+        _enable_packet_data_command,
+        _enable_gps_command);
 
-    if (result == SkywireStepperTickResult::TimedOut)
+    if (result == SkywireStepResult::TimedOut)
     {
         reset();
         SkywireAtEngine::rebeginModem();

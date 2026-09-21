@@ -27,9 +27,7 @@ public:
     void reset();
 
 private:
-    SkywireStepperTickResult tickCurrentStep();
-
-    SkywireStepper _stepper;
+    SkywireStepper<STARTUP_STEP_COUNT> _stepper;
     AtSkywireCommand _at_command;
     SkywireAtEngine _cmee_command;
     DisableEchoSkywireCommand _disable_echo_command;

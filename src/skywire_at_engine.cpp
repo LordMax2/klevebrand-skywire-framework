@@ -15,27 +15,13 @@ SkywireAtEngine::SkywireAtEngine(
       _on_completed_function(on_completed_function),
       _sent_timestamp(0),
       _first_process_call_timestamp(0),
-      _flags(0)
+      _sent(false),
+      _on_completed_called(false),
+      _first_process_called(false),
+      _completed(false)
 {
     _skywire = skywire;
     _debug_mode = debug_mode;
-}
-
-bool SkywireAtEngine::flag(const uint8_t mask) const
-{
-    return (_flags & mask) != 0;
-}
-
-void SkywireAtEngine::setFlag(const uint8_t mask, const bool value)
-{
-    if (value)
-    {
-        _flags = static_cast<uint8_t>(_flags | mask);
-    }
-    else
-    {
-        _flags = static_cast<uint8_t>(_flags & static_cast<uint8_t>(~mask));
-    }
 }
 
 const __FlashStringHelper *SkywireAtEngine::command() const
@@ -190,10 +176,10 @@ bool SkywireAtEngine::okReceived() const
 
 void SkywireAtEngine::setFirstProcessCall()
 {
-    if (!flag(kFlagFirstProcessCalled))
+    if (!_first_process_called)
     {
         _first_process_call_timestamp = millis();
-        setFlag(kFlagFirstProcessCalled, true);
+        _first_process_called = true;
     }
 }
 
@@ -204,7 +190,7 @@ unsigned long SkywireAtEngine::getFirstProcessCallTimestamp() const
 
 void SkywireAtEngine::setSent(const bool sent)
 {
-    setFlag(kFlagSent, sent);
+    _sent = sent;
     if (sent)
     {
         _sent_timestamp = millis();
@@ -213,7 +199,7 @@ void SkywireAtEngine::setSent(const bool sent)
 
 bool SkywireAtEngine::isSent() const
 {
-    return flag(kFlagSent);
+    return _sent;
 }
 
 unsigned long SkywireAtEngine::getSentTimestamp() const
@@ -223,22 +209,22 @@ unsigned long SkywireAtEngine::getSentTimestamp() const
 
 void SkywireAtEngine::setCompleted(const bool completed)
 {
-    setFlag(kFlagCompleted, completed);
+    _completed = completed;
 }
 
 bool SkywireAtEngine::isCompletedFlag() const
 {
-    return flag(kFlagCompleted);
+    return _completed;
 }
 
 bool SkywireAtEngine::isOnCompletedCalled() const
 {
-    return flag(kFlagOnCompletedCalled);
+    return _on_completed_called;
 }
 
 void SkywireAtEngine::setOnCompletedCalled(const bool on_completed_called)
 {
-    setFlag(kFlagOnCompletedCalled, on_completed_called);
+    _on_completed_called = on_completed_called;
 }
 
 void SkywireAtEngine::notifyCompletedIfNeeded()
@@ -259,7 +245,10 @@ void SkywireAtEngine::reset()
 {
     _sent_timestamp = 0;
     _first_process_call_timestamp = 0;
-    _flags = 0;
+    _sent = false;
+    _on_completed_called = false;
+    _first_process_called = false;
+    _completed = false;
     resetRxBuffer();
 }
 

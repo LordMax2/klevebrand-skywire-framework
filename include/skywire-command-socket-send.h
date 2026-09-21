@@ -31,13 +31,6 @@ public:
     const __FlashStringHelper *command() const { return _at.command(); }
 
 private:
-    static constexpr uint8_t kFlagReadResponse = 1 << 0;
-    static constexpr uint8_t kFlagPayloadSent = 1 << 1;
-    static constexpr uint8_t kFlagResponseRequested = 1 << 2;
-    static constexpr uint8_t kFlagResponseReceived = 1 << 3;
-
-    bool flag(uint8_t mask) const;
-    void setFlag(uint8_t mask, bool value);
     bool promptReceived() const;
     bool responseReceived() const;
     bool responseRetrySuggested() const;
@@ -49,7 +42,10 @@ private:
     const __FlashStringHelper *_flash_message;
     char *_message;
     unsigned long _last_read_timestamp;
-    uint8_t _send_flags;
+    bool _read_response;
+    bool _payload_sent;
+    bool _response_requested;
+    bool _response_received;
 };
 
 static_assert(SkywireCommandConcept<SocketSendSkywireCommand>, "SocketSendSkywireCommand doesnt implement the concept");
