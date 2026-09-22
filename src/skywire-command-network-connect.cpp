@@ -1,5 +1,5 @@
 #include "skywire-command-network-connect.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 NetworkConnectSkywireCommand::NetworkConnectSkywireCommand(
     HardwareSerial *skywire,
@@ -79,7 +79,7 @@ void NetworkConnectSkywireCommand::reset()
 bool NetworkConnectSkywireCommand::isNetworkConnected()
 {
     char *const rx_ptr = SkywireAtEngine::getRxBuffer();
-    char *const cereg_pos = skywireStrstrP(rx_ptr, PSTR("+CEREG:"));
+    char *const cereg_pos = skywireFindFlashString(rx_ptr, PSTR("+CEREG:"));
 
     if (cereg_pos == nullptr)
     {

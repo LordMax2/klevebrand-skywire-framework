@@ -1,5 +1,5 @@
 #include "skywire-command-tcp-gps-step-worker.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 DroneRequest_t SkywireTcpGpsStepWorker::_latest_drone_request_response = DroneRequest_t::empty();
 GpsLocationInfo_t SkywireTcpGpsStepWorker::_latest_gps_response = GpsLocationInfo_t::empty();
@@ -105,19 +105,19 @@ void SkywireTcpGpsStepWorker::setLatestTcpResponse(char *response)
 {
     char *payload = response;
 
-    char *line_break = skywireStrstrP(payload, PSTR("\r\n"));
+    char *line_break = skywireFindFlashString(payload, PSTR("\r\n"));
     if (line_break != nullptr)
     {
         payload = line_break + 2;
     }
 
-    char *ok_marker = skywireStrstrP(payload, PSTR("\r\nOK\r\n"));
+    char *ok_marker = skywireFindFlashString(payload, PSTR("\r\nOK\r\n"));
     if (ok_marker != nullptr)
     {
         *ok_marker = '\0';
     }
 
-    line_break = skywireStrstrP(payload, PSTR("\r\n"));
+    line_break = skywireFindFlashString(payload, PSTR("\r\n"));
     if (line_break != nullptr)
     {
         payload = line_break + 2;

@@ -1,5 +1,5 @@
 #include "skywire-command-enable-packet-data.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 EnablePacketDataSkywireCommand::EnablePacketDataSkywireCommand(
     HardwareSerial *skywire,
@@ -14,8 +14,8 @@ bool EnablePacketDataSkywireCommand::okReceived() const
     char *const rx_buffer = SkywireAtEngine::getRxBuffer();
 
     return _at.okReceived() ||
-           skywireContainsP(rx_buffer, PSTR("ERROR")) ||
-           skywireContainsP(rx_buffer, PSTR("+CME ERROR: context already activated"));
+           skywireContainsFlashString(rx_buffer, PSTR("ERROR")) ||
+           skywireContainsFlashString(rx_buffer, PSTR("+CME ERROR: context already activated"));
 }
 
 SkywireResponseResult_t EnablePacketDataSkywireCommand::process()

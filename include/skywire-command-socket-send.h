@@ -27,7 +27,9 @@ public:
     SkywireResponseResult_t process();
     bool completed() const;
     void reset();
-    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+
+    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+
     const __FlashStringHelper *command() const { return _at.command(); }
 
 private:
@@ -45,7 +47,6 @@ private:
     bool _should_read_response;
     bool _has_sent_payload;
     bool _has_requested_response;
-    bool _has_received_response;
 };
 
 static_assert(SkywireCommandConcept<SocketSendSkywireCommand>, "SocketSendSkywireCommand doesnt implement the concept");

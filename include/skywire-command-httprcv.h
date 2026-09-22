@@ -18,7 +18,9 @@ public:
     SkywireResponseResult_t process();
     void reset();
     bool completed() const;
-    unsigned long getSentTimestamp() const { return _at.getSentTimestamp(); }
+
+    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+
     const __FlashStringHelper *command() const { return _at.command(); }
 
 private:

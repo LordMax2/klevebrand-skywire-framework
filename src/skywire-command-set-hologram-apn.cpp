@@ -1,5 +1,5 @@
 #include "skywire-command-set-hologram-apn.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 SetApnHologramSkywireCommand::SetApnHologramSkywireCommand(
     HardwareSerial *skywire,
@@ -72,8 +72,8 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         _at.serialReadToRxBuffer();
         rx_buffer = SkywireAtEngine::getRxBuffer();
 
-        const bool has_hologram_ok = skywireContainsP(rx_buffer, PSTR("hologram"));
-        const bool already_active = skywireContainsP(rx_buffer, PSTR("+CME ERROR: context already activated"));
+        const bool has_hologram_ok = skywireContainsFlashString(rx_buffer, PSTR("hologram"));
+        const bool already_active = skywireContainsFlashString(rx_buffer, PSTR("+CME ERROR: context already activated"));
 
         if (has_hologram_ok || already_active)
         {
@@ -95,7 +95,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand::process()
         return {true, rx_buffer};
     }
 
-    if (_at.hasSent() && now - _at.getSentTimestamp() >= 1000)
+    if (_at.hasSent() && now - _at.getLastSendTimestamp() >= 1000)
     {
         if (_state == State::WaitSet)
         {

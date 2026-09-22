@@ -2,7 +2,7 @@
 
 #if SKYWIRE_ENABLE_HTTP
 
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 HttpRingSkywireCommand::HttpRingSkywireCommand(
     HardwareSerial *skywire,
@@ -50,7 +50,7 @@ SkywireResponseResult_t HttpRingSkywireCommand::process()
 
 bool HttpRingSkywireCommand::okReceived() const
 {
-    char *const ring = skywireStrstrP(SkywireAtEngine::getRxBuffer(), PSTR("HTTPRING"));
+    char *const ring = skywireFindFlashString(SkywireAtEngine::getRxBuffer(), PSTR("HTTPRING"));
     if (ring == nullptr)
     {
         return false;
@@ -62,7 +62,7 @@ bool HttpRingSkywireCommand::okReceived() const
 bool HttpRingSkywireCommand::completed() const
 {
     return _at.hasMarkedCompleted() ||
-           (_at.hasSent() && okReceived() && millis() - _at.getSentTimestamp() > 500);
+           (_at.hasSent() && okReceived() && millis() - _at.getLastSendTimestamp() > 500);
 }
 
 #endif

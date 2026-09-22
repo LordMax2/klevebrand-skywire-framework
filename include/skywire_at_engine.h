@@ -6,9 +6,8 @@
 #include "Arduino.h"
 #include "skywire_config.h"
 #include "skywire-response-result.h"
+#include "skywire_on_completed_function.h"
 #include "concept_skywire_command.h"
-
-typedef void (*OnCompletedFunction)(char *result_content);
 
 class SkywireAtEngine
 {
@@ -22,7 +21,7 @@ public:
     SkywireResponseResult_t process();
     void reset();
     bool completed() const;
-    unsigned long getSentTimestamp() const;
+    unsigned long getLastSendTimestamp() const;
     const __FlashStringHelper *command() const;
 
     bool okReceived() const;
@@ -54,7 +53,7 @@ public:
     static void logStepTimeout(
         const __FlashStringHelper *command,
         unsigned long timeout_milliseconds,
-        unsigned long sent_timestamp);
+        unsigned long last_send_timestamp);
 
 private:
     static HardwareSerial *_skywire;
@@ -64,7 +63,7 @@ private:
 
     const __FlashStringHelper *_command;
     OnCompletedFunction _on_completed_function;
-    unsigned long _sent_timestamp;
+    unsigned long _last_send_timestamp;
     unsigned long _first_process_call_timestamp;
     bool _has_sent;
     bool _has_called_on_completed;

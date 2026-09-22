@@ -5,11 +5,12 @@
 
 #include "concepts.h"
 
-template<typename T>
-concept SkywireWorkerConcept = requires(T& w)
+template<typename Worker>
+concept SkywireWorkerConcept = requires(Worker& worker)
 {
-    { w.run() } -> same_as<bool>;
-    { w.reset() } -> same_as<void>;
+    { worker.run() } -> same_as<bool>;
+
+    { worker.reset() } -> same_as<void>;
 };
 
 #endif

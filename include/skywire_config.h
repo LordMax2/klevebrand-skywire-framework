@@ -8,7 +8,8 @@
 #endif
 
 #ifndef SOCKET_SEND_MESSAGE_SIZE
-#define SOCKET_SEND_MESSAGE_SIZE 96
+// "SetDroneState|1337|" plus the 128-byte telemetry payload Maxfly builds.
+#define SOCKET_SEND_MESSAGE_SIZE 160
 #endif
 
 #ifndef SKYWIRE_SRECV_SIZE

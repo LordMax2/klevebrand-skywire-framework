@@ -6,13 +6,7 @@
 #include "Arduino.h"
 #include "concept_skywire_command.h"
 #include "skywire_at_engine.h"
-
-enum class SkywireStepResult
-{
-    SequenceStillRunning,
-    SequenceCompleted,
-    StepTimedOut
-};
+#include "skywire_step_result.h"
 
 template<uint8_t StepCount>
 class SkywireStepper
@@ -65,14 +59,11 @@ SkywireStepResult SkywireStepper<StepCount>::stepCommand(Command &command)
         return SkywireStepResult::SequenceStillRunning;
     }
 
-    const unsigned long sent_timestamp = command.getSentTimestamp();
+    const unsigned long last_send_timestamp = command.getLastSendTimestamp();
 
-    if (sent_timestamp != 0 && millis() - sent_timestamp > _timeout_milliseconds)
+    if (last_send_timestamp != 0 && millis() - last_send_timestamp > _timeout_milliseconds)
     {
-        if (SkywireAtEngine::debugMode())
-        {
-            SkywireAtEngine::logStepTimeout(command.command(), _timeout_milliseconds, sent_timestamp);
-        }
+        SkywireAtEngine::logStepTimeout(command.command(), _timeout_milliseconds, last_send_timestamp);
 
         return SkywireStepResult::StepTimedOut;
     }

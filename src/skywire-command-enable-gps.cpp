@@ -1,5 +1,5 @@
 #include "skywire-command-enable-gps.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 EnableGpsSkywireCommand::EnableGpsSkywireCommand(
     HardwareSerial *skywire,
@@ -11,7 +11,7 @@ EnableGpsSkywireCommand::EnableGpsSkywireCommand(
 
 bool EnableGpsSkywireCommand::okReceived() const
 {
-    return _at.okReceived() || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("ERROR"));
+    return _at.okReceived() || skywireContainsFlashString(SkywireAtEngine::getRxBuffer(), PSTR("ERROR"));
 }
 
 SkywireResponseResult_t EnableGpsSkywireCommand::process()

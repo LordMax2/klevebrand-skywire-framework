@@ -1,5 +1,5 @@
 #include "skywire-command-socket-configure.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 SocketConfigureSkywireCommand::SocketConfigureSkywireCommand(
     HardwareSerial *skywire,
@@ -13,16 +13,16 @@ SocketConfigureSkywireCommand::SocketConfigureSkywireCommand(
 
 bool SocketConfigureSkywireCommand::socketSetupFailed() const
 {
-    return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("+CME ERROR: can not setup socket"));
+    return skywireContainsFlashString(SkywireAtEngine::getRxBuffer(), PSTR("+CME ERROR: can not setup socket"));
 }
 
 bool SocketConfigureSkywireCommand::hasReceivedSocketCloseResponse() const
 {
     char *const rx_buffer = SkywireAtEngine::getRxBuffer();
 
-    return skywireContainsP(rx_buffer, PSTR("\r\nOK\r\n")) ||
-           skywireContainsP(rx_buffer, PSTR("ERROR")) ||
-           skywireContainsP(rx_buffer, PSTR("+CME ERROR"));
+    return skywireContainsFlashString(rx_buffer, PSTR("\r\nOK\r\n")) ||
+           skywireContainsFlashString(rx_buffer, PSTR("ERROR")) ||
+           skywireContainsFlashString(rx_buffer, PSTR("+CME ERROR"));
 }
 
 SkywireResponseResult_t SocketConfigureSkywireCommand::process()

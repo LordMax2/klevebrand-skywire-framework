@@ -2,7 +2,7 @@
 
 #if SKYWIRE_ENABLE_HTTP
 
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 HttpRcvSkywireCommand::HttpRcvSkywireCommand(
     HardwareSerial *skywire,
@@ -77,7 +77,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand::process()
 
 bool HttpRcvSkywireCommand::okReceived() const
 {
-    return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("ERROR"));
+    return skywireContainsFlashString(SkywireAtEngine::getRxBuffer(), PSTR("ERROR"));
 }
 
 void HttpRcvSkywireCommand::reset()

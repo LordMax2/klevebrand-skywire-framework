@@ -2,7 +2,7 @@
 
 #if SKYWIRE_ENABLE_HTTP
 
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 HttpSndSkywireCommand::HttpSndSkywireCommand(
     HardwareSerial *skywire,
@@ -20,7 +20,7 @@ HttpSndSkywireCommand::HttpSndSkywireCommand(
 
 bool HttpSndSkywireCommand::arrowsReceived() const
 {
-    return skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR(">"));
+    return skywireContainsFlashString(SkywireAtEngine::getRxBuffer(), PSTR(">"));
 }
 
 void HttpSndSkywireCommand::setPayload(const char *payload_to_send)
@@ -38,7 +38,7 @@ void HttpSndSkywireCommand::reset()
 
 bool HttpSndSkywireCommand::okReceived() const
 {
-    return _has_received_ok || skywireContainsP(SkywireAtEngine::getRxBuffer(), PSTR("\r\nOK\r\n"));
+    return _has_received_ok || skywireContainsFlashString(SkywireAtEngine::getRxBuffer(), PSTR("\r\nOK\r\n"));
 }
 
 SkywireResponseResult_t HttpSndSkywireCommand::process()

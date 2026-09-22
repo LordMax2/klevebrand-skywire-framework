@@ -1,5 +1,5 @@
 #include "skywire_at_engine.h"
-#include "skywire_strstr_p.h"
+#include "skywire_flash_string.h"
 
 HardwareSerial *SkywireAtEngine::_skywire = nullptr;
 bool SkywireAtEngine::_debug_mode = false;
@@ -13,7 +13,7 @@ SkywireAtEngine::SkywireAtEngine(
     const OnCompletedFunction on_completed_function)
     : _command(command),
       _on_completed_function(on_completed_function),
-      _sent_timestamp(0),
+      _last_send_timestamp(0),
       _first_process_call_timestamp(0),
       _has_sent(false),
       _has_called_on_completed(false),
@@ -45,14 +45,14 @@ void SkywireAtEngine::rebeginModem()
 void SkywireAtEngine::logStepTimeout(
     const __FlashStringHelper *command,
     const unsigned long timeout_milliseconds,
-    const unsigned long sent_timestamp)
+    const unsigned long last_send_timestamp)
 {
     Serial.print(F("Skywire command step: "));
     Serial.print(command);
     Serial.print(F(", after "));
     Serial.print(timeout_milliseconds);
-    Serial.print(F("ms, restarting sequence. Sent timestamp: "));
-    Serial.print(sent_timestamp);
+    Serial.print(F("ms, restarting sequence. Last send timestamp: "));
+    Serial.print(last_send_timestamp);
     Serial.print(F(", current timestamp: "));
     Serial.println(millis());
     Serial.print(F("rx_buffer at timeout: ["));
@@ -170,8 +170,8 @@ bool SkywireAtEngine::modemAvailable() const
 
 bool SkywireAtEngine::okReceived() const
 {
-    return skywireContainsP(_rx_buffer, PSTR("\r\nOK\r\n")) ||
-           skywireContainsP(_rx_buffer, PSTR("+CME ERROR: context already activated"));
+    return skywireContainsFlashString(_rx_buffer, PSTR("\r\nOK\r\n")) ||
+           skywireContainsFlashString(_rx_buffer, PSTR("+CME ERROR: context already activated"));
 }
 
 void SkywireAtEngine::recordFirstProcessCall()
@@ -194,7 +194,7 @@ void SkywireAtEngine::setSent(const bool has_sent)
 
     if (has_sent)
     {
-        _sent_timestamp = millis();
+        _last_send_timestamp = millis();
     }
 }
 
@@ -203,9 +203,9 @@ bool SkywireAtEngine::hasSent() const
     return _has_sent;
 }
 
-unsigned long SkywireAtEngine::getSentTimestamp() const
+unsigned long SkywireAtEngine::getLastSendTimestamp() const
 {
-    return _sent_timestamp;
+    return _last_send_timestamp;
 }
 
 void SkywireAtEngine::setCompleted(const bool is_completed)
@@ -244,7 +244,7 @@ bool SkywireAtEngine::completed() const
 
 void SkywireAtEngine::reset()
 {
-    _sent_timestamp = 0;
+    _last_send_timestamp = 0;
     _first_process_call_timestamp = 0;
     _has_sent = false;
     _has_called_on_completed = false;
