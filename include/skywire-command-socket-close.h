@@ -6,6 +6,7 @@
 #include "skywire_at_engine.h"
 #include "concept_skywire_command.h"
 
+template<size_t RxBufferSize>
 class SocketCloseSkywireCommand
 {
 public:
@@ -21,10 +22,22 @@ public:
 
     const __FlashStringHelper *command() const { return _at.command(); }
 
+    char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
+
 private:
-    SkywireAtEngine _at;
+    SkywireAtEngine<RxBufferSize> _at;
 };
 
-static_assert(SkywireCommandConcept<SocketCloseSkywireCommand>, "SocketCloseSkywireCommand doesnt implement the concept");
+
+
+template<size_t RxBufferSize>
+SocketCloseSkywireCommand<RxBufferSize>::SocketCloseSkywireCommand(
+    HardwareSerial *skywire,
+    const bool debug_mode,
+    const OnCompletedFunction on_completed_function)
+    : _at(skywire, F("AT#SH=1"), debug_mode, on_completed_function)
+{
+    static_assert(SkywireCommandConcept<SocketCloseSkywireCommand<RxBufferSize>>, "SocketCloseSkywireCommand doesnt implement the concept");
+}
 
 #endif

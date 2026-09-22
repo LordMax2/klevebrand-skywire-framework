@@ -18,6 +18,8 @@ concept SkywireCommandConcept = requires(Command& command, const Command& const_
     { const_command.getLastSendTimestamp() } -> same_as<unsigned long>;
 
     { const_command.command() } -> same_as<const __FlashStringHelper *>;
+
+    { const_command.getRxBuffer() } -> same_as<char *>;
 };
 
 #endif

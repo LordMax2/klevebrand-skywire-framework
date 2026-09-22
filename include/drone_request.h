@@ -7,6 +7,8 @@
 
 struct DroneRequest_t
 {
+    DroneRequest_t() = default;
+
     DroneRequest_t(
         int flight_mode_id,
         bool enable_power,

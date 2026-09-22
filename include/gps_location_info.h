@@ -11,6 +11,8 @@
 
 struct GpsLocationInfo_t
 {
+    GpsLocationInfo_t() = default;
+
     GpsLocationInfo_t(
         const char *timestamp,
         const char *date,

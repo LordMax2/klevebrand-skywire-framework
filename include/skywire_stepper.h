@@ -63,7 +63,11 @@ SkywireStepResult SkywireStepper<StepCount>::stepCommand(Command &command)
 
     if (last_send_timestamp != 0 && millis() - last_send_timestamp > _timeout_milliseconds)
     {
-        SkywireAtEngine::logStepTimeout(command.command(), _timeout_milliseconds, last_send_timestamp);
+        logSkywireStepTimeout(
+            command.command(),
+            _timeout_milliseconds,
+            last_send_timestamp,
+            command.getRxBuffer());
 
         return SkywireStepResult::StepTimedOut;
     }
