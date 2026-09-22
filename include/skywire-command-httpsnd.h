@@ -24,7 +24,7 @@ public:
 
     unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
 
-    const __FlashStringHelper *command() const { return _at.command(); }
+    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
 
     char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
@@ -109,7 +109,7 @@ SkywireResponseResult_t HttpSndSkywireCommand<RxBufferSize, HttpSendPathSize, Ht
 
             if (SkywireAtEngine<RxBufferSize>::debugMode())
             {
-                Serial.print(_at.command());
+                Serial.print(_at.getCommand());
                 Serial.print(_path);
                 Serial.print(F(","));
                 Serial.print(strlen(_payload));
@@ -117,7 +117,7 @@ SkywireResponseResult_t HttpSndSkywireCommand<RxBufferSize, HttpSendPathSize, Ht
                 Serial.println();
             }
 
-            _at.printToModem(_at.command());
+            _at.printToModem(_at.getCommand());
             _at.printToModem(_path);
             _at.printToModem(F(","));
             _at.printToModem(static_cast<int>(strlen(_payload)));

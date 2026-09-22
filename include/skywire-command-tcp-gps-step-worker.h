@@ -117,7 +117,7 @@ bool SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveS
     if (result == SkywireStepResult::StepTimedOut)
     {
         reset();
-        SkywireAtEngine<RxBufferSize>::rebeginModem();
+        SkywireAtEngine<RxBufferSize>::beginModem();
     }
     else if (result == SkywireStepResult::SequenceCompleted)
     {

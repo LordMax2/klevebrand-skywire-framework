@@ -23,7 +23,7 @@ public:
     void reset();
     bool completed() const;
     unsigned long getLastSendTimestamp() const;
-    const __FlashStringHelper *command() const;
+    const __FlashStringHelper *getCommand() const;
 
     bool okReceived() const;
     bool waitForSendThenRead();
@@ -50,7 +50,7 @@ public:
     bool modemAvailable() const;
 
     static bool debugMode();
-    static void rebeginModem();
+    static void beginModem();
 
 private:
     static HardwareSerial *_skywire;
@@ -119,7 +119,7 @@ SkywireAtEngine<RxBufferSize>::SkywireAtEngine(
 }
 
 template<size_t RxBufferSize>
-const __FlashStringHelper *SkywireAtEngine<RxBufferSize>::command() const
+const __FlashStringHelper *SkywireAtEngine<RxBufferSize>::getCommand() const
 {
     return _command;
 }
@@ -131,12 +131,9 @@ bool SkywireAtEngine<RxBufferSize>::debugMode()
 }
 
 template<size_t RxBufferSize>
-void SkywireAtEngine<RxBufferSize>::rebeginModem()
+void SkywireAtEngine<RxBufferSize>::beginModem()
 {
-    if (_skywire != nullptr)
-    {
-        _skywire->begin(115200);
-    }
+    _skywire->begin(115200);
 }
 
 template<size_t RxBufferSize>

@@ -19,7 +19,7 @@ public:
 
     unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
 
-    const __FlashStringHelper *command() const { return _at.command(); }
+    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
 
     char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 

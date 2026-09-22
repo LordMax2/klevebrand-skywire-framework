@@ -96,7 +96,7 @@ bool SkywireCommandStartupWorker<RxBufferSize>::run()
     if (result == SkywireStepResult::StepTimedOut)
     {
         reset();
-        SkywireAtEngine<RxBufferSize>::rebeginModem();
+        SkywireAtEngine<RxBufferSize>::beginModem();
     }
 
     return false;
