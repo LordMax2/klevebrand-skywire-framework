@@ -1,19 +1,34 @@
-#ifndef SKYWIRE_STEP_HTTP_RCV_H
-#define SKYWIRE_STEP_HTTP_RCV_H
+#pragma once
 
-#include "Arduino.h"
-#include "skywire-command.h"
+#ifndef SKYWIRE_COMMAND_HTTPRCV_H
+#define SKYWIRE_COMMAND_HTTPRCV_H
 
-class HttpRcvSkywireCommand : public SkywireCommand
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
+
+template<size_t RxBufferSize>
+class HttpRcvSkywireCommand
 {
 public:
     HttpRcvSkywireCommand(HardwareSerial *skywire, bool debug_mode, OnCompletedFunction on_completed_function);
-    SkywireResponseResult_t process() override;
 
-    bool okReceived() override;
+    SkywireResponseResult_t process();
+    void reset();
+    bool completed() const;
+
+    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+
+    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
+
+    char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
 private:
-    unsigned long timestamp_milliseconds = 0;
+    bool okReceived() const;
+
+    SkywireAtEngine<RxBufferSize> _at;
+    unsigned long _timestamp_milliseconds;
 };
+
+#include "skywire-command-httprcv.ipp"
 
 #endif

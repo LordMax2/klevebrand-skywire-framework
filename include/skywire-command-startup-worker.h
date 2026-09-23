@@ -1,8 +1,12 @@
-#ifndef SKYWIRE_STEP_STARTUP_WORKER_H
-#define SKYWIRE_STEP_STARTUP_WORKER_H
+#pragma once
+
+#ifndef SKYWIRE_COMMAND_STARTUP_WORKER_H
+#define SKYWIRE_COMMAND_STARTUP_WORKER_H
 
 #include "Arduino.h"
-#include "skywire-command-worker.h"
+#include "skywire_stepper.h"
+#include "skywire_at_engine.h"
+#include "concept_skywire_worker.h"
 #include "skywire-command-at.h"
 #include "skywire-command-disable-echo.h"
 #include "skywire-command-set-hologram-apn.h"
@@ -12,25 +16,30 @@
 
 #define STARTUP_STEP_COUNT 9
 
-class SkywireCommandStartupWorker : public SkywireCommandWorker
+template<size_t RxBufferSize>
+class SkywireCommandStartupWorker
 {
 public:
     explicit SkywireCommandStartupWorker(
         HardwareSerial *skywire_serial,
         bool debug_mode = false);
 
-    bool run() override;
+    bool run();
+    void reset();
 
 private:
-    AtSkywireCommand at_command;
-    SkywireCommand cmee_command;
-    DisableEchoSkywireCommand disable_echo_command;
-    SkywireCommand flow_control_command;
-    SkywireCommand interface_control_command;
-    SetApnHologramSkywireCommand set_apn_command;
-    NetworkConnectSkywireCommand network_connect_command;
-    EnablePacketDataSkywireCommand enable_packet_data_command;
-    EnableGpsSkywireCommand enable_gps_command;
+    SkywireStepper<STARTUP_STEP_COUNT> _stepper;
+    AtSkywireCommand<RxBufferSize> _at_command;
+    SkywireAtEngine<RxBufferSize> _cmee_command;
+    DisableEchoSkywireCommand<RxBufferSize> _disable_echo_command;
+    SkywireAtEngine<RxBufferSize> _flow_control_command;
+    SkywireAtEngine<RxBufferSize> _interface_control_command;
+    SetApnHologramSkywireCommand<RxBufferSize> _set_apn_command;
+    NetworkConnectSkywireCommand<RxBufferSize> _network_connect_command;
+    EnablePacketDataSkywireCommand<RxBufferSize> _enable_packet_data_command;
+    EnableGpsSkywireCommand<RxBufferSize> _enable_gps_command;
 };
+
+#include "skywire-command-startup-worker.ipp"
 
 #endif

@@ -1,11 +1,12 @@
-#ifndef SKYWIRE_RESPONSE_RESULT_T
-#define SKYWIRE_RESPONSE_RESULT_T
+#pragma once
 
-#include "Arduino.h"
+#ifndef SKYWIRE_RESPONSE_RESULT_H
+#define SKYWIRE_RESPONSE_RESULT_H
 
 struct SkywireResponseResult_t
 {
     SkywireResponseResult_t(bool is_success, const char *response_content);
+
     bool is_success;
     const char *response_content;
 };

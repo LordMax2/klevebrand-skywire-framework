@@ -1,9 +1,12 @@
-#ifndef KLEVEBRAND_SKYWIRE_TCP_GPS_STEPPER_CLIENT_H
-#define KLEVEBRAND_SKYWIRE_TCP_GPS_STEPPER_CLIENT_H
+#pragma once
+
+#ifndef SKYWIRE_COMMAND_TCP_GPS_STEP_WORKER_H
+#define SKYWIRE_COMMAND_TCP_GPS_STEP_WORKER_H
 
 #include "Arduino.h"
-#include "skywire-command-worker.h"
-#include "skywire-command.h"
+#include "skywire_stepper.h"
+#include "skywire_at_engine.h"
+#include "concept_skywire_worker.h"
 #include "skywire-command-gpsacp.h"
 #include "skywire-command-socket-configure.h"
 #include "skywire-command-socket-connect.h"
@@ -14,7 +17,8 @@
 
 #define TCP_GPS_STEP_COUNT 6
 
-class SkywireTcpGpsStepWorker : public SkywireCommandWorker
+template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>
+class SkywireTcpGpsStepWorker
 {
 public:
     SkywireTcpGpsStepWorker(
@@ -22,32 +26,11 @@ public:
         const char *host,
         int port,
         unsigned long timeout_milliseconds,
-        bool debug_mode) : SkywireCommandWorker(skywire_serial, debug_mode, timeout_milliseconds, TCP_GPS_STEP_COUNT),
-                          gps_command(skywire_serial, debug_mode, setLatestGpsResponse),
-                          socket_configure_command(skywire_serial, debug_mode, nullptr),
-                          socket_connect_command(skywire_serial, host, port, debug_mode, nullptr),
-                          request_command(skywire_serial, debug_mode, "GetDroneRequest|1337", true, setLatestTcpResponse),
-                          send_state_command(skywire_serial, debug_mode, "", false, nullptr),
-                          socket_close_command(skywire_serial, debug_mode, nullptr)
-    {
-        this->steps[0] = &gps_command;
-        this->steps[1] = &socket_configure_command;
-        this->steps[2] = &socket_connect_command;
-        this->steps[3] = &request_command;
-        this->steps[4] = &send_state_command;
-        this->steps[5] = &socket_close_command;
+        bool debug_mode);
 
-        reset();
-    }
-
-    void setPayloadToSend(const char *payload)
-    {
-        char message[SOCKET_SEND_MESSAGE_SIZE];
-        strncpy(message, "SetDroneState|1337|", sizeof(message) - 1);
-        message[sizeof(message) - 1] = '\0';
-        strncat(message, payload != nullptr ? payload : "", sizeof(message) - strlen(message) - 1);
-        send_state_command.setMessage(message);
-    }
+    bool run();
+    void reset();
+    void setPayloadToSend(const char *payload);
 
     GpsLocationInfo_t getLatestGpsResponse();
     DroneRequest_t getLatestDroneRequest();
@@ -55,14 +38,22 @@ public:
     static void setLatestGpsResponse(char *response);
 
 private:
-    static GpsLocationInfo_t _latest_gps_response;
-    static DroneRequest_t _latest_drone_request_response;
-    GpsAcpSkywireCommand gps_command;
-    SocketConfigureSkywireCommand socket_configure_command;
-    SocketConnectSkywireCommand socket_connect_command;
-    SocketSendSkywireCommand request_command;
-    SocketSendSkywireCommand send_state_command;
-    SocketCloseSkywireCommand socket_close_command;
+    inline static GpsLocationInfo_t _latest_gps_response {};
+    inline static DroneRequest_t _latest_drone_request_response {};
+
+    SkywireStepper<TCP_GPS_STEP_COUNT> _stepper;
+    GpsAcpSkywireCommand<RxBufferSize> _gps_command;
+    SocketConfigureSkywireCommand<RxBufferSize> _socket_configure_command;
+    SocketConnectSkywireCommand<RxBufferSize> _socket_connect_command;
+    SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize> _request_command;
+
+    static_assert(SocketSendMessageSize >= sizeof("SetDroneState|1337|"), "SocketSendMessageSize must hold SetDroneState|1337|");
+
+    char _state_message[SocketSendMessageSize];
+    SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize> _send_state_command;
+    SocketCloseSkywireCommand<RxBufferSize> _socket_close_command;
 };
+
+#include "skywire-command-tcp-gps-step-worker.ipp"
 
 #endif

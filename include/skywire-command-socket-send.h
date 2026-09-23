@@ -1,38 +1,58 @@
+#pragma once
+
 #ifndef SKYWIRE_COMMAND_SOCKET_SEND_H
 #define SKYWIRE_COMMAND_SOCKET_SEND_H
 
-#include "skywire-command.h"
+#include "skywire_at_engine.h"
+#include "concept_skywire_command.h"
 
-#define SOCKET_SEND_MESSAGE_SIZE 160
-
-class SocketSendSkywireCommand : public SkywireCommand
+template<size_t RxBufferSize, size_t SocketReceiveSize>
+class SocketSendSkywireCommand
 {
 public:
-    SocketSendSkywireCommand(HardwareSerial *skywire,
-                             bool debug_mode,
-                             const char *message,
-                             bool read_response,
-                             OnCompletedFunction on_completed_function);
+    SocketSendSkywireCommand(
+        HardwareSerial *skywire,
+        bool debug_mode,
+        const __FlashStringHelper *flash_message,
+        bool should_read_response,
+        OnCompletedFunction on_completed_function);
 
-    SkywireResponseResult_t process() override;
-    bool completed() override;
-    void reset() override;
+    SocketSendSkywireCommand(
+        HardwareSerial *skywire,
+        bool debug_mode,
+        char *message,
+        bool should_read_response,
+        OnCompletedFunction on_completed_function);
 
-    void setMessage(const char *message_to_send);
-    char *getMessage();
+    SkywireResponseResult_t process();
+    [[nodiscard]] bool completed() const;
+    void reset();
+
+    [[nodiscard]] unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+
+    [[nodiscard]] const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
+
+    [[nodiscard]] char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
 private:
-    bool promptReceived() const;
-    bool responseReceived() const;
-    bool responseRetrySuggested() const;
+    [[nodiscard]] bool promptReceived() const;
+    [[nodiscard]] bool responseReceived() const;
+    [[nodiscard]] bool responseRetrySuggested() const;
+    [[nodiscard]] bool shouldRetrySocketRead() const;
+    [[nodiscard]] int receivedByteCount() const;
+    void writePayloadToModem();
     void readSocketResponse();
+    [[nodiscard]] bool hasPayload() const;
 
-    char message[SOCKET_SEND_MESSAGE_SIZE]{};
-    bool read_response = false;
-    bool payload_sent = false;
-    bool response_requested = false;
-    bool response_received = false;
-    unsigned long last_read_timestamp = 0;
+    SkywireAtEngine<RxBufferSize> _at;
+    const __FlashStringHelper *_flash_message;
+    char *_message;
+    unsigned long _last_response_request_timestamp;
+    bool _should_read_response;
+    bool _has_sent_payload;
+    bool _has_requested_response;
 };
+
+#include "skywire-command-socket-send.ipp"
 
 #endif
