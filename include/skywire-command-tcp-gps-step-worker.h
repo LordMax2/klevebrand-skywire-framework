@@ -46,6 +46,9 @@ private:
     SocketConfigureSkywireCommand<RxBufferSize> _socket_configure_command;
     SocketConnectSkywireCommand<RxBufferSize> _socket_connect_command;
     SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize> _request_command;
+
+    static_assert(SocketSendMessageSize >= sizeof("SetDroneState|1337|"), "SocketSendMessageSize must hold SetDroneState|1337|");
+
     char _state_message[SocketSendMessageSize];
     SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize> _send_state_command;
     SocketCloseSkywireCommand<RxBufferSize> _socket_close_command;

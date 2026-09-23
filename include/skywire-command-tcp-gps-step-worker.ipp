@@ -33,7 +33,9 @@ void SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveS
 template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>
 void SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>::setPayloadToSend(const char *payload)
 {
-    strcpy_P(_state_message, PSTR("SetDroneState|1337|"));
+    strncpy_P(_state_message, PSTR("SetDroneState|1337|"), sizeof(_state_message) - 1);
+    _state_message[sizeof(_state_message) - 1] = '\0';
+
     strncat(_state_message, payload != nullptr ? payload : "", sizeof(_state_message) - strlen(_state_message) - 1);
 }
 
