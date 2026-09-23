@@ -106,10 +106,10 @@ struct GpsLocationInfo_t
                 strncpy(course_over_ground, field_content, sizeof(course_over_ground) - 1);
                 break;
             case 7:
-                speed_over_ground_knots = atof(field_content);
+                speed_over_ground_kmh = atof(field_content);
                 break;
             case 8:
-                speed_over_ground_kmh = atof(field_content);
+                speed_over_ground_knots = atof(field_content);
                 break;
             case 9:
                 strncpy(date, field_content, sizeof(date) - 1);

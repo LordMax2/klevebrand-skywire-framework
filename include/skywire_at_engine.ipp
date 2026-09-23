@@ -281,7 +281,7 @@ bool SkywireAtEngine<RxBufferSize>::waitForSendThenRead()
 
     if (!hasSent())
     {
-        if (now - getFirstProcessCallTimestamp() > 200 && getFirstProcessCallTimestamp() != 0)
+        if (now - getFirstProcessCallTimestamp() > 200)
         {
             resetRxBuffer();
             writeCommandToModem();

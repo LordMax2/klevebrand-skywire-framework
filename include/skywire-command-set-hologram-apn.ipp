@@ -27,8 +27,7 @@ SkywireResponseResult_t SetApnHologramSkywireCommand<RxBufferSize>::process()
         _at.recordFirstProcessCall();
 
         if (!_at.hasSent() &&
-            millis() - _at.getFirstProcessCallTimestamp() > 200 &&
-            _at.getFirstProcessCallTimestamp() != 0)
+            millis() - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
             _at.writeCommandToModem();

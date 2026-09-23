@@ -57,8 +57,51 @@ bool SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::responseReceived
 {
     char *const rx_buffer = SkywireAtEngine<RxBufferSize>::getRxBuffer();
 
-    return skywireContainsFlashString(rx_buffer, PSTR("#SRECV:")) &&
+    return receivedByteCount() > 0 &&
            skywireContainsFlashString(rx_buffer, PSTR("\r\nOK\r\n"));
+}
+
+template<size_t RxBufferSize, size_t SocketReceiveSize>
+int SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::receivedByteCount() const
+{
+    char *const marker = skywireFindFlashString(SkywireAtEngine<RxBufferSize>::getRxBuffer(), PSTR("#SRECV:"));
+
+    if (marker == nullptr)
+    {
+        return -1;
+    }
+
+    const char *const byte_count = strchr(marker, ',');
+
+    if (byte_count == nullptr)
+    {
+        return -1;
+    }
+
+    return atoi(byte_count + 1);
+}
+
+template<size_t RxBufferSize, size_t SocketReceiveSize>
+bool SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::shouldRetrySocketRead() const
+{
+    if (responseRetrySuggested())
+    {
+        return true;
+    }
+
+    const int received_byte_count = receivedByteCount();
+
+    if (received_byte_count > 0)
+    {
+        return false;
+    }
+
+    if (received_byte_count == 0)
+    {
+        return skywireContainsFlashString(SkywireAtEngine<RxBufferSize>::getRxBuffer(), PSTR("\r\nOK\r\n"));
+    }
+
+    return !_at.modemAvailable();
 }
 
 template<size_t RxBufferSize, size_t SocketReceiveSize>
@@ -91,7 +134,6 @@ void SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::readSocketRespon
     _at.printToModem(F("AT#SRECV=1,"));
     _at.printToModem(static_cast<int>(SocketReceiveSize));
     _at.printToModem('\r');
-    _at.setSent(true);
     _last_response_request_timestamp = millis();
     _has_requested_response = true;
 
@@ -117,7 +159,7 @@ SkywireResponseResult_t SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize
 
     if (!_at.hasSent())
     {
-        if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
+        if (now - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
             _at.writeCommandToModem();
@@ -167,26 +209,23 @@ SkywireResponseResult_t SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize
     }
     else
     {
-        if (!_has_requested_response && _at.okReceived())
-        {
-            _at.resetRxBuffer();
-            readSocketResponse();
-
-            return {false, rx_buffer};
-        }
-
-        if (_has_requested_response &&
-            now - _last_response_request_timestamp > 200 &&
-            (responseRetrySuggested() || !_at.modemAvailable()))
-        {
-            _at.resetRxBuffer();
-            readSocketResponse();
-
-            return {false, rx_buffer};
-        }
-
         if (!responseReceived())
         {
+            const bool read_attempt_settled =
+                _has_requested_response &&
+                now - _last_response_request_timestamp > 200;
+
+            if (!_has_requested_response && _at.okReceived())
+            {
+                _at.resetRxBuffer();
+                readSocketResponse();
+            }
+            else if (read_attempt_settled && shouldRetrySocketRead())
+            {
+                _at.resetRxBuffer();
+                readSocketResponse();
+            }
+
             return {false, rx_buffer};
         }
     }

@@ -25,7 +25,7 @@ SkywireResponseResult_t HttpRcvSkywireCommand<RxBufferSize>::process()
 
     if (!_at.hasSent())
     {
-        if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
+        if (now - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
             if (SkywireAtEngine<RxBufferSize>::debugMode())

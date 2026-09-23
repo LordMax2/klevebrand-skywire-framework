@@ -46,7 +46,7 @@ SkywireResponseResult_t SocketConnectSkywireCommand<RxBufferSize>::process()
 
     if (!_at.hasSent())
     {
-        if (millis() - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
+        if (millis() - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
             writeConnectCommandToModem();

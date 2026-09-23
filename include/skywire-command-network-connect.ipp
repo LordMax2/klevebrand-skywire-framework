@@ -26,7 +26,6 @@ SkywireResponseResult_t NetworkConnectSkywireCommand<RxBufferSize>::process()
     if (!_at.hasSent())
     {
         if (now - _at.getFirstProcessCallTimestamp() > 200 &&
-            _at.getFirstProcessCallTimestamp() != 0 &&
             (_last_poll_timestamp == 0 || now - _last_poll_timestamp >= 1000))
         {
             if (SkywireAtEngine<RxBufferSize>::debugMode())

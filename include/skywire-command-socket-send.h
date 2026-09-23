@@ -38,6 +38,8 @@ private:
     [[nodiscard]] bool promptReceived() const;
     [[nodiscard]] bool responseReceived() const;
     [[nodiscard]] bool responseRetrySuggested() const;
+    [[nodiscard]] bool shouldRetrySocketRead() const;
+    [[nodiscard]] int receivedByteCount() const;
     void writePayloadToModem();
     void readSocketResponse();
     [[nodiscard]] bool hasPayload() const;

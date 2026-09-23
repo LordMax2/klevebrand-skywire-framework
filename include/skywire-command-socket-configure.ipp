@@ -44,8 +44,7 @@ SkywireResponseResult_t SocketConfigureSkywireCommand<RxBufferSize>::process()
     {
     case State::SendConfigure:
         if (!_at.hasSent() &&
-            now - _at.getFirstProcessCallTimestamp() > 200 &&
-            _at.getFirstProcessCallTimestamp() != 0)
+            now - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
             _at.writeCommandToModem();

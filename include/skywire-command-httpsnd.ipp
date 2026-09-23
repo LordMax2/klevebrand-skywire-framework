@@ -57,7 +57,7 @@ SkywireResponseResult_t HttpSndSkywireCommand<RxBufferSize, HttpSendPathSize, Ht
 
     if (!_at.hasSent())
     {
-        if (now - _at.getFirstProcessCallTimestamp() > 200 && _at.getFirstProcessCallTimestamp() != 0)
+        if (now - _at.getFirstProcessCallTimestamp() > 200)
         {
             _at.resetRxBuffer();
 
