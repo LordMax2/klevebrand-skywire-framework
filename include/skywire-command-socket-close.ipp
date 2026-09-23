@@ -5,5 +5,5 @@ SocketCloseSkywireCommand<RxBufferSize>::SocketCloseSkywireCommand(
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT#SH=1"), debug_mode, on_completed_function)
 {
-    static_assert(SkywireCommandConcept<SocketCloseSkywireCommand<RxBufferSize>>, "SocketCloseSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<SocketCloseSkywireCommand>, "SocketCloseSkywireCommand doesnt implement the concept");
 }

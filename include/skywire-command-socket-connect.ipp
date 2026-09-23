@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize>
 SocketConnectSkywireCommand<RxBufferSize>::SocketConnectSkywireCommand(
     HardwareSerial *skywire,

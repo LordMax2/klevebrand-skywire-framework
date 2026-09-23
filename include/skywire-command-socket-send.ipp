@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize, size_t SocketReceiveSize>
 SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::SocketSendSkywireCommand(
     HardwareSerial *skywire,
@@ -13,7 +14,7 @@ SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::SocketSendSkywireComm
       _has_sent_payload(false),
       _has_requested_response(false)
 {
-    static_assert(SkywireCommandConcept<SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>>, "SocketSendSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<SocketSendSkywireCommand>, "SocketSendSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize, size_t SocketReceiveSize>
@@ -31,7 +32,7 @@ SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>::SocketSendSkywireComm
       _has_sent_payload(false),
       _has_requested_response(false)
 {
-    static_assert(SkywireCommandConcept<SocketSendSkywireCommand<RxBufferSize, SocketReceiveSize>>, "SocketSendSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<SocketSendSkywireCommand>, "SocketSendSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize, size_t SocketReceiveSize>

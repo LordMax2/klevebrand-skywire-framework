@@ -1,9 +1,4 @@
-template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>
-DroneRequest_t SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>::_latest_drone_request_response{};
-
-template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>
-GpsLocationInfo_t SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>::_latest_gps_response{};
-
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>
 SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>::SkywireTcpGpsStepWorker(
     HardwareSerial *skywire_serial,
@@ -20,7 +15,7 @@ SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>:
       _send_state_command(skywire_serial, debug_mode, _state_message, false, nullptr),
       _socket_close_command(skywire_serial, debug_mode, nullptr)
 {
-    static_assert(SkywireWorkerConcept<SkywireTcpGpsStepWorker<RxBufferSize, SocketSendMessageSize, SocketReceiveSize>>, "SkywireTcpGpsStepWorker doesnt implement the concept");
+    static_assert(SkywireWorkerConcept<SkywireTcpGpsStepWorker>, "SkywireTcpGpsStepWorker doesnt implement the concept");
 }
 
 template<size_t RxBufferSize, size_t SocketSendMessageSize, size_t SocketReceiveSize>

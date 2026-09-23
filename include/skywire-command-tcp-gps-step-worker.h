@@ -38,8 +38,8 @@ public:
     static void setLatestGpsResponse(char *response);
 
 private:
-    static GpsLocationInfo_t _latest_gps_response;
-    static DroneRequest_t _latest_drone_request_response;
+    inline static GpsLocationInfo_t _latest_gps_response {};
+    inline static DroneRequest_t _latest_drone_request_response {};
 
     SkywireStepper<TCP_GPS_STEP_COUNT> _stepper;
     GpsAcpSkywireCommand<RxBufferSize> _gps_command;

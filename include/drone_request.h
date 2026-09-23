@@ -10,11 +10,11 @@ struct DroneRequest_t
     DroneRequest_t() = default;
 
     DroneRequest_t(
-        int flight_mode_id,
-        bool enable_power,
-        bool enable_motors,
-        float longitude,
-        float latitude) : flight_mode_id(flight_mode_id),
+        const int flight_mode_id,
+        const bool enable_power,
+        const bool enable_motors,
+        const float longitude,
+        const float latitude) : flight_mode_id(flight_mode_id),
                           enable_power(enable_power),
                           enable_motors(enable_motors),
                           longitude(longitude),
@@ -64,13 +64,14 @@ struct DroneRequest_t
             case 4:
                 latitude = atof(field_content);
                 break;
+            default: ;
             }
 
             field_index++;
             field_content = strtok(nullptr, ",");
         }
 
-        return DroneRequest_t(flight_mode_id, enable_power, enable_motors, longitude, latitude);
+        return {flight_mode_id, enable_power, enable_motors, longitude, latitude};
     }
 };
 

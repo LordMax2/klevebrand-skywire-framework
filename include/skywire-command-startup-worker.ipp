@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize>
 SkywireCommandStartupWorker<RxBufferSize>::SkywireCommandStartupWorker(
     HardwareSerial *skywire_serial,
@@ -13,7 +14,7 @@ SkywireCommandStartupWorker<RxBufferSize>::SkywireCommandStartupWorker(
       _enable_packet_data_command(skywire_serial, debug_mode, nullptr),
       _enable_gps_command(skywire_serial, debug_mode, nullptr)
 {
-    static_assert(SkywireWorkerConcept<SkywireCommandStartupWorker<RxBufferSize>>, "SkywireCommandStartupWorker doesnt implement the concept");
+    static_assert(SkywireWorkerConcept<SkywireCommandStartupWorker>, "SkywireCommandStartupWorker doesnt implement the concept");
 }
 
 template<size_t RxBufferSize>

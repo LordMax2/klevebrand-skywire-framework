@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize>
 NetworkConnectSkywireCommand<RxBufferSize>::NetworkConnectSkywireCommand(
     HardwareSerial *skywire,
@@ -6,7 +7,7 @@ NetworkConnectSkywireCommand<RxBufferSize>::NetworkConnectSkywireCommand(
     : _at(skywire, F("AT+CEREG?"), debug_mode, on_completed_function),
       _last_poll_timestamp(0)
 {
-    static_assert(SkywireCommandConcept<NetworkConnectSkywireCommand<RxBufferSize>>, "NetworkConnectSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<NetworkConnectSkywireCommand>, "NetworkConnectSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize>

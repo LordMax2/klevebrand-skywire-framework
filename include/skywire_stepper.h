@@ -14,7 +14,7 @@ class SkywireStepper
 public:
     explicit SkywireStepper(unsigned long timeout_milliseconds);
 
-    bool hasCompletedAllCommands() const;
+    [[nodiscard]] bool hasCompletedAllCommands() const;
 
     template<SkywireCommandConcept... Commands>
     SkywireStepResult stepCurrent(Commands &...commands);

@@ -25,22 +25,22 @@ public:
         OnCompletedFunction on_completed_function);
 
     SkywireResponseResult_t process();
-    bool completed() const;
+    [[nodiscard]] bool completed() const;
     void reset();
 
-    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+    [[nodiscard]] unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
 
-    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
+    [[nodiscard]] const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
 
-    char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
+    [[nodiscard]] char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
 private:
-    bool promptReceived() const;
-    bool responseReceived() const;
-    bool responseRetrySuggested() const;
+    [[nodiscard]] bool promptReceived() const;
+    [[nodiscard]] bool responseReceived() const;
+    [[nodiscard]] bool responseRetrySuggested() const;
     void writePayloadToModem();
     void readSocketResponse();
-    bool hasPayload() const;
+    [[nodiscard]] bool hasPayload() const;
 
     SkywireAtEngine<RxBufferSize> _at;
     const __FlashStringHelper *_flash_message;

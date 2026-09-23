@@ -17,16 +17,6 @@ inline void logSkywireStepTimeout(
     Serial.println(F("]"));
 }
 
-
-template<size_t RxBufferSize>
-HardwareSerial *SkywireAtEngine<RxBufferSize>::_skywire = nullptr;
-template<size_t RxBufferSize>
-bool SkywireAtEngine<RxBufferSize>::_debug_mode = false;
-template<size_t RxBufferSize>
-char SkywireAtEngine<RxBufferSize>::_rx_buffer[RxBufferSize] = {0};
-template<size_t RxBufferSize>
-size_t SkywireAtEngine<RxBufferSize>::_rx_buffer_cursor_index = 0;
-
 template<size_t RxBufferSize>
 SkywireAtEngine<RxBufferSize>::SkywireAtEngine(
     HardwareSerial *skywire,

@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize>
 EnableGpsSkywireCommand<RxBufferSize>::EnableGpsSkywireCommand(
     HardwareSerial *skywire,
@@ -5,7 +6,7 @@ EnableGpsSkywireCommand<RxBufferSize>::EnableGpsSkywireCommand(
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT$GPSP=1"), debug_mode, on_completed_function)
 {
-    static_assert(SkywireCommandConcept<EnableGpsSkywireCommand<RxBufferSize>>, "EnableGpsSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<EnableGpsSkywireCommand>, "EnableGpsSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize>

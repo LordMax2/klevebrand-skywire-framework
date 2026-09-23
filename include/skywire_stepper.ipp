@@ -1,12 +1,12 @@
 template<uint8_t StepCount>
-inline SkywireStepper<StepCount>::SkywireStepper(const unsigned long timeout_milliseconds)
+SkywireStepper<StepCount>::SkywireStepper(const unsigned long timeout_milliseconds)
     : _timeout_milliseconds(timeout_milliseconds),
       _step_cursor_index(0)
 {
 }
 
 template<uint8_t StepCount>
-inline bool SkywireStepper<StepCount>::hasCompletedAllCommands() const
+bool SkywireStepper<StepCount>::hasCompletedAllCommands() const
 {
     return _step_cursor_index >= StepCount;
 }
@@ -51,7 +51,7 @@ SkywireStepResult SkywireStepper<StepCount>::stepCurrent(Commands &...commands)
 {
     static_assert(sizeof...(Commands) == StepCount, "command list size must match step count");
 
-    SkywireStepResult result = SkywireStepResult::SequenceCompleted;
+    auto result = SkywireStepResult::SequenceCompleted;
     uint8_t command_index = 0;
 
     const auto step_matching_command = [&](auto &command) -> bool

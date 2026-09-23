@@ -6,7 +6,7 @@ SetApnHologramSkywireCommand<RxBufferSize>::SetApnHologramSkywireCommand(
     : _at(skywire, F("AT+CGDCONT=1,\"IPV4V6\",\"hologram\""), debug_mode, on_completed_function),
       _state(State::SendSet)
 {
-    static_assert(SkywireCommandConcept<SetApnHologramSkywireCommand<RxBufferSize>>, "SetApnHologramSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<SetApnHologramSkywireCommand>, "SetApnHologramSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize>

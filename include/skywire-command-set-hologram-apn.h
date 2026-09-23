@@ -15,13 +15,13 @@ public:
     SkywireResponseResult_t process();
     void reset();
 
-    bool completed() const { return _at.completed(); }
+    [[nodiscard]] bool completed() const { return _at.completed(); }
 
-    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+    [[nodiscard]] unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
 
-    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
+    [[nodiscard]] const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
 
-    char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
+    [[nodiscard]] char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
 private:
     enum class State

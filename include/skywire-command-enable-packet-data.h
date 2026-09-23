@@ -16,16 +16,16 @@ public:
 
     void reset() { _at.reset(); }
 
-    bool completed() const;
+    [[nodiscard]] bool completed() const;
 
-    unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
+    [[nodiscard]] unsigned long getLastSendTimestamp() const { return _at.getLastSendTimestamp(); }
 
-    const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
+    [[nodiscard]] const __FlashStringHelper *getCommand() const { return _at.getCommand(); }
 
-    char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
+    [[nodiscard]] char *getRxBuffer() const { return SkywireAtEngine<RxBufferSize>::getRxBuffer(); }
 
 private:
-    bool okReceived() const;
+    [[nodiscard]] bool okReceived() const;
 
     SkywireAtEngine<RxBufferSize> _at;
 };

@@ -1,3 +1,4 @@
+// ReSharper disable CppMissingIncludeGuard
 template<size_t RxBufferSize>
 EnablePacketDataSkywireCommand<RxBufferSize>::EnablePacketDataSkywireCommand(
     HardwareSerial *skywire,
@@ -5,7 +6,7 @@ EnablePacketDataSkywireCommand<RxBufferSize>::EnablePacketDataSkywireCommand(
     const OnCompletedFunction on_completed_function)
     : _at(skywire, F("AT#SGACT=1,1"), debug_mode, on_completed_function)
 {
-    static_assert(SkywireCommandConcept<EnablePacketDataSkywireCommand<RxBufferSize>>, "EnablePacketDataSkywireCommand doesnt implement the concept");
+    static_assert(SkywireCommandConcept<EnablePacketDataSkywireCommand>, "EnablePacketDataSkywireCommand doesnt implement the concept");
 }
 
 template<size_t RxBufferSize>

@@ -21,11 +21,11 @@ public:
 
     SkywireResponseResult_t process();
     void reset();
-    bool completed() const;
-    unsigned long getLastSendTimestamp() const;
-    const __FlashStringHelper *getCommand() const;
+    [[nodiscard]] bool completed() const;
+    [[nodiscard]] unsigned long getLastSendTimestamp() const;
+    [[nodiscard]] const __FlashStringHelper *getCommand() const;
 
-    bool okReceived() const;
+    [[nodiscard]] bool okReceived() const;
     bool waitForSendThenRead();
     void writeCommandToModem();
     void serialReadToRxBuffer();
@@ -33,12 +33,12 @@ public:
     static char *getRxBuffer();
 
     void recordFirstProcessCall();
-    unsigned long getFirstProcessCallTimestamp() const;
-    bool hasSent() const;
+    [[nodiscard]] unsigned long getFirstProcessCallTimestamp() const;
+    [[nodiscard]] bool hasSent() const;
     void setSent(bool has_sent);
     void setCompleted(bool is_completed);
-    bool hasMarkedCompleted() const;
-    bool hasCalledOnCompleted() const;
+    [[nodiscard]] bool hasMarkedCompleted() const;
+    [[nodiscard]] bool hasCalledOnCompleted() const;
     void setHasCalledOnCompleted(bool has_called_on_completed);
     void notifyCompletedIfNeeded();
 
@@ -47,16 +47,16 @@ public:
     void printToModem(char value);
     void printToModem(int value);
     void writeToModem(uint8_t value);
-    bool modemAvailable() const;
+    [[nodiscard]] bool modemAvailable() const;
 
     static bool debugMode();
     static void beginModem();
 
 private:
-    static HardwareSerial *_skywire;
-    static bool _debug_mode;
-    static char _rx_buffer[RxBufferSize];
-    static size_t _rx_buffer_cursor_index;
+    inline static HardwareSerial *_skywire = nullptr;
+    inline static bool _debug_mode = false;
+    inline static char _rx_buffer[RxBufferSize] = {0};
+    inline static size_t _rx_buffer_cursor_index = 0;
 
     const __FlashStringHelper *_command;
     OnCompletedFunction _on_completed_function;
