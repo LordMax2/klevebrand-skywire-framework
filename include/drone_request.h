@@ -14,11 +14,13 @@ struct DroneRequest_t
         const bool enable_power,
         const bool enable_motors,
         const float longitude,
-        const float latitude) : flight_mode_id(flight_mode_id),
+        const float latitude,
+        const float altitude) : flight_mode_id(flight_mode_id),
                           enable_power(enable_power),
                           enable_motors(enable_motors),
                           longitude(longitude),
-                          latitude(latitude)
+                          latitude(latitude),
+                          altitude(altitude)
     {
     }
 
@@ -27,10 +29,11 @@ struct DroneRequest_t
     bool enable_motors;
     float longitude;
     float latitude;
+    float altitude;
 
     static DroneRequest_t empty()
     {
-        return DroneRequest_t(0, false, false, 0.0f, 0.0f);
+        return DroneRequest_t(0, false, false, 0.0f, 0.0f, 0.0f);
     }
 
     static DroneRequest_t parseFromCsvString(char *value)
@@ -40,12 +43,13 @@ struct DroneRequest_t
         bool enable_motors = false;
         float longitude = 0;
         float latitude = 0;
+        float altitude = 0;
         char empty[] = "";
 
         char *field_content = strtok(value != nullptr ? value : empty, ",");
         int field_index = 0;
 
-        while (field_content != nullptr && field_index < 5)
+        while (field_content != nullptr && field_index < 6)
         {
             switch (field_index)
             {
@@ -64,6 +68,9 @@ struct DroneRequest_t
             case 4:
                 latitude = atof(field_content);
                 break;
+            case 5:
+                altitude = atof(field_content);
+                break;
             default: ;
             }
 
@@ -71,7 +78,7 @@ struct DroneRequest_t
             field_content = strtok(nullptr, ",");
         }
 
-        return {flight_mode_id, enable_power, enable_motors, longitude, latitude};
+        return {flight_mode_id, enable_power, enable_motors, longitude, latitude, altitude};
     }
 };
 
